@@ -18,6 +18,7 @@ namespace FlagCarrierWin
     public partial class MainForm : Form
     {
         private ProximityDevice device;
+        private long subId;
 
         public MainForm()
         {
@@ -31,7 +32,7 @@ namespace FlagCarrierWin
             } else {
                 device.DeviceArrived += DeviceArrived;
                 device.DeviceDeparted += DeviceDeparted;
-                device.SubscribeForMessage("NDEF", MessageReceived);
+                subId = device.SubscribeForMessage("NDEF", MessageReceived);
                 textLabel.Text = "Ready";
             }
         }
@@ -73,5 +74,40 @@ namespace FlagCarrierWin
                 }
             }));
 		}
+
+        private bool publishing = false;
+
+        private void writeButton_Click(object sender, EventArgs e)
+        {
+            if (publishing)
+                return;
+
+            Dictionary<string, string> data = new Dictionary<string, string>
+            {
+                { "display_name", "Timo" },
+                { "country_code", "US" },
+            };
+
+            byte[] binMsg = NdefHandler.GenerateRawNdefMessage(data);
+
+            DataWriter writer = new DataWriter();
+            writer.WriteBytes(binMsg);
+
+            device.StopSubscribingForMessage(subId);
+            device.PublishBinaryMessage("NDEF:WriteTag", writer.DetachBuffer(), HandleTransmitted);
+            publishing = true;
+        }
+
+        private void HandleTransmitted(ProximityDevice sender, long messageId)
+        {
+            device.StopPublishingMessage(messageId);
+            subId = device.SubscribeForMessage("NDEF", MessageReceived);
+            publishing = false;
+
+            Invoke(new Action(()=>
+            {
+                textLabel.Text = "Submitted Message!";
+            }));
+        }
     }
 }
