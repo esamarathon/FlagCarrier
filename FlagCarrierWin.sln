@@ -1,9 +1,10 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2035
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlagCarrierWin", "FlagCarrierWin.csproj", "{72A2029D-B144-48DE-A1A5-4A66BFA18674}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlagCarrierWin", "FlagCarrierWin\FlagCarrierWin.csproj", "{72A2029D-B144-48DE-A1A5-4A66BFA18674}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PcscSdk", "PcscSdk\PcscSdk.csproj", "{66037162-6421-4056-8E88-6FDBAB55E9FE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +16,10 @@ Global
 		{72A2029D-B144-48DE-A1A5-4A66BFA18674}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{72A2029D-B144-48DE-A1A5-4A66BFA18674}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{72A2029D-B144-48DE-A1A5-4A66BFA18674}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66037162-6421-4056-8E88-6FDBAB55E9FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66037162-6421-4056-8E88-6FDBAB55E9FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66037162-6421-4056-8E88-6FDBAB55E9FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66037162-6421-4056-8E88-6FDBAB55E9FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

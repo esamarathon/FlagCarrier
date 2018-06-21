@@ -8,11 +8,6 @@ namespace FlagCarrierWin
 {
     static class Program
     {
-        static Program()
-        {
-            CosturaUtility.Initialize();
-        }
-
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
