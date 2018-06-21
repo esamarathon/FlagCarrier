@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using Windows.Devices.Enumeration;
 using Windows.Devices.SmartCards;
-using Windows.Foundation.Metadata;
+using Pcsc;
 
 
 namespace FlagCarrierWin
@@ -15,17 +15,10 @@ namespace FlagCarrierWin
 	{
 		internal static async Task<SmartCardReader> FindNfcReaderAsync()
 		{
-			if (!ApiInformation.IsTypePresent("Windows.Devices.SmartCards.SmartCardConnection"))
-				return null;
+			DeviceInformation info = await SmartCardReaderUtils.GetFirstSmartCardReaderInfo(SmartCardReaderKind.Nfc);
+			if (info == null)
+				info = await SmartCardReaderUtils.GetFirstSmartCardReaderInfo(SmartCardReaderKind.Any);
 
-			string query = SmartCardReader.GetDeviceSelector(SmartCardReaderKind.Nfc);
-			string queryAny = SmartCardReader.GetDeviceSelector(SmartCardReaderKind.Any);
-
-			DeviceInformationCollection devices = await DeviceInformation.FindAllAsync(query);
-			if(devices.Count < 1)
-				devices = await DeviceInformation.FindAllAsync(queryAny);
-
-			DeviceInformation info = devices.Where(d => d.IsEnabled).OrderByDescending(d => d.IsDefault).FirstOrDefault();
 			if (info == null)
 				return null;
 

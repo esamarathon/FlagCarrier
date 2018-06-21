@@ -31,8 +31,8 @@ namespace FlagCarrierWin
             this.writeButton = new System.Windows.Forms.Button();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.readerNameLabel = new System.Windows.Forms.ToolStripStatusLabel();
-            this.readerStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.spacerLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.readerStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.outTextBox = new System.Windows.Forms.RichTextBox();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -65,17 +65,17 @@ namespace FlagCarrierWin
             this.readerNameLabel.Size = new System.Drawing.Size(61, 17);
             this.readerNameLabel.Text = "Initializing";
             // 
-            // readerStatusLabel
-            // 
-            this.readerStatusLabel.Name = "readerStatusLabel";
-            this.readerStatusLabel.Size = new System.Drawing.Size(58, 17);
-            this.readerStatusLabel.Text = "No Status";
-            // 
             // spacerLabel
             // 
             this.spacerLabel.Name = "spacerLabel";
             this.spacerLabel.Size = new System.Drawing.Size(666, 17);
             this.spacerLabel.Spring = true;
+            // 
+            // readerStatusLabel
+            // 
+            this.readerStatusLabel.Name = "readerStatusLabel";
+            this.readerStatusLabel.Size = new System.Drawing.Size(58, 17);
+            this.readerStatusLabel.Text = "No Status";
             // 
             // outTextBox
             // 
@@ -84,6 +84,7 @@ namespace FlagCarrierWin
             | System.Windows.Forms.AnchorStyles.Right)));
             this.outTextBox.Location = new System.Drawing.Point(19, 43);
             this.outTextBox.Name = "outTextBox";
+            this.outTextBox.ReadOnly = true;
             this.outTextBox.Size = new System.Drawing.Size(769, 382);
             this.outTextBox.TabIndex = 3;
             this.outTextBox.Text = "";
@@ -97,7 +98,7 @@ namespace FlagCarrierWin
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.writeButton);
             this.Name = "MainForm";
-            this.Text = "Form1";
+            this.Text = "FlagCarrier for Windows";
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
