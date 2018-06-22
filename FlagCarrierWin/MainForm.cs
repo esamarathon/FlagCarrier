@@ -16,15 +16,15 @@ using Windows.Storage.Streams;
 
 namespace FlagCarrierWin
 {
-    public partial class MainForm : Form
-    {
-        public MainForm()
-        {
-            InitializeComponent();
+	public partial class MainForm : Form
+	{
+		public MainForm()
+		{
+			InitializeComponent();
 		}
 
-        private void writeButton_Click(object sender, EventArgs e)
-        {
+		private void writeButton_Click(object sender, EventArgs e)
+		{
 			
 		}
 
