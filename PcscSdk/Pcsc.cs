@@ -1,4 +1,4 @@
-﻿//*********************************************************
+//*********************************************************
 //
 // Copyright (c) Microsoft. All rights reserved.
 // This code is licensed under the MIT License (MIT).
@@ -249,10 +249,20 @@ namespace Pcsc
         {
         }
     }
-    /// <summary>
-    /// PCSC Apdu response
-    /// </summary>
-    public class ApduResponse : Iso7816.ApduResponse
+	/// <summary>
+	/// PCSC Apdu response
+	/// </summary>
+	public class GetVersion : Iso7816.ApduCommand
+	{
+		public GetVersion()
+			: base((byte)Iso7816.Cla.ProprietaryCla9x, (byte)Pcsc.Ins.GetVersion, 0x00, 0x00, null, 0x00)
+		{
+		}
+	}
+	/// <summary>
+	/// PCSC Apdu response
+	/// </summary>
+	public class ApduResponse : Iso7816.ApduResponse
     {
         public ApduResponse()
             : base()

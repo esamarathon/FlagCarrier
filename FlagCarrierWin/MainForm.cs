@@ -12,7 +12,6 @@ using System.Windows.Forms;
 using Windows.Devices.SmartCards;
 using Pcsc;
 using Pcsc.Common;
-using MifareUltralight;
 using Windows.Storage.Streams;
 
 namespace FlagCarrierWin
@@ -85,17 +84,12 @@ namespace FlagCarrierWin
 					return;
 				}
 
-				byte[] cmd = new byte[4];
-				cmd[0] = 0x30;
-				cmd[1] = 3;
-				cmd[2] = 0;
-				cmd[3] = 0; // Calc CRC: https://stackoverflow.com/questions/202466/how-to-calculate-crc-b-in-c-sharp
-				byte[] res = (await con.TransmitAsync(cmd.AsBuffer())).ToArray();
-				AppendOutput("Got Test Resp: " + BitConverter.ToString(res) + "\r\n\r\n");
+				//new byte[] { 0x01, 0x00, 0x04, 0x01, 0x00, 0x00, 0x03, 0x98 };
 
-				return;
-
-				//await HandleMifareUL(new MifareUltralight.AccessHandler(con));
+				var cmd = new Iso7816.ApduCommand(0xFF, 0xB0, 0b0_00_00_001, 0x00, null, 16);
+				var resp = await con.TransceiveAsync(cmd);
+				byte[] res = new byte[] { resp.SW1, resp.SW2 };
+				AppendOutput("Response: " + BitConverter.ToString(res));
 			}
 		}
 
@@ -125,7 +119,7 @@ namespace FlagCarrierWin
 			AppendOutput(BitConverter.ToString(data));
 		}
 
-		private async Task<byte[]> DumpMifare(AccessHandler mifare, int capacity)
+		private async Task<byte[]> DumpMifare(MifareUltralight.AccessHandler mifare, int capacity)
 		{
 			byte[] res = new byte[capacity];
 

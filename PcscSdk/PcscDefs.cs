@@ -1,4 +1,4 @@
-﻿//*********************************************************
+//*********************************************************
 //
 // Copyright (c) Microsoft. All rights reserved.
 // This code is licensed under the MIT License (MIT).
@@ -124,5 +124,6 @@ namespace Pcsc
         Verify = 0x20,
         ReadBinary = 0xB0,
         UpdateBinary = 0xD6,
+		GetVersion = 0x60,
     }
 }
