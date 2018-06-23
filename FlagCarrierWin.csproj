@@ -70,6 +70,24 @@
     </Compile>
     <Compile Include="NdefHandler.cs" />
     <Compile Include="NfcHandler.cs" />
+    <Compile Include="PcscSdk\AtrParser.cs" />
+    <Compile Include="PcscSdk\CommonDefs.cs" />
+    <Compile Include="PcscSdk\DesfireAccessHandler.cs" />
+    <Compile Include="PcscSdk\DesfireCommand.cs" />
+    <Compile Include="PcscSdk\FelicaAccessHandler.cs" />
+    <Compile Include="PcscSdk\FelicaCommands.cs" />
+    <Compile Include="PcscSdk\IccDetection.cs" />
+    <Compile Include="PcscSdk\Iso15693AccessHandler.cs" />
+    <Compile Include="PcscSdk\Iso15693Commands.cs" />
+    <Compile Include="PcscSdk\Iso7816.cs" />
+    <Compile Include="PcscSdk\Iso7816Defs.cs" />
+    <Compile Include="PcscSdk\MifareStandardAccessHandler.cs" />
+    <Compile Include="PcscSdk\MifareStandardCommands.cs" />
+    <Compile Include="PcscSdk\MifareUltralightAccessHandler.cs" />
+    <Compile Include="PcscSdk\MifareUltralightCommands.cs" />
+    <Compile Include="PcscSdk\Pcsc.cs" />
+    <Compile Include="PcscSdk\PcscDefs.cs" />
+    <Compile Include="PcscSdk\PcscUtils.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProximityApiHandler.cs" />
@@ -117,12 +135,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\PcscSdk\PcscSdk.csproj">
-      <Project>{66037162-6421-4056-8e88-6fdbab55e9fe}</Project>
-      <Name>PcscSdk</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
