@@ -9,10 +9,8 @@
 //
 //*********************************************************
 
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Storage.Streams;
 
-namespace Pcsc
+namespace PcscSdk
 {
 	/// <summary>
 	/// PCSC GetData command
@@ -30,7 +28,7 @@ namespace Pcsc
 			get { return (GetDataDataType)base.P1; }
 		}
 		public GetData(GetDataDataType type)
-			: base((byte)Iso7816.Cla.ReservedForPts, (byte)Pcsc.Ins.GetData, (byte)type, 0, null, 0)
+			: base((byte)Iso7816.Cla.ReservedForPts, (byte)PcscSdk.Ins.GetData, (byte)type, 0, null, 0)
 		{
 		}
 	}
@@ -91,7 +89,7 @@ namespace Pcsc
 			get { return base.CommandData; }
 		}
 		public LoadKeys(LoadKeysKeyType keyType, byte? readerKeyNumber, LoadKeysTransmissionType transmissionType, LoadKeysStorageType storageType, byte keyNumber, byte[] keyData)
-			: base((byte)Iso7816.Cla.ReservedForPts, (byte)Pcsc.Ins.LoadKeys, (byte)((byte)keyType | (byte)transmissionType | (byte)storageType | (readerKeyNumber ?? 0)), keyNumber, keyData, null)
+			: base((byte)Iso7816.Cla.ReservedForPts, (byte)PcscSdk.Ins.LoadKeys, (byte)((byte)keyType | (byte)transmissionType | (byte)storageType | (readerKeyNumber ?? 0)), keyNumber, keyData, null)
 		{
 		}
 	}
@@ -134,7 +132,7 @@ namespace Pcsc
 			get { return base.CommandData[4]; }
 		}
 		public GeneralAuthenticate(GeneralAuthenticateVersionNumber version, ushort address, GeneralAuthenticateKeyType keyType, byte keyNo)
-			: base((byte)Iso7816.Cla.ReservedForPts, (byte)Pcsc.Ins.GeneralAuthenticate, 0, 0, new byte[5] { (byte)version, (byte)(address >> 8), (byte)(address & 0x00FF), (byte)keyType, keyNo }, null)
+			: base((byte)Iso7816.Cla.ReservedForPts, (byte)PcscSdk.Ins.GeneralAuthenticate, 0, 0, new byte[5] { (byte)version, (byte)(address >> 8), (byte)(address & 0x00FF), (byte)keyType, keyNo }, null)
 		{
 		}
 	}
@@ -144,7 +142,7 @@ namespace Pcsc
 	public class ReadBinary : Iso7816.ApduCommand
 	{
 		public ReadBinary(ushort address, byte? expectedReturnBytes)
-			: base((byte)Iso7816.Cla.ReservedForPts, (byte)Pcsc.Ins.ReadBinary, 0, 0, null, expectedReturnBytes)
+			: base((byte)Iso7816.Cla.ReservedForPts, (byte)PcscSdk.Ins.ReadBinary, 0, 0, null, expectedReturnBytes)
 		{
 			this.Address = address;
 		}
@@ -165,7 +163,7 @@ namespace Pcsc
 	public class UpdateBinary : Iso7816.ApduCommand
 	{
 		public UpdateBinary(ushort address, byte[] dataToWrite)
-			: base((byte)Iso7816.Cla.ReservedForPts, (byte)Pcsc.Ins.UpdateBinary, 0, 0, dataToWrite, null)
+			: base((byte)Iso7816.Cla.ReservedForPts, (byte)PcscSdk.Ins.UpdateBinary, 0, 0, dataToWrite, null)
 		{
 			this.Address = address;
 		}

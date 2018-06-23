@@ -1,4 +1,4 @@
-﻿//*********************************************************
+//*********************************************************
 //
 // Copyright (c) Microsoft. All rights reserved.
 // This code is licensed under the MIT License (MIT).
@@ -9,10 +9,10 @@
 //
 //*********************************************************
 
-using Windows.Storage.Streams;
-using System.Runtime.InteropServices.WindowsRuntime;
+using System.IO;
 
-namespace Pcsc.Common
+
+namespace PcscSdk.Common
 {
 	public class AtrInfo
 	{
@@ -50,7 +50,7 @@ namespace Pcsc.Common
 		/// <summary>
 		/// Historical bytes if present
 		/// </summary>
-		public IBuffer HistoricalBytes { set; get; }
+		public byte[] HistoricalBytes { set; get; }
 		/// <summary>
 		/// Check Byte valid
 		/// </summary>
@@ -77,7 +77,8 @@ namespace Pcsc.Common
 			byte initialChar = 0, formatByte = 0;
 			int supportedProtocols = 0;
 
-			using (DataReader reader = DataReader.FromBuffer(atrBytes.AsBuffer()))
+			using (MemoryStream mem = new MemoryStream(atrBytes))
+			using (BinaryReader reader = new BinaryReader(mem))
 			{
 				initialChar = reader.ReadByte();
 
@@ -109,7 +110,7 @@ namespace Pcsc.Common
 					supportedProtocols |= (1 << interfacePresence.LowNibble());
 				}
 
-				atrInfo.HistoricalBytes = reader.ReadBuffer(formatByte.LowNibble());
+				atrInfo.HistoricalBytes = reader.ReadBytes(formatByte.LowNibble());
 
 				if ((supportedProtocols & ~1) != 0)
 				{

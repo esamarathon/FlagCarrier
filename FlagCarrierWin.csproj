@@ -11,7 +11,6 @@
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <TargetPlatformVersion>8.0</TargetPlatformVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -45,21 +44,13 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Runtime.WindowsRuntime, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETCore\v4.5\System.Runtime.WindowsRuntime.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="Windows">
-      <HintPath>C:\Program Files (x86)\Windows Kits\10\UnionMetadata\10.0.17134.0\Windows.winmd</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainForm.cs">
@@ -72,13 +63,7 @@
     <Compile Include="NfcHandler.cs" />
     <Compile Include="PcscSdk\AtrParser.cs" />
     <Compile Include="PcscSdk\CommonDefs.cs" />
-    <Compile Include="PcscSdk\DesfireAccessHandler.cs" />
-    <Compile Include="PcscSdk\DesfireCommand.cs" />
-    <Compile Include="PcscSdk\FelicaAccessHandler.cs" />
-    <Compile Include="PcscSdk\FelicaCommands.cs" />
     <Compile Include="PcscSdk\IccDetection.cs" />
-    <Compile Include="PcscSdk\Iso15693AccessHandler.cs" />
-    <Compile Include="PcscSdk\Iso15693Commands.cs" />
     <Compile Include="PcscSdk\Iso7816.cs" />
     <Compile Include="PcscSdk\Iso7816Defs.cs" />
     <Compile Include="PcscSdk\MifareStandardAccessHandler.cs" />
@@ -90,8 +75,6 @@
     <Compile Include="PcscSdk\PcscUtils.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ProximityApiHandler.cs" />
-    <Compile Include="SmartCardUtils.cs" />
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -131,6 +114,9 @@
     </PackageReference>
     <PackageReference Include="NdefLibrary">
       <Version>4.1.0</Version>
+    </PackageReference>
+    <PackageReference Include="PCSC">
+      <Version>4.0.0</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

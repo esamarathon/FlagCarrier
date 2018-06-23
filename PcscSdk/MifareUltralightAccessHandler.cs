@@ -10,11 +10,9 @@
 //*********************************************************
 
 using System.Threading.Tasks;
-using Windows.Devices.SmartCards;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Storage.Streams;
 
-using Pcsc;
+using PCSC;
+using PcscSdk;
 using System;
 
 namespace MifareUltralight
@@ -28,16 +26,16 @@ namespace MifareUltralight
 		/// <summary>
 		/// connection object to smart card
 		/// </summary>
-		private SmartCardConnection connectionObject { set; get; }
+		private ICardReader cardReader { set; get; }
 		/// <summary>
 		/// Class constructor
 		/// </summary>
 		/// <param name="ScConnection">
 		/// connection object to a MifareUL ICC
 		/// </param>
-		public AccessHandler(SmartCardConnection ScConnection)
+		public AccessHandler(ICardReader cardReader)
 		{
-			connectionObject = ScConnection;
+			this.cardReader = cardReader;
 		}
 		/// <summary>
 		/// Wrapper method to read 16 bytes (4 pages) starting at pageAddress
@@ -48,9 +46,9 @@ namespace MifareUltralight
 		/// <returns>
 		/// byte array of 16 bytes
 		/// </returns>
-		public async Task<byte[]> ReadAsync(byte pageAddress)
+		public byte[] Read(byte pageAddress)
 		{
-			var apduRes = await connectionObject.TransceiveAsync(new MifareUltralight.Read(pageAddress));
+			var apduRes = cardReader.Transceive(new MifareUltralight.Read(pageAddress));
 
 			if (!apduRes.Succeeded)
 			{
@@ -66,14 +64,14 @@ namespace MifareUltralight
 		/// </param>
 		/// byte array of the data to write
 		/// </returns>
-		public async Task WriteAsync(byte pageAddress, byte[] data)
+		public void Write(byte pageAddress, byte[] data)
 		{
 			if (data.Length != 4)
 			{
 				throw new NotSupportedException();
 			}
 
-			var apduRes = await connectionObject.TransceiveAsync(new MifareUltralight.Write(pageAddress, ref data));
+			var apduRes = cardReader.Transceive(new MifareUltralight.Write(pageAddress, ref data));
 
 			if (!apduRes.Succeeded)
 			{
@@ -89,9 +87,9 @@ namespace MifareUltralight
 		/// <returns>
 		/// byte array of the read data
 		/// </returns>
-		public async Task<byte[]> TransparentExchangeAsync(byte[] commandData)
+		public byte[] TransparentExchange(byte[] commandData)
 		{
-			byte[] responseData = await connectionObject.TransparentExchangeAsync(commandData);
+			byte[] responseData = cardReader.TransparentExchange(commandData);
 
 			return responseData;
 		}
@@ -101,9 +99,9 @@ namespace MifareUltralight
 		/// <returns>
 		/// byte array UID
 		/// </returns>
-		public async Task<byte[]> GetUidAsync()
+		public byte[] GetUid()
 		{
-			var apduRes = await connectionObject.TransceiveAsync(new MifareUltralight.GetUid());
+			var apduRes = cardReader.Transceive(new MifareUltralight.GetUid());
 
 			if (!apduRes.Succeeded)
 			{

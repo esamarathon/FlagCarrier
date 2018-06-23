@@ -17,7 +17,7 @@ namespace MifareUltralight
 	/// Mifare UL Read commad when sent to the card the card is expected to return 16 byte of 4 Mifare
 	/// pages starting at address addr.
 	/// </summary>
-	public class Read : Pcsc.ReadBinary
+	public class Read : PcscSdk.ReadBinary
 	{
 		public Read(byte pageAddress)
 			: base(pageAddress, 16)
@@ -28,7 +28,7 @@ namespace MifareUltralight
 	/// Mifare UL Write commad when sent to the card, writes 4 bytes (1 Mifare block) at given
 	/// block address addr.
 	/// </summary>
-	public class Write : Pcsc.UpdateBinary
+	public class Write : PcscSdk.UpdateBinary
 	{
 		public byte[] Data
 		{
@@ -48,7 +48,7 @@ namespace MifareUltralight
 	/// <summary>
 	/// Mifare UL GetUid command
 	/// </summary>
-	public class GetUid : Pcsc.GetUid
+	public class GetUid : PcscSdk.GetUid
 	{
 		public GetUid()
 			: base()
@@ -58,7 +58,7 @@ namespace MifareUltralight
 	/// <summary>
 	/// Mifare UL GetHistoricalBytes command
 	/// </summary>
-	public class GetHistoricalBytes : Pcsc.GetHistoricalBytes
+	public class GetHistoricalBytes : PcscSdk.GetHistoricalBytes
 	{
 		public GetHistoricalBytes()
 			: base()
@@ -68,7 +68,7 @@ namespace MifareUltralight
 	/// <summary>
 	/// Mifare response APDU
 	/// </summary>
-	public class ApduResponse : Pcsc.ApduResponse
+	public class ApduResponse : PcscSdk.ApduResponse
 	{
 		public ApduResponse()
 			: base()

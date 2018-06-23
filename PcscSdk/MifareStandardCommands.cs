@@ -16,7 +16,7 @@ namespace MifareStandard
 	/// <summary>
 	/// Mifare Standard Read commad when sent to the card the card is expected to return 16 bytes
 	/// </summary>
-	public class Read : Pcsc.ReadBinary
+	public class Read : PcscSdk.ReadBinary
 	{
 		public Read(ushort address)
 			: base(address, 16)
@@ -26,7 +26,7 @@ namespace MifareStandard
 	/// <summary>
 	/// Mifare Standard Write commad when sent to the card, writes 16 bytes at a time
 	/// </summary>
-	public class Write : Pcsc.UpdateBinary
+	public class Write : PcscSdk.UpdateBinary
 	{
 		public byte[] Data
 		{
@@ -46,7 +46,7 @@ namespace MifareStandard
 	/// <summary>
 	/// Mifare Standard GetUid command
 	/// </summary>
-	public class GetUid : Pcsc.GetUid
+	public class GetUid : PcscSdk.GetUid
 	{
 		public GetUid()
 			: base()
@@ -56,7 +56,7 @@ namespace MifareStandard
 	/// <summary>
 	/// Mifare Standard GetHistoricalBytes command
 	/// </summary>
-	public class GetHistoricalBytes : Pcsc.GetHistoricalBytes
+	public class GetHistoricalBytes : PcscSdk.GetHistoricalBytes
 	{
 		public GetHistoricalBytes()
 			: base()
@@ -67,7 +67,7 @@ namespace MifareStandard
 	/// Mifare Standard Load Keys commad which stores the supplied key into the specified numbered key slot
 	/// for subsequent use by the General Authenticate command.
 	/// </summary>
-	public class LoadKey : Pcsc.LoadKeys
+	public class LoadKey : PcscSdk.LoadKeys
 	{
 		public LoadKey(byte[] mifareKey, byte keySlotNumber)
 			: base(LoadKeysKeyType.CardKey, null, LoadKeysTransmissionType.Plain, LoadKeysStorageType.Volatile, keySlotNumber, mifareKey)
@@ -77,7 +77,7 @@ namespace MifareStandard
 	/// <summary>
 	/// Mifare Standard GetHistoricalBytes command
 	/// </summary>
-	public class GeneralAuthenticate : Pcsc.GeneralAuthenticate
+	public class GeneralAuthenticate : PcscSdk.GeneralAuthenticate
 	{
 		public GeneralAuthenticate(ushort address, byte keySlotNumber, GeneralAuthenticateKeyType keyType)
 			: base(GeneralAuthenticateVersionNumber.VersionOne, address, keyType, keySlotNumber)
@@ -91,7 +91,7 @@ namespace MifareStandard
 	/// <summary>
 	/// Mifare response APDU
 	/// </summary>
-	public class ApduResponse : Pcsc.ApduResponse
+	public class ApduResponse : PcscSdk.ApduResponse
 	{
 		public ApduResponse()
 			: base()

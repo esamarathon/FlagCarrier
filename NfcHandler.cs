@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Threading.Tasks;
-using Windows.Devices.SmartCards;
-using Pcsc;
-using Pcsc.Common;
-using Windows.Devices.Enumeration;
+
 using NdefLibrary.Ndef;
-using MifareUltralight;
+using PCSC;
+using PCSC.Utils;
+using PCSC.Monitoring;
+using PCSC.Exceptions;
+
+using PcscSdk;
+using PcscSdk.Common;
+
 
 namespace FlagCarrierWin
 {
@@ -31,46 +35,18 @@ namespace FlagCarrierWin
 
 	class NfcHandler : IDisposable
 	{
-		public static async Task<List<DeviceInformation>> GetAvailableReaders()
+		private static readonly IContextFactory contextFactory = ContextFactory.Instance;
+
+		public static string[] GetReaderNames()
 		{
-			if (!Windows.Foundation.Metadata.ApiInformation.IsTypePresent("Windows.Devices.SmartCards.SmartCardConnection"))
-				throw new NfcHandlerException("NFC reading is not supported on this platform");
-
-			string query = "System.Devices.InterfaceClassGuid:=\"{DEEBE6AD-9E01-47E2-A3B2-A66AA2C036C9}\"";
-			string nfcQuery = query + " AND System.Devices.SmartCards.ReaderKind:=3";
-			DeviceInformationCollection nfc = await DeviceInformation.FindAllAsync(nfcQuery);
-			DeviceInformationCollection any = await DeviceInformation.FindAllAsync(query);
-
-			List<DeviceInformation> infos = nfc.ToList();
-			infos.AddRange(any);
-
-			return infos
-				.GroupBy(i => i.Id)
-				.Select(g => g.First())
-				.OrderByDescending(i => i.IsDefault)
-				.ToList();
+			using (var ctx = contextFactory.Establish(SCardScope.System))
+			{
+				return ctx.GetReaders();
+			}
 		}
 
-		public static async Task<NfcHandler> GetFromDevInfoAsync(DeviceInformation info)
+		public NfcHandler()
 		{
-			if (!info.IsEnabled)
-				throw new NfcHandlerException("Reader " + info.Name + " is disabled");
-
-			return await GetFromDevIdAsync(info.Id);
-		}
-
-		public static async Task<NfcHandler> GetFromDevIdAsync(string devid)
-		{
-			SmartCardReader reader = await SmartCardReader.FromIdAsync(devid);
-			return new NfcHandler(reader);
-		}
-
-		private NfcHandler(SmartCardReader reader)
-		{
-			this.reader = reader;
-
-			reader.CardAdded += Reader_CardAdded;
-			reader.CardRemoved += Reader_CardRemoved;
 		}
 
 		~NfcHandler()
@@ -80,11 +56,14 @@ namespace FlagCarrierWin
 
 		public void Dispose()
 		{
-			if (reader != null)
+			if (monitor != null)
 			{
-				reader.CardAdded -= Reader_CardAdded;
-				reader.CardRemoved -= Reader_CardRemoved;
-				reader = null;
+				monitor.Cancel();
+				monitor.CardInserted -= Monitor_CardInserted;
+				monitor.CardRemoved -= Monitor_CardRemoved;
+				monitor.MonitorException -= Monitor_MonitorException;
+				monitor.Dispose();
+				monitor = null;
 			}
 		}
 
@@ -93,52 +72,82 @@ namespace FlagCarrierWin
 		public event Action CardAdded;
 		public event Action<NdefMessage> ReceiveNdefMessage;
 
-		private SmartCardReader reader;
 		private byte[] ndefDataToWrite;
+		private ISCardMonitor monitor;
+
+		public void StartMonitoring(string[] readerNames = null)
+		{
+			if (monitor == null)
+			{
+				var monitorFactory = MonitorFactory.Instance;
+				monitor = monitorFactory.Create(SCardScope.System);
+				monitor.CardInserted += Monitor_CardInserted;
+				monitor.CardRemoved += Monitor_CardRemoved;
+				monitor.MonitorException += Monitor_MonitorException;
+			}
+
+			monitor.Cancel();
+
+			if(readerNames != null)
+			{
+				monitor.Start(readerNames);
+			}
+			else
+			{
+				monitor.Start(GetReaderNames());
+			}
+		}
 
 		public void WriteNdefMessage(NdefMessage msg)
 		{
 			ndefDataToWrite = msg.ToByteArray();
 		}
 
-		private void Reader_CardRemoved(SmartCardReader sender, CardRemovedEventArgs args)
-		{
-			StatusMessage?.Invoke("Tag removed");
-		}
-
-		private async void Reader_CardAdded(SmartCardReader sender, CardAddedEventArgs args)
+		private void Monitor_CardInserted(object sender, CardStatusEventArgs args)
 		{
 			CardAdded?.Invoke();
 			StatusMessage?.Invoke("Tag detected");
 
 			try
 			{
-				await HandleSmartCard(args.SmartCard);
-			} catch(Exception e)
+				HandleSmartCard(args.ReaderName);
+			}
+			catch (Exception e)
 			{
 				ErrorMessage?.Invoke("Error handling tag:\r\n" + e.ToString() + "\r\n");
 			}
 		}
 
-		private async Task HandleSmartCard(SmartCard card)
+		private void Monitor_CardRemoved(object sender, CardStatusEventArgs args)
 		{
-			using (SmartCardConnection con = await card.ConnectAsync())
+			StatusMessage?.Invoke("Tag removed");
+		}
+
+		private void Monitor_MonitorException(object sender, PCSCException exception)
+		{
+			ErrorMessage?.Invoke("Monitoring Error: " + exception.Message);
+		}
+
+		private void HandleSmartCard(String readerName)
+		{
+			using (ISCardContext ctx = contextFactory.Establish(SCardScope.System))
+			using (ICardReader reader = ctx.ConnectReader(readerName, SCardShareMode.Shared, SCardProtocol.Any))
 			{
 				StatusMessage?.Invoke("Connected to tag");
 
-				IccDetection cardIdent = new IccDetection(card, con);
-				await cardIdent.DetectCardTypeAync();
+				IccDetection cardIdent = new IccDetection(reader);
+				cardIdent.DetectCardType();
 
 				StatusMessage?.Invoke("Device class: " + cardIdent.PcscDeviceClass.ToString());
 				StatusMessage?.Invoke("Card name: " + cardIdent.PcscCardName.ToString());
 				StatusMessage?.Invoke("ATR: " + BitConverter.ToString(cardIdent.Atr));
 
-				if (cardIdent.PcscDeviceClass == Pcsc.Common.DeviceClass.StorageClass &&
+				if (cardIdent.PcscDeviceClass == PcscSdk.Common.DeviceClass.StorageClass &&
 					(cardIdent.PcscCardName == CardName.MifareUltralight
 					|| cardIdent.PcscCardName == CardName.MifareUltralightC
 					|| cardIdent.PcscCardName == CardName.MifareUltralightEV1))
 				{
-					await HandleMifareUL(con);
+					HandleMifareUL(reader);
 				}
 				else
 				{
@@ -147,16 +156,16 @@ namespace FlagCarrierWin
 			}
 		}
 
-		private async Task HandleMifareUL(SmartCardConnection con)
+		private void HandleMifareUL(ICardReader reader)
 		{
-			var mifare = new MifareUltralight.AccessHandler(con);
+			var mifare = new MifareUltralight.AccessHandler(reader);
 
 			StatusMessage?.Invoke("Handling as Mifare Ultralight");
 
-			byte[] uid = await mifare.GetUidAsync();
+			byte[] uid = mifare.GetUid();
 			StatusMessage?.Invoke("UID: " + BitConverter.ToString(uid));
 
-			byte[] infoData = await mifare.ReadAsync(0);
+			byte[] infoData = mifare.Read(0);
 			StatusMessage?.Invoke("CC: " + BitConverter.ToString(infoData.Skip(12).ToArray()));
 
 			byte identMagic = infoData[12];
@@ -172,19 +181,19 @@ namespace FlagCarrierWin
 
 			if(ndefDataToWrite != null)
 			{
-				await WriteNdefToMifareUL(mifare, ndefDataToWrite);
+				WriteNdefToMifareUL(mifare, ndefDataToWrite);
 				ndefDataToWrite = null;
 			}
 			else
 			{
-				byte[] data = await DumpMifareUL(mifare);
+				byte[] data = DumpMifareUL(mifare);
 				ParseTLVData(data);
 			}
 		}
 
-		private async Task WriteNdefToMifareUL(AccessHandler mifare, byte[] ndefData)
+		private void WriteNdefToMifareUL(MifareUltralight.AccessHandler mifare, byte[] ndefData)
 		{
-			byte[] infoData = await mifare.ReadAsync(3);
+			byte[] infoData = mifare.Read(3);
 			int capacity = infoData[2] * 8;
 
 			byte[] wrappedData;
@@ -219,22 +228,22 @@ namespace FlagCarrierWin
 
 			for (byte pos = 4; (pos - 4) * 4 < wrappedData.Length; pos++)
 			{
-				await mifare.WriteAsync(pos, wrappedData.Skip((pos - 4) * 4).Take(4).ToArray());
+				mifare.Write(pos, wrappedData.Skip((pos - 4) * 4).Take(4).ToArray());
 			}
 
 			StatusMessage?.Invoke("Written " + data_length + " bytes of data. Ndef message length is " + ndefData.Length + " bytes.");
 		}
 
-		private async Task<byte[]> DumpMifareUL(MifareUltralight.AccessHandler mifare)
+		private byte[] DumpMifareUL(MifareUltralight.AccessHandler mifare)
 		{
-			byte[] infoData = await mifare.ReadAsync(3);
+			byte[] infoData = mifare.Read(3);
 			int bytes_left = infoData[2] * 8;
 
 			byte[] res = new byte[bytes_left];
 
 			for (byte pos = 4; bytes_left > 0; pos += 4, bytes_left -= 16)
 			{
-				byte[] data = await mifare.ReadAsync(pos);
+				byte[] data = mifare.Read(pos);
 				if (bytes_left < 16)
 					data = data.Take(bytes_left).ToArray();
 

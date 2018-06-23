@@ -1,4 +1,4 @@
-﻿//*********************************************************
+//*********************************************************
 //
 // Copyright (c) Microsoft. All rights reserved.
 // This code is licensed under the MIT License (MIT).
@@ -10,11 +10,8 @@
 //*********************************************************
 
 using System.Threading.Tasks;
-using Windows.Devices.SmartCards;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Storage.Streams;
-
-using Pcsc;
+using PCSC;
+using PcscSdk;
 using System;
 
 namespace MifareStandard
@@ -32,16 +29,16 @@ namespace MifareStandard
 		/// <summary>
 		/// connection object to smart card
 		/// </summary>
-		private SmartCardConnection connectionObject { set; get; }
+		private ICardReader cardReader { set; get; }
 		/// <summary>
 		/// Class constructor
 		/// </summary>
 		/// <param name="ScConnection">
 		/// connection object to a Mifare Standard ICC
 		/// </param>
-		public AccessHandler(SmartCardConnection ScConnection)
+		public AccessHandler(ICardReader cardReader)
 		{
-			connectionObject = ScConnection;
+			this.cardReader = cardReader;
 		}
 		/// <summary>
 		/// Wrapper method to read 16 bytes
@@ -52,9 +49,9 @@ namespace MifareStandard
 		/// <returns>
 		/// byte array of 16 bytes
 		/// </returns>
-		public async Task LoadKeyAsync(byte[] mifareKey, byte keySlotNumber = 0)
+		public void LoadKey(byte[] mifareKey, byte keySlotNumber = 0)
 		{
-			var apduRes = await connectionObject.TransceiveAsync(new MifareStandard.LoadKey(mifareKey, keySlotNumber));
+			var apduRes = cardReader.Transceive(new MifareStandard.LoadKey(mifareKey, keySlotNumber));
 
 			if (!apduRes.Succeeded)
 			{
@@ -78,15 +75,15 @@ namespace MifareStandard
 		/// <returns>
 		/// byte array of 16 bytes
 		/// </returns>
-		public async Task<byte[]> ReadAsync(ushort blockNumber, GeneralAuthenticate.GeneralAuthenticateKeyType keyType, byte keySlotNumber = 0)
+		public byte[] Read(ushort blockNumber, GeneralAuthenticate.GeneralAuthenticateKeyType keyType, byte keySlotNumber = 0)
 		{
-			var genAuthRes = await connectionObject.TransceiveAsync(new MifareStandard.GeneralAuthenticate(blockNumber, keySlotNumber, keyType));
+			var genAuthRes = cardReader.Transceive(new MifareStandard.GeneralAuthenticate(blockNumber, keySlotNumber, keyType));
 			if (!genAuthRes.Succeeded)
 			{
 				throw new Exception("Failure authenticating to MIFARE Standard card, " + genAuthRes.ToString());
 			}
 
-			var readRes = await connectionObject.TransceiveAsync(new MifareStandard.Read(blockNumber));
+			var readRes = cardReader.Transceive(new MifareStandard.Read(blockNumber));
 			if (!readRes.Succeeded)
 			{
 				throw new Exception("Failure reading MIFARE Standard card, " + readRes.ToString());
@@ -107,20 +104,20 @@ namespace MifareStandard
 		/// </param>
 		/// byte array of the data to write
 		/// </returns>
-		public async void WriteAsync(byte blockNumber, byte[] data, GeneralAuthenticate.GeneralAuthenticateKeyType keyType, byte keySlotNumber = 0)
+		public void Write(byte blockNumber, byte[] data, GeneralAuthenticate.GeneralAuthenticateKeyType keyType, byte keySlotNumber = 0)
 		{
 			if (data.Length != 16)
 			{
 				throw new NotSupportedException();
 			}
 
-			var genAuthRes = await connectionObject.TransceiveAsync(new MifareStandard.GeneralAuthenticate(blockNumber, keySlotNumber, keyType));
+			var genAuthRes = cardReader.Transceive(new MifareStandard.GeneralAuthenticate(blockNumber, keySlotNumber, keyType));
 			if (!genAuthRes.Succeeded)
 			{
 				throw new Exception("Failure authenticating to MIFARE Standard card, " + genAuthRes.ToString());
 			}
 
-			var apduRes = await connectionObject.TransceiveAsync(new MifareStandard.Write(blockNumber, ref data));
+			var apduRes = cardReader.Transceive(new MifareStandard.Write(blockNumber, ref data));
 			if (!apduRes.Succeeded)
 			{
 				throw new Exception("Failure writing MIFARE Standard card, " + apduRes.ToString());
@@ -135,9 +132,9 @@ namespace MifareStandard
 		/// <returns>
 		/// byte array of the read data
 		/// </returns>
-		public async Task<byte[]> TransparentExchangeAsync(byte[] commandData)
+		public byte[] TransparentExchange(byte[] commandData)
 		{
-			byte[] responseData = await connectionObject.TransparentExchangeAsync(commandData);
+			byte[] responseData = cardReader.TransparentExchange(commandData);
 
 			return responseData;
 		}
@@ -147,9 +144,9 @@ namespace MifareStandard
 		/// <returns>
 		/// byte array UID
 		/// </returns>
-		public async Task<byte[]> GetUidAsync()
+		public byte[] GetUid()
 		{
-			var apduRes = await connectionObject.TransceiveAsync(new MifareStandard.GetUid());
+			var apduRes = cardReader.Transceive(new MifareStandard.GetUid());
 			if (!apduRes.Succeeded)
 			{
 				throw new Exception("Failure getting UID of MIFARE Standard card, " + apduRes.ToString());

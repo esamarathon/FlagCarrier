@@ -1,4 +1,4 @@
-﻿//*********************************************************
+//*********************************************************
 //
 // Copyright (c) Microsoft. All rights reserved.
 // This code is licensed under the MIT License (MIT).
@@ -10,14 +10,12 @@
 //*********************************************************
 
 using System;
-using Windows.Devices.SmartCards;
-
-using Windows.Storage.Streams;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
+using System.IO;
+using PCSC;
 
-namespace Pcsc.Common
+namespace PcscSdk.Common
 {
 	/// <summary>
 	/// Class used to detect the type of the ICC card detected. It accept a connection object
@@ -33,7 +31,7 @@ namespace Pcsc.Common
 		/// <summary>
 		/// PCSC card name provided in the nn short int
 		/// </summary>
-		public Pcsc.CardName PcscCardName { set; get; }
+		public PcscSdk.CardName PcscCardName { set; get; }
 		/// <summary>
 		/// ATR byte array
 		/// </summary>
@@ -45,11 +43,7 @@ namespace Pcsc.Common
 		/// <summary>
 		/// smard card object passed in the constructor
 		/// </summary>
-		private SmartCard smartCard { set; get; }
-		/// <summary>
-		/// Smard card connection passed in the constructor
-		/// </summary>
-		private SmartCardConnection connectionObject  { set; get; }
+		private ICardReader cardReader { set; get; }
 		/// <summary>
 		/// class constructor.
 		/// </summary>
@@ -59,12 +53,11 @@ namespace Pcsc.Common
 		/// <param name="connection">
 		/// connection object to the smard card
 		/// </param>
-		public IccDetection(SmartCard card, SmartCardConnection connection) 
+		public IccDetection(ICardReader card)
 		{
-			smartCard = card;
-			connectionObject = connection;
+			cardReader = card;
 			PcscDeviceClass = DeviceClass.Unknown;
-			PcscCardName = Pcsc.CardName.Unknown;
+			PcscCardName = PcscSdk.CardName.Unknown;
 		}
 		/// <summary>
 		/// Detects the ICC type by parsing, and analyzing the ATR
@@ -72,25 +65,18 @@ namespace Pcsc.Common
 		/// <returns>
 		/// none
 		/// </returns>
-		public async System.Threading.Tasks.Task DetectCardTypeAync()
+		public void DetectCardType()
 		{
-			try
+			ReaderStatus status = cardReader.GetStatus();
+			Atr = status.GetAtr();
+
+			Debug.WriteLine("Status: " + status.State.ToString() + " ATR [" + Atr.Length + "] = " + BitConverter.ToString(Atr));
+
+			AtrInformation = AtrParser.Parse(Atr);
+
+			if (AtrInformation != null && AtrInformation.HistoricalBytes.Length > 0)
 			{
-				var atrBuffer = await smartCard.GetAnswerToResetAsync();
-				Atr = atrBuffer.ToArray();
-
-				Debug.WriteLine("Status: " + (await smartCard.GetStatusAsync()) + "ATR [" + atrBuffer.Length.ToString() + "] = " + BitConverter.ToString(Atr));
-
-				AtrInformation = AtrParser.Parse(Atr);
-
-				if (AtrInformation != null && AtrInformation.HistoricalBytes.Length > 0)
-				{
-					DetectCard();
-				}
-			}
-			catch (Exception e)
-			{
-				Debug.WriteLine(e.Message + e.StackTrace);
+				DetectCard();
 			}
 		}
 		/// <summary>
@@ -103,41 +89,43 @@ namespace Pcsc.Common
 			{
 				byte categoryIndicator;
 
-				using (DataReader reader = DataReader.FromBuffer(AtrInformation.HistoricalBytes))
+				using (MemoryStream mem = new MemoryStream(AtrInformation.HistoricalBytes))
+				using (BinaryReader reader = new BinaryReader(mem))
 				{
 					categoryIndicator = reader.ReadByte();
 
 					if (categoryIndicator == (byte)CategoryIndicator.StatusInfoPresentInTlv)
 					{
-						while (reader.UnconsumedBufferLength > 0)
+						while (reader.BaseStream.Position < reader.BaseStream.Length)
 						{
 							const byte appIdPresenceIndTag = 0x4F;
 							const byte appIdPresenceIndTagLen = 0x0C;
 
 							var tagValue = reader.ReadByte();
 							var tagLength = reader.ReadByte();
-							
+
 							if (tagValue == appIdPresenceIndTag && tagLength == appIdPresenceIndTagLen)
 							{
 								byte[] pcscRid = { 0xA0, 0x00, 0x00, 0x03, 0x06 };
-								byte[] pcscRidRead = new byte[pcscRid.Length];
-
-								reader.ReadBytes(pcscRidRead);
+								byte[] pcscRidRead = reader.ReadBytes(pcscRid.Length);
 
 								if (pcscRid.SequenceEqual(pcscRidRead))
 								{
 									byte storageStandard = reader.ReadByte();
-									ushort cardName = reader.ReadUInt16();
 
-									PcscCardName = (Pcsc.CardName)cardName;
+									byte[] cardNameData = reader.ReadBytes(2);
+									if (BitConverter.IsLittleEndian)
+										Array.Reverse(cardNameData);
+
+									PcscCardName = (PcscSdk.CardName)BitConverter.ToUInt16(cardNameData, 0);
 									PcscDeviceClass = DeviceClass.StorageClass;
 								}
 
-								reader.ReadBuffer(4); // RFU bytes
+								reader.ReadBytes(4); // RFU bytes
 							}
 							else
 							{
-								reader.ReadBuffer(tagLength);
+								reader.ReadBytes(tagLength);
 							}
 						}
 					}

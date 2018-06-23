@@ -12,8 +12,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using Windows.Storage.Streams;
-using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace Iso7816
 {
@@ -72,9 +70,9 @@ namespace Iso7816
 		/// <returns>
 		/// buffer holds the current wire/air format of the command
 		/// </returns>
-		public IBuffer GetBuffer()
+		public byte[] ToByteArray()
 		{
-			using (DataWriter writer = new DataWriter())
+			using (MemoryStream writer = new MemoryStream())
 			{
 				writer.WriteByte(CLA);
 				writer.WriteByte(INS);
@@ -84,7 +82,7 @@ namespace Iso7816
 				if (CommandData != null && CommandData.Length > 0)
 				{
 					writer.WriteByte((byte)CommandData.Length);
-					writer.WriteBytes(CommandData);
+					writer.Write(CommandData, 0, CommandData.Length);
 				}
 
 				if (Le != null)
@@ -92,7 +90,7 @@ namespace Iso7816
 					writer.WriteByte((byte)Le);
 				}
 
-				return writer.DetachBuffer();
+				return writer.ToArray();
 			}
 		}
 		/// <summary>
@@ -123,16 +121,16 @@ namespace Iso7816
 		/// method to extract the response data, status and qualifier
 		/// </summary>
 		/// <param name="response"></param>
-		public virtual void ExtractResponse(IBuffer response)
+		public virtual void ExtractResponse(byte[] response)
 		{
 			if (response.Length < 2)
 			{
 				throw new InvalidOperationException("APDU response must be at least 2 bytes, got " + response.Length);
 			}
-			using (DataReader reader = DataReader.FromBuffer(response))
+			using (MemoryStream mem = new MemoryStream(response))
+			using (BinaryReader reader = new BinaryReader(mem))
 			{
-				ResponseData = new byte[response.Length - 2];
-				reader.ReadBytes(ResponseData);
+				ResponseData = reader.ReadBytes(response.Length - 2);
 				SW1 = reader.ReadByte();
 				SW2 = reader.ReadByte();
 			}
@@ -142,11 +140,12 @@ namespace Iso7816
 		/// </summary>
 		public byte[] ExtractTlvDataObject(byte[] referenceTag)
 		{
-			using (var reader = DataReader.FromBuffer(ResponseData.AsBuffer()))
+			using (MemoryStream mem = new MemoryStream(ResponseData))
+			using (BinaryReader reader = new BinaryReader(mem))
 			{
 				byte nextByte;
 
-				while (reader.UnconsumedBufferLength > 0)
+				while (reader.BaseStream.Position < reader.BaseStream.Length)
 				{
 					int lengthLength = 0, valueLength = 0;
 					MemoryStream tag = new MemoryStream(), value = new MemoryStream();
@@ -156,7 +155,7 @@ namespace Iso7816
 
 					if ((nextByte & TAG_MULTI_BYTE_MASK) == TAG_MULTI_BYTE_MASK)
 					{
-						while (reader.UnconsumedBufferLength > 0)
+						while (reader.BaseStream.Position < reader.BaseStream.Length)
 						{
 							nextByte = reader.ReadByte();
 							tag.WriteByte(nextByte);
@@ -166,7 +165,7 @@ namespace Iso7816
 						}
 					}
 
-					if (reader.UnconsumedBufferLength == 0)
+					if (reader.BaseStream.Position >= reader.BaseStream.Length)
 						throw new Exception("Invalid length for TLV response");
 
 					valueLength = reader.ReadByte();

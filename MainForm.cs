@@ -9,10 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-using Windows.Devices.SmartCards;
-using Pcsc;
-using Pcsc.Common;
-using Windows.Storage.Streams;
+using PcscSdk;
+using PcscSdk.Common;
 
 namespace FlagCarrierWin
 {
@@ -23,6 +21,19 @@ namespace FlagCarrierWin
 		public MainForm()
 		{
 			InitializeComponent();
+		}
+
+		protected override void Dispose(bool disposing)
+		{
+			if (disposing)
+			{
+				if (components != null)
+					components.Dispose();
+
+				if(nfcHandler != null)
+					nfcHandler.Dispose();
+			}
+			base.Dispose(disposing);
 		}
 
 		private void writeButton_Click(object sender, EventArgs args)
@@ -38,24 +49,15 @@ namespace FlagCarrierWin
 			outTextBox.Text = "Scan tag now!";
 		}
 
-		private async void MainForm_Load(object sender, EventArgs args)
+		private void MainForm_Load(object sender, EventArgs args)
 		{
 			try
 			{
-				var readers = await NfcHandler.GetAvailableReaders();
-				if(readers.Count < 1)
-				{
-					readerNameLabel.Text = "No reader found";
-					return;
-				}
-
-				var reader = readers.First();
-				readerNameLabel.Text = reader.Name;
-
-				nfcHandler = await NfcHandler.GetFromDevInfoAsync(reader);
+				nfcHandler = new NfcHandler();
 				nfcHandler.StatusMessage += AppendOutput;
 				nfcHandler.ErrorMessage += AppendOutput;
 				nfcHandler.CardAdded += ClearOutput;
+				nfcHandler.StartMonitoring();
 			}
 			catch(NfcHandlerException e)
 			{

@@ -9,7 +9,7 @@
 //
 //*********************************************************
 
-namespace Pcsc
+namespace PcscSdk
 {
 	/// <summary>
 	/// PCSC storage standard enum (ss byte)

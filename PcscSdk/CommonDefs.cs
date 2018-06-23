@@ -9,7 +9,7 @@
 //
 //*********************************************************
 
-namespace Pcsc.Common
+namespace PcscSdk.Common
 {
 	/// <summary>
 	/// ICC Device class
