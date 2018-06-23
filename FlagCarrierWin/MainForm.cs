@@ -76,20 +76,16 @@ namespace FlagCarrierWin
 					+ "ATR: " + BitConverter.ToString(cardIdent.Atr) + "\r\n\r\n");
 
 				if (cardIdent.PcscDeviceClass != DeviceClass.StorageClass ||
-					(cardIdent.PcscCardName != CardName.MifareUltralight
-					&& cardIdent.PcscCardName != CardName.MifareUltralightC
+					(cardIdent.PcscCardName != CardName.MifareUltralightC
 					&& cardIdent.PcscCardName != CardName.MifareUltralightEV1))
 				{
-					AppendOutput("Card not supported");
+					AppendOutput("Card not supported\r\n");
+					AppendOutput("Only MifareUltralightC and MifareUltralightEV1!");
 					return;
 				}
 
-				//new byte[] { 0x01, 0x00, 0x04, 0x01, 0x00, 0x00, 0x03, 0x98 };
-
-				var cmd = new Iso7816.ApduCommand(0xFF, 0xB0, 0b0_00_00_001, 0x00, null, 16);
-				var resp = await con.TransceiveAsync(cmd);
-				byte[] res = new byte[] { resp.SW1, resp.SW2 };
-				AppendOutput("Response: " + BitConverter.ToString(res));
+				var mifare = new MifareUltralight.AccessHandler(con);
+				await HandleMifareUL(mifare);
 			}
 		}
 
@@ -116,7 +112,8 @@ namespace FlagCarrierWin
 
 			byte[] data = await DumpMifare(mifare, identCapacity);
 
-			AppendOutput(BitConverter.ToString(data));
+			AppendOutput(BitConverter.ToString(data) + "\r\n\r\n");
+			AppendOutput(Encoding.UTF8.GetString(data));
 		}
 
 		private async Task<byte[]> DumpMifare(MifareUltralight.AccessHandler mifare, int capacity)
