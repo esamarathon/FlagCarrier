@@ -1,7 +1,18 @@
 <?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)">
-  <Profiles>
-    <Profile Name="(Default)" />
-  </Profiles>
-  <Settings />
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="FlagCarrierWin.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="deviceID" Type="System.String" Scope="User">
+      <Value Profile="(Default)">windows</Value>
+    </Setting>
+    <Setting Name="groupID" Type="System.String" Scope="User">
+      <Value Profile="(Default)">main</Value>
+    </Setting>
+    <Setting Name="positionsAvail" Type="System.String" Scope="User">
+      <Value Profile="(Default)">left,mid,right</Value>
+    </Setting>
+    <Setting Name="targetUrl" Type="System.String" Scope="User">
+      <Value Profile="(Default)">https://oromit.de/hosts.php</Value>
+    </Setting>
+  </Settings>
 </SettingsFile>

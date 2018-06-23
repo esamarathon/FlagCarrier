@@ -56,13 +56,28 @@ namespace FlagCarrierWin
 				nfcHandler = new NfcHandler();
 				nfcHandler.StatusMessage += AppendOutput;
 				nfcHandler.ErrorMessage += AppendOutput;
-				nfcHandler.CardAdded += ClearOutput;
+				nfcHandler.CardAdded += CardAdded;
+				nfcHandler.CardRemoved += CardRemoved;
 				nfcHandler.StartMonitoring();
+				readerNameLabel.Text = "Monitoring all readers";
 			}
 			catch(NfcHandlerException e)
 			{
 				readerNameLabel.Text = "Error: " + e.Message;
 			}
+
+			ResetSettings();
+		}
+
+		private void CardRemoved()
+		{
+			readerStatusLabel.Text = "Tag removed";
+		}
+
+		private void CardAdded()
+		{
+			ClearOutput();
+			readerStatusLabel.Text = "Tag added";
 		}
 
 		private void ClearOutput()
@@ -81,6 +96,40 @@ namespace FlagCarrierWin
 				outTextBox.SelectionStart = outTextBox.Text.Length;
 				outTextBox.ScrollToCaret();
 			}));
+		}
+
+		private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			Close();
+		}
+
+		private void applySettingsButton_Click(object sender, EventArgs e)
+		{
+			Properties.Settings.Default.deviceID = deviceIdBox.Text;
+			Properties.Settings.Default.groupID = groupIdBox.Text;
+			Properties.Settings.Default.positionsAvail = positionsBox.Text;
+			Properties.Settings.Default.targetUrl = targetUrlBox.Text;
+			Properties.Settings.Default.Save();
+			applySettingsButton.Enabled = false;
+		}
+
+		private void resetSettingsButton_Click(object sender, EventArgs e)
+		{
+			ResetSettings();
+		}
+
+		private void ResetSettings()
+		{
+			deviceIdBox.Text = Properties.Settings.Default.deviceID;
+			groupIdBox.Text = Properties.Settings.Default.groupID;
+			positionsBox.Text = Properties.Settings.Default.positionsAvail;
+			targetUrlBox.Text = Properties.Settings.Default.targetUrl;
+			applySettingsButton.Enabled = false;
+		}
+
+		private void SettingTextChanged(object sender, EventArgs e)
+		{
+			applySettingsButton.Enabled = true;
 		}
 	}
 }

@@ -70,6 +70,7 @@ namespace FlagCarrierWin
 		public event Action<string> StatusMessage;
 		public event Action<string> ErrorMessage;
 		public event Action CardAdded;
+		public event Action CardRemoved;
 		public event Action<NdefMessage> ReceiveNdefMessage;
 
 		private byte[] ndefDataToWrite;
@@ -120,6 +121,7 @@ namespace FlagCarrierWin
 
 		private void Monitor_CardRemoved(object sender, CardStatusEventArgs args)
 		{
+			CardRemoved?.Invoke();
 			StatusMessage?.Invoke("Tag removed");
 		}
 
