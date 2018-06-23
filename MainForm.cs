@@ -40,8 +40,30 @@ namespace FlagCarrierWin
 		{
 			Dictionary<string, string> vals = new Dictionary<string, string>();
 
-			vals.Add("display_name", "Test");
-			vals.Add("country_code", "US");
+			if (displayNameBox.Text.Trim() == "" || countryCodeBox.Text.Trim() == "")
+			{
+				outTextBox.Text = "Display Name and Country Code are required!";
+				return;
+			}
+
+			vals.Add("display_name", displayNameBox.Text.Trim());
+			vals.Add("country_code", countryCodeBox.Text.Trim());
+			vals.Add("speedruncom_name", srcomNameBox.Text.Trim());
+			vals.Add("twitch_name", twitchNameBox.Text.Trim());
+			vals.Add("twitter_handle", twitterHandleBox.Text.Trim());
+
+			foreach (String line in extraDataBox.Text.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries))
+			{
+				string[] kv = line.Split(new[] { '=' }, 2, StringSplitOptions.None);
+
+				if (kv.Length != 2)
+				{
+					outTextBox.Text = "Invalid extra data!";
+					return;
+				}
+
+				vals.Add(kv[0], kv[1]);
+			}
 
 			var msg = NdefHandler.GenerateNdefMessage(vals);
 			nfcHandler.WriteNdefMessage(msg);
