@@ -12,10 +12,9 @@
 using System.Threading.Tasks;
 
 using PCSC;
-using PcscSdk;
 using System;
 
-namespace MifareUltralight
+namespace PcscSdk.MifareUltralight
 {
 	/// <summary>
 	/// Access handler class for MifareUL based ICC. It provides wrappers for different MifareUL 

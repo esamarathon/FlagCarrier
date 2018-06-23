@@ -1,4 +1,4 @@
-﻿//*********************************************************
+//*********************************************************
 //
 // Copyright (c) Microsoft. All rights reserved.
 // This code is licensed under the MIT License (MIT).
@@ -11,7 +11,7 @@
 
 using System;
 
-namespace MifareUltralight
+namespace PcscSdk.MifareUltralight
 {
 	/// <summary>
 	/// Mifare UL Read commad when sent to the card the card is expected to return 16 byte of 4 Mifare

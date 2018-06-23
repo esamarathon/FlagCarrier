@@ -142,7 +142,7 @@ namespace FlagCarrierWin
 				StatusMessage?.Invoke("Card name: " + cardIdent.PcscCardName.ToString());
 				StatusMessage?.Invoke("ATR: " + BitConverter.ToString(cardIdent.Atr));
 
-				if (cardIdent.PcscDeviceClass == PcscSdk.Common.DeviceClass.StorageClass &&
+				if (cardIdent.PcscDeviceClass == DeviceClass.StorageClass &&
 					(cardIdent.PcscCardName == CardName.MifareUltralight
 					|| cardIdent.PcscCardName == CardName.MifareUltralightC
 					|| cardIdent.PcscCardName == CardName.MifareUltralightEV1))
@@ -158,7 +158,7 @@ namespace FlagCarrierWin
 
 		private void HandleMifareUL(ICardReader reader)
 		{
-			var mifare = new MifareUltralight.AccessHandler(reader);
+			var mifare = new PcscSdk.MifareUltralight.AccessHandler(reader);
 
 			StatusMessage?.Invoke("Handling as Mifare Ultralight");
 
@@ -191,7 +191,7 @@ namespace FlagCarrierWin
 			}
 		}
 
-		private void WriteNdefToMifareUL(MifareUltralight.AccessHandler mifare, byte[] ndefData)
+		private void WriteNdefToMifareUL(PcscSdk.MifareUltralight.AccessHandler mifare, byte[] ndefData)
 		{
 			byte[] infoData = mifare.Read(3);
 			int capacity = infoData[2] * 8;
@@ -237,7 +237,7 @@ namespace FlagCarrierWin
 			StatusMessage?.Invoke("Written " + data_length + " bytes of data. Ndef message length is " + ndefData.Length + " bytes.");
 		}
 
-		private byte[] DumpMifareUL(MifareUltralight.AccessHandler mifare)
+		private byte[] DumpMifareUL(PcscSdk.MifareUltralight.AccessHandler mifare)
 		{
 			byte[] infoData = mifare.Read(3);
 			int bytes_left = infoData[2] * 8;

@@ -11,10 +11,9 @@
 
 using System.Threading.Tasks;
 using PCSC;
-using PcscSdk;
 using System;
 
-namespace MifareStandard
+namespace PcscSdk.MifareStandard
 {
 	public class DefaultKeys
 	{

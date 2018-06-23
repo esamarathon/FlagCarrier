@@ -1,4 +1,4 @@
-﻿//*********************************************************
+//*********************************************************
 //
 // Copyright (c) Microsoft. All rights reserved.
 // This code is licensed under the MIT License (MIT).
@@ -11,7 +11,7 @@
 
 using System;
 
-namespace MifareStandard
+namespace PcscSdk.MifareStandard
 {
 	/// <summary>
 	/// Mifare Standard Read commad when sent to the card the card is expected to return 16 bytes
