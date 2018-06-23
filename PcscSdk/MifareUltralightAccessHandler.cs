@@ -1,4 +1,4 @@
-﻿//*********************************************************
+//*********************************************************
 //
 // Copyright (c) Microsoft. All rights reserved.
 // This code is licensed under the MIT License (MIT).
@@ -66,7 +66,7 @@ namespace MifareUltralight
 		/// </param>
 		/// byte array of the data to write
 		/// </returns>
-		public async void WriteAsync(byte pageAddress, byte[] data)
+		public async Task WriteAsync(byte pageAddress, byte[] data)
 		{
 			if (data.Length != 4)
 			{

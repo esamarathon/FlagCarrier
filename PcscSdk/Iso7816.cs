@@ -1,4 +1,4 @@
-﻿//*********************************************************
+//*********************************************************
 //
 // Copyright (c) Microsoft. All rights reserved.
 // This code is licensed under the MIT License (MIT).
@@ -127,7 +127,7 @@ namespace Iso7816
 		{
 			if (response.Length < 2)
 			{
-				throw new InvalidOperationException("APDU response must be at least 2 bytes");
+				throw new InvalidOperationException("APDU response must be at least 2 bytes, got " + response.Length);
 			}
 			using (DataReader reader = DataReader.FromBuffer(response))
 			{
