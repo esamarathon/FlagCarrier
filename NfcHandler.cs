@@ -205,7 +205,10 @@ namespace FlagCarrierWin
 					if(ndefData.Length >= 0xFF)
 					{
 						writer.Write((byte)0xFF);
-						writer.Write((ushort)ndefData.Length);
+						byte[] lengthBytes = BitConverter.GetBytes((ushort)ndefData.Length);
+						if (BitConverter.IsLittleEndian)
+							Array.Reverse(lengthBytes);
+						writer.Write(lengthBytes);
 					}
 					else
 					{
@@ -263,7 +266,12 @@ namespace FlagCarrierWin
 					byte tag = reader.ReadByte();
 					int length = reader.ReadByte();
 					if (length >= 0xFF)
-						length = reader.ReadUInt16();
+					{
+						byte[] lengthBytes = reader.ReadBytes(2);
+						if (BitConverter.IsLittleEndian)
+							Array.Reverse(lengthBytes);
+						length = BitConverter.ToUInt16(lengthBytes, 0);
+					}
 					byte[] val = length > 0 ? reader.ReadBytes(length) : null;
 
 					switch(tag)
@@ -283,7 +291,7 @@ namespace FlagCarrierWin
 						case 0x03:
 							if (val != null)
 							{
-								StatusMessage?.Invoke("Found NDEF TLV");
+								StatusMessage?.Invoke("Found NDEF TLV (" + length + " bytes)");
 								NdefMessage msg = NdefMessage.FromByteArray(val);
 								ReceiveNdefMessage?.Invoke(msg);
 							}
