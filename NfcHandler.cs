@@ -114,7 +114,7 @@ namespace FlagCarrierWin
 			}
 			catch (Exception e)
 			{
-				ErrorMessage?.Invoke("Error handling tag:\r\n" + e.ToString() + "\r\n");
+				ErrorMessage?.Invoke("Error handling tag: " + e.Message);
 			}
 		}
 
