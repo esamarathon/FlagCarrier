@@ -55,7 +55,7 @@ namespace PcscSdk.MifareStandard
 		/// <summary>
 		/// connection object to smart card
 		/// </summary>
-		private ICardReader cardReader { set; get; }
+		public ICardReader CardReader { set; get; }
 		/// <summary>
 		/// Class constructor
 		/// </summary>
@@ -64,7 +64,7 @@ namespace PcscSdk.MifareStandard
 		/// </param>
 		public AccessHandler(ICardReader cardReader)
 		{
-			this.cardReader = cardReader;
+			this.CardReader = cardReader;
 		}
 		/// <summary>
 		/// Wrapper method to read 16 bytes
@@ -77,7 +77,7 @@ namespace PcscSdk.MifareStandard
 		/// </returns>
 		public void LoadKey(byte[] mifareKey, byte keySlotNumber = 0)
 		{
-			var apduRes = cardReader.Transceive(new MifareStandard.LoadKey(mifareKey, keySlotNumber));
+			var apduRes = CardReader.Transceive(new MifareStandard.LoadKey(mifareKey, keySlotNumber));
 
 			if (!apduRes.Succeeded)
 			{
@@ -103,13 +103,13 @@ namespace PcscSdk.MifareStandard
 		/// </returns>
 		public byte[] Read(ushort blockNumber, GeneralAuthenticate.GeneralAuthenticateKeyType keyType, byte keySlotNumber = 0)
 		{
-			var genAuthRes = cardReader.Transceive(new MifareStandard.GeneralAuthenticate(blockNumber, keySlotNumber, keyType));
+			var genAuthRes = CardReader.Transceive(new MifareStandard.GeneralAuthenticate(blockNumber, keySlotNumber, keyType));
 			if (!genAuthRes.Succeeded)
 			{
 				throw new Exception("Failure authenticating to MIFARE Standard card, " + genAuthRes.ToString());
 			}
 
-			var readRes = cardReader.Transceive(new MifareStandard.Read(blockNumber));
+			var readRes = CardReader.Transceive(new MifareStandard.Read(blockNumber));
 			if (!readRes.Succeeded)
 			{
 				throw new Exception("Failure reading MIFARE Standard card, " + readRes.ToString());
@@ -137,13 +137,13 @@ namespace PcscSdk.MifareStandard
 				throw new NotSupportedException();
 			}
 
-			var genAuthRes = cardReader.Transceive(new MifareStandard.GeneralAuthenticate(blockNumber, keySlotNumber, keyType));
+			var genAuthRes = CardReader.Transceive(new MifareStandard.GeneralAuthenticate(blockNumber, keySlotNumber, keyType));
 			if (!genAuthRes.Succeeded)
 			{
 				throw new Exception("Failure authenticating to MIFARE Standard card, " + genAuthRes.ToString());
 			}
 
-			var apduRes = cardReader.Transceive(new MifareStandard.Write(blockNumber, ref data));
+			var apduRes = CardReader.Transceive(new MifareStandard.Write(blockNumber, ref data));
 			if (!apduRes.Succeeded)
 			{
 				throw new Exception("Failure writing MIFARE Standard card, " + apduRes.ToString());
@@ -160,7 +160,7 @@ namespace PcscSdk.MifareStandard
 		/// </returns>
 		public byte[] TransparentExchange(byte[] commandData)
 		{
-			byte[] responseData = cardReader.TransparentExchange(commandData);
+			byte[] responseData = CardReader.TransparentExchange(commandData);
 
 			return responseData;
 		}
@@ -172,7 +172,7 @@ namespace PcscSdk.MifareStandard
 		/// </returns>
 		public byte[] GetUid()
 		{
-			var apduRes = cardReader.Transceive(new MifareStandard.GetUid());
+			var apduRes = CardReader.Transceive(new MifareStandard.GetUid());
 			if (!apduRes.Succeeded)
 			{
 				throw new Exception("Failure getting UID of MIFARE Standard card, " + apduRes.ToString());

@@ -25,7 +25,7 @@ namespace PcscSdk.MifareUltralight
 		/// <summary>
 		/// connection object to smart card
 		/// </summary>
-		private ICardReader cardReader { set; get; }
+		public ICardReader CardReader { set; get; }
 		/// <summary>
 		/// Class constructor
 		/// </summary>
@@ -34,7 +34,7 @@ namespace PcscSdk.MifareUltralight
 		/// </param>
 		public AccessHandler(ICardReader cardReader)
 		{
-			this.cardReader = cardReader;
+			this.CardReader = cardReader;
 		}
 		/// <summary>
 		/// Wrapper method to read 16 bytes (4 pages) starting at pageAddress
@@ -47,7 +47,7 @@ namespace PcscSdk.MifareUltralight
 		/// </returns>
 		public byte[] Read(byte pageAddress)
 		{
-			var apduRes = cardReader.Transceive(new MifareUltralight.Read(pageAddress));
+			var apduRes = CardReader.Transceive(new MifareUltralight.Read(pageAddress));
 
 			if (!apduRes.Succeeded)
 			{
@@ -70,7 +70,7 @@ namespace PcscSdk.MifareUltralight
 				throw new NotSupportedException();
 			}
 
-			var apduRes = cardReader.Transceive(new MifareUltralight.Write(pageAddress, ref data));
+			var apduRes = CardReader.Transceive(new MifareUltralight.Write(pageAddress, ref data));
 
 			if (!apduRes.Succeeded)
 			{
@@ -88,7 +88,7 @@ namespace PcscSdk.MifareUltralight
 		/// </returns>
 		public byte[] TransparentExchange(byte[] commandData)
 		{
-			byte[] responseData = cardReader.TransparentExchange(commandData);
+			byte[] responseData = CardReader.TransparentExchange(commandData);
 
 			return responseData;
 		}
@@ -100,7 +100,7 @@ namespace PcscSdk.MifareUltralight
 		/// </returns>
 		public byte[] GetUid()
 		{
-			var apduRes = cardReader.Transceive(new MifareUltralight.GetUid());
+			var apduRes = CardReader.Transceive(new MifareUltralight.GetUid());
 
 			if (!apduRes.Succeeded)
 			{

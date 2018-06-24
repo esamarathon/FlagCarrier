@@ -362,16 +362,22 @@ namespace FlagCarrierWin
 					mifare.Write(block, madData[block], GeneralAuthenticate.GeneralAuthenticateKeyType.PicoTagPassKeyB, 0);
 				}
 			}
-			else
-			{
-				StatusMessage?.Invoke("NDEF MAD block OK");
-			}
 
 			for (int sector = 1; sector < 16; sector++)
 			{
 				byte block = (byte)(sector * 4 + 3);
 				try
 				{
+					for (int i = 1; i < 4; i++)
+					{
+						var authRes = mifare.CardReader.Transceive(new PcscSdk.MifareStandard.GeneralAuthenticate((byte)(block - i), 1, GeneralAuthenticate.GeneralAuthenticateKeyType.MifareKeyA));
+						if (!authRes.Succeeded)
+						{
+							StatusMessage?.Invoke("NDEF read authentication failed, trying trailr rewrite.");
+							throw new Exception();
+						}
+					}
+
 					byte[] sectorIdent = mifare.Read(block, GeneralAuthenticate.GeneralAuthenticateKeyType.MifareKeyA, 1).Skip(6).Take(4).ToArray();
 					if (!sectorIdent.SequenceEqual(ndefComparator))
 						throw new Exception();
@@ -382,6 +388,8 @@ namespace FlagCarrierWin
 					mifare.Write(block, ndefSectorIdent, GeneralAuthenticate.GeneralAuthenticateKeyType.PicoTagPassKeyB, 0);
 				}
 			}
+
+			StatusMessage?.Invoke("Tag is NDEF formated");
 		}
 
 		private byte[] DumpMifareStandard(PcscSdk.MifareStandard.AccessHandler mifare)
