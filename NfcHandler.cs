@@ -203,13 +203,30 @@ namespace FlagCarrierWin
 			byte[] infoData = mifare.Read(3);
 			int capacity = infoData[2] * 8;
 
-			byte[] wrappedData;
+			byte[] wrappedData = GenerateTLVData(ndefData);
+
+			if (wrappedData.Length > capacity)
+				throw new NfcHandlerException("Data size of " + wrappedData.Length + " bytes exceeds capacity of " + capacity + " bytes!");
+
+			int data_length = wrappedData.Length;
+			Array.Resize(ref wrappedData, (data_length / 4) * 4 + 4);
+
+			for (byte pos = 4; (pos - 4) * 4 < wrappedData.Length; pos++)
+			{
+				mifare.Write(pos, wrappedData.Skip((pos - 4) * 4).Take(4).ToArray());
+			}
+
+			StatusMessage?.Invoke("Written " + data_length + " bytes of data. Ndef message length is " + ndefData.Length + " bytes.");
+		}
+
+		private byte[] GenerateTLVData(byte[] ndefData)
+		{
 			using (MemoryStream stream = new MemoryStream())
 			{
 				using (BinaryWriter writer = new BinaryWriter(stream))
 				{
 					writer.Write((byte)0x03);
-					if(ndefData.Length >= 0xFF)
+					if (ndefData.Length >= 0xFF)
 					{
 						writer.Write((byte)0xFF);
 						byte[] lengthBytes = BitConverter.GetBytes((ushort)ndefData.Length);
@@ -227,21 +244,8 @@ namespace FlagCarrierWin
 					writer.Write((byte)0x00);
 				}
 
-				wrappedData = stream.ToArray();
+				return stream.ToArray();
 			}
-
-			if (wrappedData.Length > capacity)
-				throw new NfcHandlerException("Data size of " + wrappedData.Length + " bytes exceeds capacity of " + capacity + " bytes!");
-
-			int data_length = wrappedData.Length;
-			Array.Resize(ref wrappedData, (data_length / 4) * 4 + 4);
-
-			for (byte pos = 4; (pos - 4) * 4 < wrappedData.Length; pos++)
-			{
-				mifare.Write(pos, wrappedData.Skip((pos - 4) * 4).Take(4).ToArray());
-			}
-
-			StatusMessage?.Invoke("Written " + data_length + " bytes of data. Ndef message length is " + ndefData.Length + " bytes.");
 		}
 
 		private byte[] DumpMifareUL(PcscSdk.MifareUltralight.AccessHandler mifare)
@@ -272,26 +276,13 @@ namespace FlagCarrierWin
 			byte[] uid = mifare.GetUid();
 			StatusMessage?.Invoke("UID: " + BitConverter.ToString(uid));
 
-			mifare.LoadKey(new byte[] { 0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5 }, 0);
-			StatusMessage?.Invoke("Loaded public MAD key in slot 0.");
-
-			mifare.LoadKey(new byte[] { 0xD3, 0xF7, 0xD3, 0xF7, 0xD3, 0xF7 }, 1);
-			StatusMessage?.Invoke("Loaded public NDEF key in slot 1.");
-
-			byte[] infoData = mifare.Read(3, GeneralAuthenticate.GeneralAuthenticateKeyType.MifareKeyA, 0);
-			byte gpByte = infoData[9];
-			StatusMessage?.Invoke("General purpose byte: " + BitConverter.ToString(new[] { gpByte }));
+			byte gpByte = InitAndGetGPMifareStandard(mifare);
 
 			bool usesMad = (gpByte & 0x80) != 0;
 			bool multiApp = (gpByte & 0x40) != 0;
 			int madVersion = gpByte & 0x03;
 
 			StatusMessage?.Invoke("Uses MAD: " + usesMad + "; Multi App: " + multiApp + "; Version: " + madVersion);
-
-			if (!usesMad)
-				throw new NfcHandlerException("No MAD in use");
-			if (madVersion != 1)
-				throw new NfcHandlerException("Unsupported MAD version: " + madVersion + " (Only version 1 is supported)");
 
 			if (ndefDataToWrite != null)
 			{
@@ -300,14 +291,118 @@ namespace FlagCarrierWin
 			}
 			else
 			{
+				if (!usesMad)
+					throw new NfcHandlerException("No MAD in use");
+				if (madVersion != 1)
+					throw new NfcHandlerException("Unsupported MAD version: " + madVersion + " (Only version 1 is supported)");
+
 				byte[] data = DumpMifareStandard(mifare);
 				ParseTLVData(data);
 			}
 		}
 
-		private void WriteNdefToMifareStandard(PcscSdk.MifareStandard.AccessHandler mifare, byte[] ndefDataToWrite)
+		private byte InitAndGetGPMifareStandard(PcscSdk.MifareStandard.AccessHandler mifare)
 		{
-			throw new NotImplementedException();
+			mifare.LoadKey(new byte[] { 0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5 }, 0);
+			StatusMessage?.Invoke("Loaded public MAD key in slot 0.");
+
+			mifare.LoadKey(new byte[] { 0xD3, 0xF7, 0xD3, 0xF7, 0xD3, 0xF7 }, 1);
+			StatusMessage?.Invoke("Loaded public NDEF key in slot 1.");
+
+			byte[] infoData;
+			try
+			{
+				infoData = mifare.Read(3, GeneralAuthenticate.GeneralAuthenticateKeyType.MifareKeyA, 0);
+			}
+			catch (Exception)
+			{
+				StatusMessage?.Invoke("Failed reading with default key.");
+
+				mifare.LoadKey(PcscSdk.MifareStandard.DefaultKeys.FactoryDefault, 0);
+				StatusMessage?.Invoke("Loaded factory default key in slot 0.");
+
+				infoData = mifare.Read(3, GeneralAuthenticate.GeneralAuthenticateKeyType.MifareKeyA, 0);
+				StatusMessage?.Invoke("Card uses factory default key!");
+			}
+			byte gpByte = infoData[9];
+			StatusMessage?.Invoke("General purpose byte: " + BitConverter.ToString(new[] { gpByte }));
+
+			return gpByte;
+		}
+
+		private void WriteNdefToMifareStandard(PcscSdk.MifareStandard.AccessHandler mifare, byte[] ndefData)
+		{
+			InitializeMifareStandard(mifare);
+
+			int capacity = 15 * 3 * 16;
+
+			byte[] wrappedData = GenerateTLVData(ndefData);
+
+			if (wrappedData.Length > capacity)
+				throw new NfcHandlerException("Data size of " + wrappedData.Length + " bytes exceeds capacity of " + capacity + " bytes!");
+
+			int data_length = wrappedData.Length;
+			Array.Resize(ref wrappedData, (data_length / 16) * 16 + 16);
+
+			byte writeBlock = 3;
+			for (byte pos = 0; pos < wrappedData.Length; pos += 16)
+			{
+				if (++writeBlock % 4 == 3)
+					writeBlock++;
+				mifare.Write(writeBlock, wrappedData.Skip(pos).Take(16).ToArray(), GeneralAuthenticate.GeneralAuthenticateKeyType.MifareKeyA, 1);
+			}
+
+			StatusMessage?.Invoke("Written " + data_length + " bytes of data. Ndef message length is " + ndefData.Length + " bytes.");
+		}
+
+		private void InitializeMifareStandard(PcscSdk.MifareStandard.AccessHandler mifare)
+		{
+			byte[][] madData = new byte[][] {
+				null,
+				new byte[] { 0x14, 0x01, 0x03, 0xE1, 0x03, 0xE1, 0x03, 0xE1, 0x03, 0xE1, 0x03, 0xE1, 0x03, 0xE1, 0x03, 0xE1 },
+				new byte[] { 0x03, 0xE1, 0x03, 0xE1, 0x03, 0xE1, 0x03, 0xE1, 0x03, 0xE1, 0x03, 0xE1, 0x03, 0xE1, 0x03, 0xE1 },
+				new byte[] { 0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5, 0x78, 0x77, 0x88, 0xC1, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }
+			};
+
+			byte[] ndefSectorIdent = new byte[] { 0xD3, 0xF7, 0xD3, 0xF7, 0xD3, 0xF7, 0x7F, 0x07, 0x88, 0x40, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+			byte[] ndefComparator = ndefSectorIdent.Skip(6).Take(4).ToArray();
+
+			byte[] mad1 = mifare.Read(1, PcscSdk.MifareStandard.GeneralAuthenticate.GeneralAuthenticateKeyType.MifareKeyA, 0);
+			byte[] mad2 = mifare.Read(2, PcscSdk.MifareStandard.GeneralAuthenticate.GeneralAuthenticateKeyType.MifareKeyA, 0);
+
+			mifare.LoadKey(PcscSdk.MifareStandard.DefaultKeys.FactoryDefault, 0);
+			StatusMessage?.Invoke("Loaded factory default key in slot 0.");
+
+			if (!mad1.SequenceEqual(madData[1]) || !mad2.SequenceEqual(madData[2]))
+			{
+				StatusMessage?.Invoke("Writing NDEF MAD block.");
+
+				for (byte block = 1; block < 4; block++)
+				{
+					StatusMessage?.Invoke("Writing MAD block " + block);
+					mifare.Write(block, madData[block], GeneralAuthenticate.GeneralAuthenticateKeyType.PicoTagPassKeyB, 0);
+				}
+			}
+			else
+			{
+				StatusMessage?.Invoke("NDEF MAD block OK");
+			}
+
+			for (int sector = 1; sector < 16; sector++)
+			{
+				byte block = (byte)(sector * 4 + 3);
+				try
+				{
+					byte[] sectorIdent = mifare.Read(block, GeneralAuthenticate.GeneralAuthenticateKeyType.MifareKeyA, 1).Skip(6).Take(4).ToArray();
+					if (!sectorIdent.SequenceEqual(ndefComparator))
+						throw new Exception();
+				}
+				catch (Exception)
+				{
+					StatusMessage?.Invoke("Writing NDEF trailer into sector " + sector);
+					mifare.Write(block, ndefSectorIdent, GeneralAuthenticate.GeneralAuthenticateKeyType.PicoTagPassKeyB, 0);
+				}
+			}
 		}
 
 		private byte[] DumpMifareStandard(PcscSdk.MifareStandard.AccessHandler mifare)
