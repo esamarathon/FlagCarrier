@@ -25,6 +25,11 @@ namespace FlagCarrierWin
 			this.mainSplitContainer = new System.Windows.Forms.SplitContainer();
 			this.tabControl = new System.Windows.Forms.TabControl();
 			this.loginTagPage = new System.Windows.Forms.TabPage();
+			this.clearButton = new System.Windows.Forms.Button();
+			this.label11 = new System.Windows.Forms.Label();
+			this.loginButton = new System.Windows.Forms.Button();
+			this.positionSelectBox = new System.Windows.Forms.ComboBox();
+			this.loginTextBox = new System.Windows.Forms.RichTextBox();
 			this.writeTabPage = new System.Windows.Forms.TabPage();
 			this.extraDataBox = new System.Windows.Forms.TextBox();
 			this.label10 = new System.Windows.Forms.Label();
@@ -52,12 +57,14 @@ namespace FlagCarrierWin
 			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
 			this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.sendToLoginButton = new System.Windows.Forms.Button();
 			this.statusStrip1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.mainSplitContainer)).BeginInit();
 			this.mainSplitContainer.Panel1.SuspendLayout();
 			this.mainSplitContainer.Panel2.SuspendLayout();
 			this.mainSplitContainer.SuspendLayout();
 			this.tabControl.SuspendLayout();
+			this.loginTagPage.SuspendLayout();
 			this.writeTabPage.SuspendLayout();
 			this.settingsTabPage.SuspendLayout();
 			this.menuStrip1.SuspendLayout();
@@ -69,7 +76,7 @@ namespace FlagCarrierWin
 			this.writeButton.Location = new System.Drawing.Point(8, 397);
 			this.writeButton.Name = "writeButton";
 			this.writeButton.Size = new System.Drawing.Size(75, 23);
-			this.writeButton.TabIndex = 1;
+			this.writeButton.TabIndex = 14;
 			this.writeButton.Text = "Write";
 			this.writeButton.UseVisualStyleBackColor = true;
 			this.writeButton.Click += new System.EventHandler(this.WriteButton_Click);
@@ -146,6 +153,11 @@ namespace FlagCarrierWin
 			// 
 			// loginTagPage
 			// 
+			this.loginTagPage.Controls.Add(this.clearButton);
+			this.loginTagPage.Controls.Add(this.label11);
+			this.loginTagPage.Controls.Add(this.loginButton);
+			this.loginTagPage.Controls.Add(this.positionSelectBox);
+			this.loginTagPage.Controls.Add(this.loginTextBox);
 			this.loginTagPage.Location = new System.Drawing.Point(4, 22);
 			this.loginTagPage.Name = "loginTagPage";
 			this.loginTagPage.Padding = new System.Windows.Forms.Padding(3);
@@ -154,8 +166,65 @@ namespace FlagCarrierWin
 			this.loginTagPage.Text = "Login";
 			this.loginTagPage.UseVisualStyleBackColor = true;
 			// 
+			// clearButton
+			// 
+			this.clearButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.clearButton.Location = new System.Drawing.Point(393, 394);
+			this.clearButton.Name = "clearButton";
+			this.clearButton.Size = new System.Drawing.Size(75, 23);
+			this.clearButton.TabIndex = 4;
+			this.clearButton.Text = "Clear";
+			this.clearButton.UseVisualStyleBackColor = true;
+			this.clearButton.Click += new System.EventHandler(this.ClearButton_Click);
+			// 
+			// label11
+			// 
+			this.label11.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.label11.AutoSize = true;
+			this.label11.Location = new System.Drawing.Point(8, 342);
+			this.label11.Name = "label11";
+			this.label11.Size = new System.Drawing.Size(44, 13);
+			this.label11.TabIndex = 1;
+			this.label11.Text = "Position";
+			// 
+			// loginButton
+			// 
+			this.loginButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.loginButton.Location = new System.Drawing.Point(9, 394);
+			this.loginButton.Name = "loginButton";
+			this.loginButton.Size = new System.Drawing.Size(378, 23);
+			this.loginButton.TabIndex = 3;
+			this.loginButton.Text = "Login";
+			this.loginButton.UseVisualStyleBackColor = true;
+			this.loginButton.Click += new System.EventHandler(this.LoginButton_Click);
+			// 
+			// positionSelectBox
+			// 
+			this.positionSelectBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.positionSelectBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.positionSelectBox.FormattingEnabled = true;
+			this.positionSelectBox.Location = new System.Drawing.Point(9, 358);
+			this.positionSelectBox.Name = "positionSelectBox";
+			this.positionSelectBox.Size = new System.Drawing.Size(459, 21);
+			this.positionSelectBox.TabIndex = 2;
+			// 
+			// loginTextBox
+			// 
+			this.loginTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.loginTextBox.Location = new System.Drawing.Point(9, 7);
+			this.loginTextBox.Name = "loginTextBox";
+			this.loginTextBox.ReadOnly = true;
+			this.loginTextBox.Size = new System.Drawing.Size(459, 320);
+			this.loginTextBox.TabIndex = 0;
+			this.loginTextBox.Text = "";
+			// 
 			// writeTabPage
 			// 
+			this.writeTabPage.Controls.Add(this.sendToLoginButton);
 			this.writeTabPage.Controls.Add(this.extraDataBox);
 			this.writeTabPage.Controls.Add(this.label10);
 			this.writeTabPage.Controls.Add(this.twitterHandleBox);
@@ -312,7 +381,7 @@ namespace FlagCarrierWin
 			this.resetSettingsButton.Location = new System.Drawing.Point(393, 397);
 			this.resetSettingsButton.Name = "resetSettingsButton";
 			this.resetSettingsButton.Size = new System.Drawing.Size(75, 23);
-			this.resetSettingsButton.TabIndex = 9;
+			this.resetSettingsButton.TabIndex = 10;
 			this.resetSettingsButton.Text = "Reset";
 			this.resetSettingsButton.UseVisualStyleBackColor = true;
 			this.resetSettingsButton.Click += new System.EventHandler(this.ResetSettingsButton_Click);
@@ -400,7 +469,7 @@ namespace FlagCarrierWin
 			this.applySettingsButton.Location = new System.Drawing.Point(8, 397);
 			this.applySettingsButton.Name = "applySettingsButton";
 			this.applySettingsButton.Size = new System.Drawing.Size(75, 23);
-			this.applySettingsButton.TabIndex = 0;
+			this.applySettingsButton.TabIndex = 9;
 			this.applySettingsButton.Text = "Apply";
 			this.applySettingsButton.UseVisualStyleBackColor = true;
 			this.applySettingsButton.Click += new System.EventHandler(this.ApplySettingsButton_Click);
@@ -430,6 +499,17 @@ namespace FlagCarrierWin
 			this.exitToolStripMenuItem.Text = "Exit";
 			this.exitToolStripMenuItem.Click += new System.EventHandler(this.ExitToolStripMenuItem_Click);
 			// 
+			// sendToLoginButton
+			// 
+			this.sendToLoginButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.sendToLoginButton.Location = new System.Drawing.Point(372, 397);
+			this.sendToLoginButton.Name = "sendToLoginButton";
+			this.sendToLoginButton.Size = new System.Drawing.Size(96, 23);
+			this.sendToLoginButton.TabIndex = 15;
+			this.sendToLoginButton.Text = "Send to Login";
+			this.sendToLoginButton.UseVisualStyleBackColor = true;
+			this.sendToLoginButton.Click += new System.EventHandler(this.SendToLoginButton_Click);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -451,6 +531,8 @@ namespace FlagCarrierWin
 			((System.ComponentModel.ISupportInitialize)(this.mainSplitContainer)).EndInit();
 			this.mainSplitContainer.ResumeLayout(false);
 			this.tabControl.ResumeLayout(false);
+			this.loginTagPage.ResumeLayout(false);
+			this.loginTagPage.PerformLayout();
 			this.writeTabPage.ResumeLayout(false);
 			this.writeTabPage.PerformLayout();
 			this.settingsTabPage.ResumeLayout(false);
@@ -499,6 +581,12 @@ namespace FlagCarrierWin
 		private System.Windows.Forms.Label label5;
 		private System.Windows.Forms.TextBox extraDataBox;
 		private System.Windows.Forms.Label label10;
+		private System.Windows.Forms.RichTextBox loginTextBox;
+		private System.Windows.Forms.ComboBox positionSelectBox;
+		private System.Windows.Forms.Label label11;
+		private System.Windows.Forms.Button loginButton;
+		private System.Windows.Forms.Button clearButton;
+		private System.Windows.Forms.Button sendToLoginButton;
 	}
 }
 

@@ -1,16 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Globalization;
 using System.Windows.Forms;
 
-using PcscSdk;
-using PcscSdk.Common;
+using NdefLibrary.Ndef;
 
 namespace FlagCarrierWin
 {
@@ -21,6 +20,14 @@ namespace FlagCarrierWin
 		private static readonly string SRCOM_NAME = "speedruncom_name";
 		private static readonly string TWITCH_NAME = "twitch_name";
 		private static readonly string TWITTER_HANDLE = "twitter_handle";
+		private static readonly Dictionary<string, string> KV_DISPLAY_VALUES = new Dictionary<string, string>
+		{
+			{ DISPLAY_NAME, "Display Name" },
+			{ COUNTRY_CODE, "Country Code" },
+			{ SRCOM_NAME, "Speedrun.com Name" },
+			{ TWITCH_NAME, "Twitch Name" },
+			{ TWITTER_HANDLE, "Twitter Handle" }
+		};
 
 		private NfcHandler nfcHandler;
 
@@ -42,14 +49,14 @@ namespace FlagCarrierWin
 			base.Dispose(disposing);
 		}
 
-		private void WriteButton_Click(object sender, EventArgs args)
+		private Dictionary<string, string> GetWriteData()
 		{
 			Dictionary<string, string> vals = new Dictionary<string, string>();
 
 			if (displayNameBox.Text.Trim() == "" || countryCodeBox.Text.Trim() == "")
 			{
 				outTextBox.Text = "Display Name and Country Code are required!";
-				return;
+				return null;
 			}
 
 			vals.Add(DISPLAY_NAME, displayNameBox.Text.Trim());
@@ -65,16 +72,36 @@ namespace FlagCarrierWin
 				if (kv.Length != 2)
 				{
 					outTextBox.Text = "Invalid extra data!";
-					return;
+					return null;
 				}
 
 				vals.Add(kv[0], kv[1]);
 			}
 
+			return vals;
+		}
+
+		private void WriteButton_Click(object sender, EventArgs args)
+		{
+			var vals = GetWriteData();
+			if (vals == null)
+				return;
+
 			var msg = NdefHandler.GenerateNdefMessage(vals);
 			nfcHandler.WriteNdefMessage(msg);
 
 			outTextBox.Text = "Scan tag now!";
+		}
+
+		private void SendToLoginButton_Click(object sender, EventArgs e)
+		{
+			var vals = GetWriteData();
+			if (vals == null)
+				return;
+
+			GotLoginData(vals);
+			tabControl.SelectedTab = loginTagPage;
+			outTextBox.Clear();
 		}
 
 		private void MainForm_Load(object sender, EventArgs args)
@@ -86,6 +113,7 @@ namespace FlagCarrierWin
 				nfcHandler.ErrorMessage += AppendOutput;
 				nfcHandler.CardAdded += CardAdded;
 				nfcHandler.CardRemoved += CardRemoved;
+				nfcHandler.ReceiveNdefMessage += NfcHandler_ReceiveNdefMessage;
 				nfcHandler.StartMonitoring();
 				readerNameLabel.Text = "Monitoring all readers";
 			}
@@ -128,7 +156,7 @@ namespace FlagCarrierWin
 
 		private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			Close();
+			Application.Exit();
 		}
 
 		private void ApplySettingsButton_Click(object sender, EventArgs e)
@@ -139,6 +167,7 @@ namespace FlagCarrierWin
 			Properties.Settings.Default.targetUrl = targetUrlBox.Text;
 			Properties.Settings.Default.Save();
 			applySettingsButton.Enabled = false;
+			SetupPositions();
 		}
 
 		private void ResetSettingsButton_Click(object sender, EventArgs e)
@@ -153,11 +182,122 @@ namespace FlagCarrierWin
 			positionsBox.Text = Properties.Settings.Default.positionsAvail;
 			targetUrlBox.Text = Properties.Settings.Default.targetUrl;
 			applySettingsButton.Enabled = false;
+			SetupPositions();
 		}
 
 		private void SettingTextChanged(object sender, EventArgs e)
 		{
 			applySettingsButton.Enabled = true;
+		}
+
+		private void SetupPositions()
+		{
+			positionSelectBox.Items.Clear();
+			foreach(string position in Properties.Settings.Default.positionsAvail.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+			{
+				positionSelectBox.Items.Add(CultureInfo.CurrentCulture.TextInfo.ToTitleCase(position));
+			}
+
+			positionSelectBox.SelectedIndex = 0;
+		}
+
+		private void NfcHandler_ReceiveNdefMessage(NdefMessage msg)
+		{
+			try
+			{
+				var res = NdefHandler.ParseNdefMessage(msg);
+				Invoke(new Action(() =>
+				{
+					GotLoginData(res);
+				}));
+			}
+			catch(NdefHandlerException e)
+			{
+				AppendOutput("Failure parsing message: " + e.Message);
+			}
+		}
+
+		private Dictionary<string, string> loginData;
+
+		private void GotLoginData(Dictionary<string, string> data)
+		{
+			loginData = data;
+			SetupLoginTab();
+		}
+
+		private void SetupLoginTab()
+		{
+			loginTextBox.Text = "";
+			foreach (var knownKey in KV_DISPLAY_VALUES)
+			{
+				if (!loginData.ContainsKey(knownKey.Key))
+					continue;
+				loginTextBox.AppendText(knownKey.Value + ": " + loginData[knownKey.Key] + Environment.NewLine);
+			}
+
+			bool writtenHeader = false;
+			foreach (var element in loginData)
+			{
+				if (KV_DISPLAY_VALUES.ContainsKey(element.Key))
+					continue;
+				if (!writtenHeader)
+				{
+					loginTextBox.AppendText(Environment.NewLine + "Extra data:" + Environment.NewLine);
+					writtenHeader = true;
+				}
+				loginTextBox.AppendText("  " + element.Key + "=" + element.Value + Environment.NewLine);
+			}
+		}
+
+		private HttpHandler httpHandler = new HttpHandler();
+
+		private async void LoginButton_Click(object sender, EventArgs args)
+		{
+			if (loginData == null)
+			{
+				loginTextBox.Text = "No data to login!";
+				return;
+			}
+
+			loginTextBox.AppendText(Environment.NewLine + Environment.NewLine);
+
+			Dictionary<string, string> extraData = new Dictionary<string, string>();
+			extraData.Add("position", positionSelectBox.SelectedText.ToLower());
+
+			try
+			{
+				string response = await httpHandler.DoRequestAsync("login", loginData, extraData);
+				loginTextBox.AppendText("Login successful:" + Environment.NewLine);
+				loginTextBox.AppendText(response);
+				loginData = null;
+			}
+			catch(Exception e)
+			{
+				loginTextBox.AppendText("Request failed:" + Environment.NewLine);
+				loginTextBox.AppendText(e.Message);
+			}
+		}
+
+		private async void ClearButton_Click(object sender, EventArgs args)
+		{
+			var confirmResult = MessageBox.Show("This will clear the currently logged in users. Are you sure?", "Clear?", MessageBoxButtons.YesNo);
+			if (confirmResult != DialogResult.Yes)
+				return;
+
+			loginData = null;
+			loginTextBox.Text = "";
+
+			try
+			{
+				string response = await httpHandler.DoRequestAsync("clear");
+				loginTextBox.AppendText("Clear successful:" + Environment.NewLine);
+				loginTextBox.AppendText(response);
+			}
+			catch (Exception e)
+			{
+				loginTextBox.AppendText("Request failed:" + Environment.NewLine);
+				loginTextBox.AppendText(e.Message);
+			}
 		}
 	}
 }
