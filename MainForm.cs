@@ -318,5 +318,11 @@ namespace FlagCarrierWin
 				loginTextBox.AppendText(e.Message);
 			}
 		}
+
+		private void tabControl_Selecting(object sender, TabControlCancelEventArgs e)
+		{
+			ClearOutput();
+			nfcHandler.WriteNdefMessage(null);
+		}
 	}
 }

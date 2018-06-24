@@ -100,7 +100,10 @@ namespace FlagCarrierWin
 
 		public void WriteNdefMessage(NdefMessage msg)
 		{
-			ndefDataToWrite = msg.ToByteArray();
+			if (msg != null)
+				ndefDataToWrite = msg.ToByteArray();
+			else
+				ndefDataToWrite = null;
 		}
 
 		private void Monitor_CardInserted(object sender, CardStatusEventArgs args)

@@ -151,6 +151,7 @@ namespace FlagCarrierWin
 			this.tabControl.SelectedIndex = 0;
 			this.tabControl.Size = new System.Drawing.Size(484, 449);
 			this.tabControl.TabIndex = 2;
+			this.tabControl.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(this.tabControl_Selecting);
 			// 
 			// loginTagPage
 			// 
