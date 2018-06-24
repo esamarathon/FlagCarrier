@@ -16,6 +16,12 @@ namespace FlagCarrierWin
 {
 	public partial class MainForm : Form
 	{
+		private static readonly string DISPLAY_NAME = "display_name";
+		private static readonly string COUNTRY_CODE = "country_code";
+		private static readonly string SRCOM_NAME = "speedruncom_name";
+		private static readonly string TWITCH_NAME = "twitch_name";
+		private static readonly string TWITTER_HANDLE = "twitter_handle";
+
 		private NfcHandler nfcHandler;
 
 		public MainForm()
@@ -46,11 +52,11 @@ namespace FlagCarrierWin
 				return;
 			}
 
-			vals.Add("display_name", displayNameBox.Text.Trim());
-			vals.Add("country_code", countryCodeBox.Text.Trim());
-			vals.Add("speedruncom_name", srcomNameBox.Text.Trim());
-			vals.Add("twitch_name", twitchNameBox.Text.Trim());
-			vals.Add("twitter_handle", twitterHandleBox.Text.Trim());
+			vals.Add(DISPLAY_NAME, displayNameBox.Text.Trim());
+			vals.Add(COUNTRY_CODE, countryCodeBox.Text.Trim());
+			vals.Add(SRCOM_NAME, srcomNameBox.Text.Trim());
+			vals.Add(TWITCH_NAME, twitchNameBox.Text.Trim());
+			vals.Add(TWITTER_HANDLE, twitterHandleBox.Text.Trim());
 
 			foreach (String line in extraDataBox.Text.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries))
 			{
