@@ -72,7 +72,7 @@ namespace FlagCarrierWin
 			this.writeButton.TabIndex = 1;
 			this.writeButton.Text = "Write";
 			this.writeButton.UseVisualStyleBackColor = true;
-			this.writeButton.Click += new System.EventHandler(this.writeButton_Click);
+			this.writeButton.Click += new System.EventHandler(this.WriteButton_Click);
 			// 
 			// statusStrip1
 			// 
@@ -315,7 +315,7 @@ namespace FlagCarrierWin
 			this.resetSettingsButton.TabIndex = 9;
 			this.resetSettingsButton.Text = "Reset";
 			this.resetSettingsButton.UseVisualStyleBackColor = true;
-			this.resetSettingsButton.Click += new System.EventHandler(this.resetSettingsButton_Click);
+			this.resetSettingsButton.Click += new System.EventHandler(this.ResetSettingsButton_Click);
 			// 
 			// groupIdBox
 			// 
@@ -403,7 +403,7 @@ namespace FlagCarrierWin
 			this.applySettingsButton.TabIndex = 0;
 			this.applySettingsButton.Text = "Apply";
 			this.applySettingsButton.UseVisualStyleBackColor = true;
-			this.applySettingsButton.Click += new System.EventHandler(this.applySettingsButton_Click);
+			this.applySettingsButton.Click += new System.EventHandler(this.ApplySettingsButton_Click);
 			// 
 			// menuStrip1
 			// 
@@ -428,7 +428,7 @@ namespace FlagCarrierWin
 			this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
 			this.exitToolStripMenuItem.Size = new System.Drawing.Size(92, 22);
 			this.exitToolStripMenuItem.Text = "Exit";
-			this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+			this.exitToolStripMenuItem.Click += new System.EventHandler(this.ExitToolStripMenuItem_Click);
 			// 
 			// MainForm
 			// 

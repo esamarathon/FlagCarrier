@@ -42,7 +42,7 @@ namespace FlagCarrierWin
 			base.Dispose(disposing);
 		}
 
-		private void writeButton_Click(object sender, EventArgs args)
+		private void WriteButton_Click(object sender, EventArgs args)
 		{
 			Dictionary<string, string> vals = new Dictionary<string, string>();
 
@@ -126,12 +126,12 @@ namespace FlagCarrierWin
 			}));
 		}
 
-		private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+		private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			Close();
 		}
 
-		private void applySettingsButton_Click(object sender, EventArgs e)
+		private void ApplySettingsButton_Click(object sender, EventArgs e)
 		{
 			Properties.Settings.Default.deviceID = deviceIdBox.Text;
 			Properties.Settings.Default.groupID = groupIdBox.Text;
@@ -141,7 +141,7 @@ namespace FlagCarrierWin
 			applySettingsButton.Enabled = false;
 		}
 
-		private void resetSettingsButton_Click(object sender, EventArgs e)
+		private void ResetSettingsButton_Click(object sender, EventArgs e)
 		{
 			ResetSettings();
 		}
