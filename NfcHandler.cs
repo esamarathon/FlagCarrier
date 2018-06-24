@@ -463,15 +463,20 @@ namespace FlagCarrierWin
 				while(stream.Position < stream.Length)
 				{
 					byte tag = reader.ReadByte();
-					int length = reader.ReadByte();
-					if (length >= 0xFF)
+					int length = 0;
+					byte[] val = null;
+					if (tag != 0x00 && tag != 0xFE)
 					{
-						byte[] lengthBytes = reader.ReadBytes(2);
-						if (BitConverter.IsLittleEndian)
-							Array.Reverse(lengthBytes);
-						length = BitConverter.ToUInt16(lengthBytes, 0);
+						length = reader.ReadByte();
+						if (length >= 0xFF)
+						{
+							byte[] lengthBytes = reader.ReadBytes(2);
+							if (BitConverter.IsLittleEndian)
+								Array.Reverse(lengthBytes);
+							length = BitConverter.ToUInt16(lengthBytes, 0);
+						}
+						val = length > 0 ? reader.ReadBytes(length) : null;
 					}
-					byte[] val = length > 0 ? reader.ReadBytes(length) : null;
 
 					switch(tag)
 					{
