@@ -185,6 +185,23 @@ namespace FlagCarrierWin
 			SetupPositions();
 		}
 
+		private void WriteSettingsTagButton_Click(object sender, EventArgs e)
+		{
+			displayNameBox.Text = "set";
+			countryCodeBox.Text = "XX";
+			srcomNameBox.Text = "";
+			twitchNameBox.Text = "";
+			twitterHandleBox.Text = "";
+
+			extraDataBox.Clear();
+			extraDataBox.AppendText("set=pos_avail,group_id,target_url" + Environment.NewLine);
+			extraDataBox.AppendText("pos_avail=" + Properties.Settings.Default.positionsAvail + Environment.NewLine);
+			extraDataBox.AppendText("group_id=" + Properties.Settings.Default.groupID + Environment.NewLine);
+			extraDataBox.AppendText("target_url=" + Properties.Settings.Default.targetUrl + Environment.NewLine);
+
+			tabControl.SelectedTab = writeTabPage;
+		}
+
 		private void SettingTextChanged(object sender, EventArgs e)
 		{
 			applySettingsButton.Enabled = true;
@@ -247,6 +264,8 @@ namespace FlagCarrierWin
 				}
 				loginTextBox.AppendText("  " + element.Key + "=" + element.Value + Environment.NewLine);
 			}
+
+			tabControl.SelectedTab = loginTagPage;
 		}
 
 		private HttpHandler httpHandler = new HttpHandler();

@@ -31,6 +31,7 @@ namespace FlagCarrierWin
 			this.positionSelectBox = new System.Windows.Forms.ComboBox();
 			this.loginTextBox = new System.Windows.Forms.RichTextBox();
 			this.writeTabPage = new System.Windows.Forms.TabPage();
+			this.sendToLoginButton = new System.Windows.Forms.Button();
 			this.extraDataBox = new System.Windows.Forms.TextBox();
 			this.label10 = new System.Windows.Forms.Label();
 			this.twitterHandleBox = new System.Windows.Forms.TextBox();
@@ -44,6 +45,7 @@ namespace FlagCarrierWin
 			this.displayNameBox = new System.Windows.Forms.TextBox();
 			this.label5 = new System.Windows.Forms.Label();
 			this.settingsTabPage = new System.Windows.Forms.TabPage();
+			this.writeSettingsTagButton = new System.Windows.Forms.Button();
 			this.resetSettingsButton = new System.Windows.Forms.Button();
 			this.groupIdBox = new System.Windows.Forms.TextBox();
 			this.label4 = new System.Windows.Forms.Label();
@@ -57,7 +59,6 @@ namespace FlagCarrierWin
 			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
 			this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.sendToLoginButton = new System.Windows.Forms.Button();
 			this.statusStrip1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.mainSplitContainer)).BeginInit();
 			this.mainSplitContainer.Panel1.SuspendLayout();
@@ -246,6 +247,17 @@ namespace FlagCarrierWin
 			this.writeTabPage.Text = "Write";
 			this.writeTabPage.UseVisualStyleBackColor = true;
 			// 
+			// sendToLoginButton
+			// 
+			this.sendToLoginButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.sendToLoginButton.Location = new System.Drawing.Point(372, 397);
+			this.sendToLoginButton.Name = "sendToLoginButton";
+			this.sendToLoginButton.Size = new System.Drawing.Size(96, 23);
+			this.sendToLoginButton.TabIndex = 15;
+			this.sendToLoginButton.Text = "Send to Login";
+			this.sendToLoginButton.UseVisualStyleBackColor = true;
+			this.sendToLoginButton.Click += new System.EventHandler(this.SendToLoginButton_Click);
+			// 
 			// extraDataBox
 			// 
 			this.extraDataBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -358,6 +370,7 @@ namespace FlagCarrierWin
 			// 
 			// settingsTabPage
 			// 
+			this.settingsTabPage.Controls.Add(this.writeSettingsTagButton);
 			this.settingsTabPage.Controls.Add(this.resetSettingsButton);
 			this.settingsTabPage.Controls.Add(this.groupIdBox);
 			this.settingsTabPage.Controls.Add(this.label4);
@@ -375,13 +388,24 @@ namespace FlagCarrierWin
 			this.settingsTabPage.Text = "Settings";
 			this.settingsTabPage.UseVisualStyleBackColor = true;
 			// 
+			// writeSettingsTagButton
+			// 
+			this.writeSettingsTagButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.writeSettingsTagButton.Location = new System.Drawing.Point(89, 397);
+			this.writeSettingsTagButton.Name = "writeSettingsTagButton";
+			this.writeSettingsTagButton.Size = new System.Drawing.Size(75, 23);
+			this.writeSettingsTagButton.TabIndex = 10;
+			this.writeSettingsTagButton.Text = "Write to tag";
+			this.writeSettingsTagButton.UseVisualStyleBackColor = true;
+			this.writeSettingsTagButton.Click += new System.EventHandler(this.WriteSettingsTagButton_Click);
+			// 
 			// resetSettingsButton
 			// 
 			this.resetSettingsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.resetSettingsButton.Location = new System.Drawing.Point(393, 397);
 			this.resetSettingsButton.Name = "resetSettingsButton";
 			this.resetSettingsButton.Size = new System.Drawing.Size(75, 23);
-			this.resetSettingsButton.TabIndex = 10;
+			this.resetSettingsButton.TabIndex = 11;
 			this.resetSettingsButton.Text = "Reset";
 			this.resetSettingsButton.UseVisualStyleBackColor = true;
 			this.resetSettingsButton.Click += new System.EventHandler(this.ResetSettingsButton_Click);
@@ -499,17 +523,6 @@ namespace FlagCarrierWin
 			this.exitToolStripMenuItem.Text = "Exit";
 			this.exitToolStripMenuItem.Click += new System.EventHandler(this.ExitToolStripMenuItem_Click);
 			// 
-			// sendToLoginButton
-			// 
-			this.sendToLoginButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.sendToLoginButton.Location = new System.Drawing.Point(372, 397);
-			this.sendToLoginButton.Name = "sendToLoginButton";
-			this.sendToLoginButton.Size = new System.Drawing.Size(96, 23);
-			this.sendToLoginButton.TabIndex = 15;
-			this.sendToLoginButton.Text = "Send to Login";
-			this.sendToLoginButton.UseVisualStyleBackColor = true;
-			this.sendToLoginButton.Click += new System.EventHandler(this.SendToLoginButton_Click);
-			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -587,6 +600,7 @@ namespace FlagCarrierWin
 		private System.Windows.Forms.Button loginButton;
 		private System.Windows.Forms.Button clearButton;
 		private System.Windows.Forms.Button sendToLoginButton;
+		private System.Windows.Forms.Button writeSettingsTagButton;
 	}
 }
 
