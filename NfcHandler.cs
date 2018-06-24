@@ -166,6 +166,7 @@ namespace FlagCarrierWin
 			}
 		}
 
+		#region Mifare Ultralight
 		private void HandleMifareUL(ICardReader reader)
 		{
 			var mifare = new PcscSdk.MifareUltralight.AccessHandler(reader);
@@ -222,35 +223,6 @@ namespace FlagCarrierWin
 			StatusMessage?.Invoke("Written " + data_length + " bytes of data. Ndef message length is " + ndefData.Length + " bytes.");
 		}
 
-		private byte[] GenerateTLVData(byte[] ndefData)
-		{
-			using (MemoryStream stream = new MemoryStream())
-			{
-				using (BinaryWriter writer = new BinaryWriter(stream))
-				{
-					writer.Write((byte)0x03);
-					if (ndefData.Length >= 0xFF)
-					{
-						writer.Write((byte)0xFF);
-						byte[] lengthBytes = BitConverter.GetBytes((ushort)ndefData.Length);
-						if (BitConverter.IsLittleEndian)
-							Array.Reverse(lengthBytes);
-						writer.Write(lengthBytes);
-					}
-					else
-					{
-						writer.Write((byte)ndefData.Length);
-					}
-					writer.Write(ndefData);
-
-					writer.Write((byte)0xFE);
-					writer.Write((byte)0x00);
-				}
-
-				return stream.ToArray();
-			}
-		}
-
 		private byte[] DumpMifareUL(PcscSdk.MifareUltralight.AccessHandler mifare)
 		{
 			byte[] infoData = mifare.Read(3);
@@ -269,6 +241,10 @@ namespace FlagCarrierWin
 
 			return res;
 		}
+
+		#endregion
+
+		#region Mifare Standard
 
 		private void HandleMifareStandard(ICardReader reader)
 		{
@@ -438,6 +414,39 @@ namespace FlagCarrierWin
 			}
 		}
 
+		#endregion
+
+		#region Helpers
+
+		private byte[] GenerateTLVData(byte[] ndefData)
+		{
+			using (MemoryStream stream = new MemoryStream())
+			{
+				using (BinaryWriter writer = new BinaryWriter(stream))
+				{
+					writer.Write((byte)0x03);
+					if (ndefData.Length >= 0xFF)
+					{
+						writer.Write((byte)0xFF);
+						byte[] lengthBytes = BitConverter.GetBytes((ushort)ndefData.Length);
+						if (BitConverter.IsLittleEndian)
+							Array.Reverse(lengthBytes);
+						writer.Write(lengthBytes);
+					}
+					else
+					{
+						writer.Write((byte)ndefData.Length);
+					}
+					writer.Write(ndefData);
+
+					writer.Write((byte)0xFE);
+					writer.Write((byte)0x00);
+				}
+
+				return stream.ToArray();
+			}
+		}
+
 		private void ParseTLVData(byte[] data)
 		{
 			using (MemoryStream stream = new MemoryStream(data))
@@ -489,5 +498,7 @@ namespace FlagCarrierWin
 				}
 			}
 		}
+
+		#endregion
 	}
 }
