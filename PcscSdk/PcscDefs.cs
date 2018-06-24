@@ -9,6 +9,8 @@
 //
 //*********************************************************
 
+using System;
+
 namespace PcscSdk
 {
 	/// <summary>
@@ -125,5 +127,10 @@ namespace PcscSdk
 		ReadBinary = 0xB0,
 		UpdateBinary = 0xD6,
 		GetVersion = 0x60,
+	}
+
+	public static class Ioctl
+	{
+		public static readonly IntPtr CCID_ESCAPE = new IntPtr(3225264);
 	}
 }

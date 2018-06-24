@@ -81,20 +81,37 @@ namespace FlagCarrierWin
 			{
 				var monitorFactory = MonitorFactory.Instance;
 				monitor = monitorFactory.Create(SCardScope.System);
+				monitor.MonitorException += Monitor_MonitorException;
 				monitor.CardInserted += Monitor_CardInserted;
 				monitor.CardRemoved += Monitor_CardRemoved;
-				monitor.MonitorException += Monitor_MonitorException;
 			}
 
 			monitor.Cancel();
 
-			if(readerNames != null)
+			if (readerNames == null)
+				readerNames = GetReaderNames();
+
+			foreach (string readerName in readerNames)
+				TryTurnOffBeep(readerName);
+
+			monitor.Start(readerNames);
+		}
+
+		private void TryTurnOffBeep(string readerName)
+		{
+			try
 			{
-				monitor.Start(readerNames);
+				using (ISCardContext ctx = contextFactory.Establish(SCardScope.System))
+				using (ICardReader reader = ctx.ConnectReader(readerName, SCardShareMode.Direct, SCardProtocol.Unset))
+				{
+					var apdu = new Iso7816.ApduCommand(0xFF, 0x00, 0x52, 0x00, null, 0x00);
+					var res = reader.Control(apdu);
+					if(res.Succeeded)
+						StatusMessage?.Invoke("Turned off buzzer on " + reader.Name);
+				}
 			}
-			else
+			catch(Exception)
 			{
-				monitor.Start(GetReaderNames());
 			}
 		}
 

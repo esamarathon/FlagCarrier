@@ -43,6 +43,19 @@ namespace PcscSdk
 			return apduRes;
 		}
 
+		public static Iso7816.ApduResponse Control(this ICardReader reader, Iso7816.ApduCommand apduCommand)
+		{
+			Iso7816.ApduResponse apduRes = Activator.CreateInstance(apduCommand.ApduResponseType) as Iso7816.ApduResponse;
+
+			byte[] resp = new byte[256];
+			int bytesReceived = reader.Control(Ioctl.CCID_ESCAPE, apduCommand.ToByteArray(), resp);
+			Array.Resize(ref resp, bytesReceived);
+
+			apduRes.ExtractResponse(resp);
+
+			return apduRes;
+		}
+
 		/// <summary>
 		/// Extension method to SmartCardConnection class to perform a transparent exchange to the ICC
 		/// </summary>
