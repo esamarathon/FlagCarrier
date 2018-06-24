@@ -13,7 +13,6 @@ using PCSC.Exceptions;
 using PcscSdk;
 using PcscSdk.Common;
 
-
 namespace FlagCarrierWin
 {
 	public class NfcHandlerException : Exception
@@ -151,6 +150,12 @@ namespace FlagCarrierWin
 				{
 					HandleMifareUL(reader);
 				}
+				else if (cardIdent.PcscDeviceClass == DeviceClass.StorageClass &&
+					(cardIdent.PcscCardName == CardName.MifareStandard1K
+					|| cardIdent.PcscCardName == CardName.MifareStandard4K))
+				{
+					HandleMifareStandard(reader);
+				}
 				else
 				{
 					throw new NfcHandlerException("Unsupported tag type");
@@ -256,6 +261,83 @@ namespace FlagCarrierWin
 			}
 
 			return res;
+		}
+
+		private void HandleMifareStandard(ICardReader reader)
+		{
+			var mifare = new PcscSdk.MifareStandard.AccessHandler(reader);
+
+			StatusMessage?.Invoke("Handling as Mifare Standard 1K");
+
+			byte[] uid = mifare.GetUid();
+			StatusMessage?.Invoke("UID: " + BitConverter.ToString(uid));
+
+			mifare.LoadKey(new byte[] { 0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5 }, 0);
+			StatusMessage?.Invoke("Loaded public MAD key in slot 0.");
+
+			mifare.LoadKey(new byte[] { 0xD3, 0xF7, 0xD3, 0xF7, 0xD3, 0xF7 }, 1);
+			StatusMessage?.Invoke("Loaded public NDEF key in slot 1.");
+
+			byte[] infoData = mifare.Read(3, GeneralAuthenticate.GeneralAuthenticateKeyType.MifareKeyA, 0);
+			byte gpByte = infoData[9];
+			StatusMessage?.Invoke("General purpose byte: " + BitConverter.ToString(new[] { gpByte }));
+
+			bool usesMad = (gpByte & 0x80) != 0;
+			bool multiApp = (gpByte & 0x40) != 0;
+			int madVersion = gpByte & 0x03;
+
+			StatusMessage?.Invoke("Uses MAD: " + usesMad + "; Multi App: " + multiApp + "; Version: " + madVersion);
+
+			if (!usesMad)
+				throw new NfcHandlerException("No MAD in use");
+			if (madVersion != 1)
+				throw new NfcHandlerException("Unsupported MAD version: " + madVersion + " (Only version 1 is supported)");
+
+			if (ndefDataToWrite != null)
+			{
+				WriteNdefToMifareStandard(mifare, ndefDataToWrite);
+				ndefDataToWrite = null;
+			}
+			else
+			{
+				byte[] data = DumpMifareStandard(mifare);
+				ParseTLVData(data);
+			}
+		}
+
+		private void WriteNdefToMifareStandard(PcscSdk.MifareStandard.AccessHandler mifare, byte[] ndefDataToWrite)
+		{
+			throw new NotImplementedException();
+		}
+
+		private byte[] DumpMifareStandard(PcscSdk.MifareStandard.AccessHandler mifare)
+		{
+			byte[] madData = new byte[32];
+			mifare.Read(1, PcscSdk.MifareStandard.GeneralAuthenticate.GeneralAuthenticateKeyType.MifareKeyA, 0).CopyTo(madData, 0);
+			mifare.Read(2, PcscSdk.MifareStandard.GeneralAuthenticate.GeneralAuthenticateKeyType.MifareKeyA, 0).CopyTo(madData, 16);
+
+			byte crc = madData[0];
+			byte calcCrc = PcscSdk.MifareStandard.CRC8.Calc(madData.Skip(1).ToArray());
+
+			if (crc != calcCrc)
+				throw new NfcHandlerException("MAD CRC mismatch. 0x" + BitConverter.ToString(new[] { crc }) + " != 0x" + BitConverter.ToString(new[] { calcCrc }));
+
+			StatusMessage?.Invoke("CRC 0x" + BitConverter.ToString(new[] { crc }) + " OK");
+
+			using (MemoryStream mem = new MemoryStream())
+			{
+				for (int sec = 1; sec < 16; sec++)
+				{
+					if (madData[sec * 2] != 0x03 || madData[sec * 2 + 1] != 0xE1)
+						continue;
+					for (int block = sec * 4; block < sec * 4 + 3; block++)
+					{
+						mem.Write(mifare.Read((ushort)block, PcscSdk.MifareStandard.GeneralAuthenticate.GeneralAuthenticateKeyType.MifareKeyA, 1), 0, 16);
+					}
+				}
+
+				return mem.ToArray();
+			}
 		}
 
 		private void ParseTLVData(byte[] data)

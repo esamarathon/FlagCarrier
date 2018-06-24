@@ -15,6 +15,33 @@ using System;
 
 namespace PcscSdk.MifareStandard
 {
+	public static class CRC8
+	{
+		public static byte Calc(byte[] data)
+		{
+			byte res = 0xC7;
+
+			foreach (byte v in data)
+			{
+				res ^= v;
+
+				for (byte i = 0; i < 8; i++)
+				{
+					if ((res & 0x80) != 0)
+					{
+						res = (byte)(((res << 1) ^ 0x1D) & 0xFF);
+					}
+					else
+					{
+						res <<= 1;
+					}
+				}
+			}
+
+			return res;
+		}
+	}
+
 	public class DefaultKeys
 	{
 		public static readonly byte[] FactoryDefault = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
