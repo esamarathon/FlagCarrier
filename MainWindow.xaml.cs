@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+using NdefLibrary.Ndef;
+
 namespace FlagCarrierWin
 {
 	/// <summary>
@@ -27,12 +29,28 @@ namespace FlagCarrierWin
 
 			nfcHandler = new NfcHandler();
 			nfcHandler.CardAdded += NfcHandler_CardAdded;
-			nfcHandler.StatusMessage += NfcHandler_StatusMessage;
-			nfcHandler.ErrorMessage += NfcHandler_ErrorMessage;
+			nfcHandler.StatusMessage += StatusMessage;
+			nfcHandler.ErrorMessage += StatusMessage;
 			nfcHandler.ReceiveNdefMessage += NfcHandler_ReceiveNdefMessage;
+
+			writeControl.ManualLoginRequest += WriteControl_ManualLoginRequest;
+			writeControl.WriteMessageRequest += WriteControl_WriteMessageRequest;
+			writeControl.ErrorMessage += StatusMessage;
 		}
 
-		private void NfcHandler_ReceiveNdefMessage(NdefLibrary.Ndef.NdefMessage msg)
+		private void WriteControl_WriteMessageRequest(NdefMessage msg)
+		{
+			nfcHandler.WriteNdefMessage(msg);
+			ClearOutput("Scan tag to write.");
+		}
+
+		private void WriteControl_ManualLoginRequest(Dictionary<string, string> data)
+		{
+			loginControl.NewData(data);
+			loginTab.IsSelected = true;
+		}
+
+		private void NfcHandler_ReceiveNdefMessage(NdefMessage msg)
 		{
 			var data = NdefHandler.ParseNdefMessage(msg);
 			Dispatcher.Invoke(() =>
@@ -42,12 +60,7 @@ namespace FlagCarrierWin
 			});
 		}
 
-		private void NfcHandler_ErrorMessage(string msg)
-		{
-			Dispatcher.Invoke(() => AppendOutput(msg));
-		}
-
-		private void NfcHandler_StatusMessage(string msg)
+		private void StatusMessage(string msg)
 		{
 			Dispatcher.Invoke(() => AppendOutput(msg));
 		}
@@ -77,7 +90,8 @@ namespace FlagCarrierWin
 
 		private void WriteTab_Unselected(object sender, RoutedEventArgs e)
 		{
-			writeControl.CancelWriting();
+			ClearOutput();
+			nfcHandler.WriteNdefMessage(null);
 		}
 
 		private void Window_Closed(object sender, EventArgs e)
