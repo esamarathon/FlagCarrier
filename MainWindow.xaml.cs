@@ -36,6 +36,21 @@ namespace FlagCarrierWin
 			writeControl.ManualLoginRequest += WriteControl_ManualLoginRequest;
 			writeControl.WriteMessageRequest += WriteControl_WriteMessageRequest;
 			writeControl.ErrorMessage += StatusMessage;
+
+			settingsControl.WriteToTagRequest += SettingsControl_WriteToTagRequest;
+			settingsControl.UpdatedSettings += loginControl.SettingsChanged;
+		}
+
+		private void Window_Loaded(object sender, RoutedEventArgs e)
+		{
+			nfcHandler.StartMonitoring();
+			statusTextBlock.Text = "Monitoring all readers";
+		}
+
+		private void SettingsControl_WriteToTagRequest(Dictionary<string, string> settings)
+		{
+			writeControl.PrefillWithSettings(settings);
+			writeTab.IsSelected = true;
 		}
 
 		private void WriteControl_WriteMessageRequest(NdefMessage msg)
@@ -60,14 +75,14 @@ namespace FlagCarrierWin
 			});
 		}
 
-		private void StatusMessage(string msg)
-		{
-			Dispatcher.Invoke(() => AppendOutput(msg));
-		}
-
 		private void NfcHandler_CardAdded(string reader)
 		{
 			Dispatcher.Invoke(() => ClearOutput());
+		}
+
+		private void StatusMessage(string msg)
+		{
+			Dispatcher.Invoke(() => AppendOutput(msg));
 		}
 
 		private void ClearOutput(string msg = null)
@@ -90,7 +105,6 @@ namespace FlagCarrierWin
 
 		private void WriteTab_Unselected(object sender, RoutedEventArgs e)
 		{
-			ClearOutput();
 			nfcHandler.WriteNdefMessage(null);
 		}
 
@@ -101,12 +115,6 @@ namespace FlagCarrierWin
 				nfcHandler.Dispose();
 				nfcHandler = null;
 			}
-		}
-
-		private void Window_Loaded(object sender, RoutedEventArgs e)
-		{
-			nfcHandler.StartMonitoring();
-			statusTextBlock.Text = "Monitoring all readers";
 		}
 	}
 }

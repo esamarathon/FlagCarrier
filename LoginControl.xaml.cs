@@ -31,10 +31,9 @@ namespace FlagCarrierWin
 			httpHandler = new HttpHandler();
 
 			UpdateAvailablePositions();
-			Properties.Settings.Default.PropertyChanged += SettingsChanged;
 		}
 
-		private void SettingsChanged(object sender, System.ComponentModel.PropertyChangedEventArgs args)
+		public void SettingsChanged()
 		{
 			UpdateAvailablePositions();
 		}
@@ -49,7 +48,11 @@ namespace FlagCarrierWin
 			positionComboBox.Items.Clear();
 
 			foreach (string pos in positions)
-				positionComboBox.Items.Add(CultureInfo.CurrentCulture.TextInfo.ToTitleCase(pos.Trim()));
+			{
+				var item = new ComboBoxItem();
+				item.Content = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(pos.Trim());
+				positionComboBox.Items.Add(item);
+			}
 
 			positionComboBox.SelectedIndex = 0;
 		}

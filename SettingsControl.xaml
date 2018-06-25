@@ -21,15 +21,15 @@
 		</Grid.ColumnDefinitions>
         <StackPanel Grid.Row="0" Grid.ColumnSpan="4">
             <TextBlock Margin="0,5,0,2">Target URL</TextBlock>
-            <TextBox Name="targetUrlBox" />
+            <TextBox Name="targetUrlBox" TextChanged="TextChanged" />
             <TextBlock Margin="0,10,0,5">Device ID</TextBlock>
-            <TextBox Name="deviceIdBox" />
+            <TextBox Name="deviceIdBox" TextChanged="TextChanged" />
             <TextBlock Margin="0,10,0,5">Group ID</TextBlock>
-            <TextBox Name="groupIdBox" />
+            <TextBox Name="groupIdBox" TextChanged="TextChanged" />
             <TextBlock Margin="0,10,0,5">Available Positions</TextBlock>
-            <TextBox Name="positionsBox" />
+            <TextBox Name="positionsBox" TextChanged="TextChanged" />
         </StackPanel>
-		<Button Margin="2" Grid.Row="2" Grid.Column="0" Click="ApplyButton_Click">Apply</Button>
+		<Button Name="applyButton" IsEnabled="False" Margin="2" Grid.Row="2" Grid.Column="0" Click="ApplyButton_Click">Apply</Button>
 		<Button Margin="2" Grid.Row="2" Grid.Column="1" Click="WriteToTagButton_Click">Write to tag</Button>
 		<Button Margin="2" Grid.Row="2" Grid.Column="3" Click="ResetButton_Click">Reset</Button>
     </Grid>
