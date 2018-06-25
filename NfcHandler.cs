@@ -99,6 +99,9 @@ namespace FlagCarrierWin
 
 		private void TryTurnOffBeep(string readerName)
 		{
+			if (!readerName.Contains("ACR"))
+				return;
+
 			try
 			{
 				using (ISCardContext ctx = contextFactory.Establish(SCardScope.System))
@@ -106,7 +109,7 @@ namespace FlagCarrierWin
 				{
 					var apdu = new Iso7816.ApduCommand(0xFF, 0x00, 0x52, 0x00, null, 0x00);
 					var res = reader.Control(apdu);
-					if(res.Succeeded)
+					if (res.Succeeded)
 						StatusMessage?.Invoke("Turned off buzzer on " + reader.Name);
 				}
 			}
@@ -126,7 +129,7 @@ namespace FlagCarrierWin
 		private void Monitor_CardInserted(object sender, CardStatusEventArgs args)
 		{
 			CardAdded?.Invoke();
-			StatusMessage?.Invoke("Tag detected");
+			StatusMessage?.Invoke("Tag detected on " + args.ReaderName);
 
 			try
 			{
@@ -366,8 +369,18 @@ namespace FlagCarrierWin
 			byte[] mad1 = mifare.Read(1, PcscSdk.MifareStandard.GeneralAuthenticate.GeneralAuthenticateKeyType.MifareKeyA, 0);
 			byte[] mad2 = mifare.Read(2, PcscSdk.MifareStandard.GeneralAuthenticate.GeneralAuthenticateKeyType.MifareKeyA, 0);
 
-			mifare.LoadKey(PcscSdk.MifareStandard.DefaultKeys.FactoryDefault, 0);
-			StatusMessage?.Invoke("Loaded factory default key in slot 0.");
+			byte factoryKeySlot = 0;
+			try
+			{
+				mifare.LoadKey(PcscSdk.MifareStandard.DefaultKeys.FactoryDefault, 0);
+				StatusMessage?.Invoke("Loaded factory default key in slot 0.");
+			}
+			catch(Exception)
+			{
+				mifare.LoadKey(PcscSdk.MifareStandard.DefaultKeys.FactoryDefault, 2);
+				StatusMessage?.Invoke("Loaded factory default key in slot 2.");
+				factoryKeySlot = 2;
+			}
 
 			if (!mad1.SequenceEqual(madData[1]) || !mad2.SequenceEqual(madData[2]))
 			{
@@ -376,7 +389,7 @@ namespace FlagCarrierWin
 				for (byte block = 1; block < 4; block++)
 				{
 					StatusMessage?.Invoke("Writing MAD block " + block);
-					mifare.Write(block, madData[block], GeneralAuthenticate.GeneralAuthenticateKeyType.PicoTagPassKeyB, 0);
+					mifare.Write(block, madData[block], GeneralAuthenticate.GeneralAuthenticateKeyType.PicoTagPassKeyB, factoryKeySlot);
 				}
 			}
 
@@ -390,7 +403,7 @@ namespace FlagCarrierWin
 						var authRes = mifare.CardReader.Transceive(new PcscSdk.MifareStandard.GeneralAuthenticate((byte)(block - i), 1, GeneralAuthenticate.GeneralAuthenticateKeyType.MifareKeyA));
 						if (!authRes.Succeeded)
 						{
-							StatusMessage?.Invoke("NDEF read authentication failed, trying trailr rewrite.");
+							StatusMessage?.Invoke("NDEF read authentication failed, trying trailer rewrite.");
 							throw new Exception();
 						}
 					}
@@ -402,7 +415,7 @@ namespace FlagCarrierWin
 				catch (Exception)
 				{
 					StatusMessage?.Invoke("Writing NDEF trailer into sector " + sector);
-					mifare.Write(block, ndefSectorIdent, GeneralAuthenticate.GeneralAuthenticateKeyType.PicoTagPassKeyB, 0);
+					mifare.Write(block, ndefSectorIdent, GeneralAuthenticate.GeneralAuthenticateKeyType.PicoTagPassKeyB, factoryKeySlot);
 				}
 			}
 
