@@ -5,8 +5,37 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FlagCarrierWin"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        Title="MainWindow" Height="600" Width="500">
+	<DockPanel>
+		<StatusBar DockPanel.Dock="Bottom">
+			<StatusBarItem>
+				<TextBlock Name="statusTextBlock" />
+			</StatusBarItem>
+		</StatusBar>
+		<Menu DockPanel.Dock="Top">
+			<MenuItem Header="_File">
+				<MenuItem Header="E_xit" Click="ExitItem_Click"/>
+			</MenuItem>
+		</Menu>
+		<Grid>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="*" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="150" />
+			</Grid.RowDefinitions>
+			<TabControl Name="mainTabControl" Grid.Row="0">
+				<TabItem Header="Login" Name="loginTab">
+					<local:LoginControl x:Name="loginControl" />
+				</TabItem>
+				<TabItem Header="Write" Name="writeTab" Selector.Unselected="WriteTab_Unselected">
+					<local:WriteControl x:Name="writeControl" />
+				</TabItem>
+				<TabItem Header="Settings" Name="settingsTab">
+					<local:SettingsControl x:Name="settingsControl" />
+				</TabItem>
+			</TabControl>
+			<GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" />
+			<TextBox Name="outputTextBox" Grid.Row="2" IsReadOnly="True" Margin="2" />
+		</Grid>
+	</DockPanel>
 </Window>

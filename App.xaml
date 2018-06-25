@@ -4,6 +4,8 @@
              xmlns:local="clr-namespace:FlagCarrierWin"
              StartupUri="MainWindow.xaml">
 	<Application.Resources>
-
+		<Style TargetType="Control" x:Key="WhiteBackground">
+			<Setter Property="Background" Value="White" />
+		</Style>
 	</Application.Resources>
 </Application>

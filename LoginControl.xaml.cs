@@ -10,28 +10,29 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace FlagCarrierWin
 {
-	/// <summary>
-	/// Interaction logic for MainWindow.xaml
-	/// </summary>
-	public partial class MainWindow : Window
-	{
-		public MainWindow()
+    /// <summary>
+    /// Interaction logic for LoginControl.xaml
+    /// </summary>
+    public partial class LoginControl : UserControl
+    {
+        public LoginControl()
+        {
+            InitializeComponent();
+        }
+
+		private void LoginButton_Click(object sender, RoutedEventArgs e)
 		{
-			InitializeComponent();
+
 		}
 
-		private void ExitItem_Click(object sender, RoutedEventArgs e)
+		private void ClearButton_Click(object sender, RoutedEventArgs e)
 		{
-			Application.Current.Shutdown();
-		}
 
-		private void WriteTab_Unselected(object sender, RoutedEventArgs e)
-		{
-			writeControl.CancelWriting();
 		}
 	}
 }
