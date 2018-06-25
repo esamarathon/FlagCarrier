@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FlagCarrierWin"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="500" Closed="Window_Closed" Loaded="Window_Loaded">
+        Title="Flag Carrier"
+		Height="600" Width="500"
+		Closed="Window_Closed" Loaded="Window_Loaded">
 	<DockPanel>
 		<StatusBar DockPanel.Dock="Bottom">
 			<StatusBarItem>
