@@ -353,21 +353,22 @@ namespace FlagCarrierWin
 			StatusMessage?.Invoke("Written " + data_length + " bytes of data. Ndef message length is " + ndefData.Length + " bytes.");
 		}
 
-		private void InitializeMifareStandard(PcscSdk.MifareStandard.AccessHandler mifare)
-		{
-			byte[][] madData = new byte[][] {
+		private static readonly byte[][] ndefMadData = new byte[][] {
 				null,
 				new byte[] { 0x14, 0x01, 0x03, 0xE1, 0x03, 0xE1, 0x03, 0xE1, 0x03, 0xE1, 0x03, 0xE1, 0x03, 0xE1, 0x03, 0xE1 },
 				new byte[] { 0x03, 0xE1, 0x03, 0xE1, 0x03, 0xE1, 0x03, 0xE1, 0x03, 0xE1, 0x03, 0xE1, 0x03, 0xE1, 0x03, 0xE1 },
 				new byte[] { 0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5, 0x78, 0x77, 0x88, 0xC1, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }
 			};
 
-			byte[] ndefSectorIdent = new byte[] { 0xD3, 0xF7, 0xD3, 0xF7, 0xD3, 0xF7, 0x7F, 0x07, 0x88, 0x40, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-			byte[] ndefComparator = ndefSectorIdent.Skip(6).Take(4).ToArray();
+		private static readonly byte[] ndefSectorIdent = new byte[] { 0xD3, 0xF7, 0xD3, 0xF7, 0xD3, 0xF7, 0x7F, 0x07, 0x88, 0x40, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+		private static readonly byte[] ndefComparator  = new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7F, 0x07, 0x88, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
+		private void InitializeMifareStandard(PcscSdk.MifareStandard.AccessHandler mifare)
+		{
 			byte[] mad1 = mifare.Read(1, PcscSdk.MifareStandard.GeneralAuthenticate.GeneralAuthenticateKeyType.MifareKeyA, 0);
 			byte[] mad2 = mifare.Read(2, PcscSdk.MifareStandard.GeneralAuthenticate.GeneralAuthenticateKeyType.MifareKeyA, 0);
 
+			// One of my readers only has two key slots, another one does not allow overwriting them. So here we go...
 			byte factoryKeySlot = 0;
 			try
 			{
@@ -381,14 +382,21 @@ namespace FlagCarrierWin
 				factoryKeySlot = 2;
 			}
 
-			if (!mad1.SequenceEqual(madData[1]) || !mad2.SequenceEqual(madData[2]))
+			if (!mad1.SequenceEqual(ndefMadData[1]) || !mad2.SequenceEqual(ndefMadData[2]))
 			{
 				StatusMessage?.Invoke("Writing NDEF MAD block.");
 
 				for (byte block = 1; block < 4; block++)
 				{
 					StatusMessage?.Invoke("Writing MAD block " + block);
-					mifare.Write(block, madData[block], GeneralAuthenticate.GeneralAuthenticateKeyType.PicoTagPassKeyB, factoryKeySlot);
+					try
+					{
+						mifare.Write(block, ndefMadData[block], GeneralAuthenticate.GeneralAuthenticateKeyType.MifareKeyA, factoryKeySlot);
+					}
+					catch(Exception)
+					{
+						mifare.Write(block, ndefMadData[block], GeneralAuthenticate.GeneralAuthenticateKeyType.PicoTagPassKeyB, factoryKeySlot);
+					}
 				}
 			}
 
@@ -407,14 +415,21 @@ namespace FlagCarrierWin
 						}
 					}
 
-					byte[] sectorIdent = mifare.Read(block, GeneralAuthenticate.GeneralAuthenticateKeyType.MifareKeyA, 1).Skip(6).Take(4).ToArray();
+					byte[] sectorIdent = mifare.Read(block, GeneralAuthenticate.GeneralAuthenticateKeyType.MifareKeyA, 1);
 					if (!sectorIdent.SequenceEqual(ndefComparator))
 						throw new Exception();
 				}
 				catch (Exception)
 				{
 					StatusMessage?.Invoke("Writing NDEF trailer into sector " + sector);
-					mifare.Write(block, ndefSectorIdent, GeneralAuthenticate.GeneralAuthenticateKeyType.PicoTagPassKeyB, factoryKeySlot);
+					try
+					{
+						mifare.Write(block, ndefSectorIdent, GeneralAuthenticate.GeneralAuthenticateKeyType.MifareKeyA, factoryKeySlot);
+					}
+					catch(Exception)
+					{
+						mifare.Write(block, ndefSectorIdent, GeneralAuthenticate.GeneralAuthenticateKeyType.PicoTagPassKeyB, factoryKeySlot);
+					}
 				}
 			}
 
