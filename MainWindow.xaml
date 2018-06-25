@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FlagCarrierWin"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="500">
+        Title="MainWindow" Height="600" Width="500" Closed="Window_Closed" Loaded="Window_Loaded">
 	<DockPanel>
 		<StatusBar DockPanel.Dock="Bottom">
 			<StatusBarItem>
@@ -35,7 +35,7 @@
 				</TabItem>
 			</TabControl>
 			<GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" />
-			<TextBox Name="outputTextBox" Grid.Row="2" IsReadOnly="True" Margin="2" />
+			<TextBox Name="outputTextBox" Grid.Row="2" IsReadOnly="True" Margin="2" VerticalScrollBarVisibility="Auto" />
 		</Grid>
 	</DockPanel>
 </Window>

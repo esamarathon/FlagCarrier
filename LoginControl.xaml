@@ -18,7 +18,7 @@
             <ColumnDefinition />
             <ColumnDefinition Width="Auto" MinWidth="90" />
         </Grid.ColumnDefinitions>
-        <TextBox  Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Name="loginDataBox" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" Margin="2" />
+        <TextBox  Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Name="loginDataBox" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Margin="2" />
         <TextBlock Grid.Row="1" Grid.Column="0">Position</TextBlock>
 		<ComboBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Name="positionComboBox" Margin="2,2,2,12"></ComboBox>
         <Button Margin="2" Grid.Row="3" Grid.Column="0" Click="LoginButton_Click">Login</Button>

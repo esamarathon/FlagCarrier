@@ -19,9 +19,55 @@ namespace FlagCarrierWin
 	/// </summary>
 	public partial class MainWindow : Window
 	{
+		NfcHandler nfcHandler;
+
 		public MainWindow()
 		{
 			InitializeComponent();
+
+			nfcHandler = new NfcHandler();
+			nfcHandler.CardAdded += NfcHandler_CardAdded;
+			nfcHandler.StatusMessage += NfcHandler_StatusMessage;
+			nfcHandler.ErrorMessage += NfcHandler_ErrorMessage;
+			nfcHandler.ReceiveNdefMessage += NfcHandler_ReceiveNdefMessage;
+		}
+
+		private void NfcHandler_ReceiveNdefMessage(NdefLibrary.Ndef.NdefMessage msg)
+		{
+			var data = NdefHandler.ParseNdefMessage(msg);
+			Dispatcher.Invoke(() =>
+			{
+				loginControl.NewData(data);
+				loginTab.IsSelected = true;
+			});
+		}
+
+		private void NfcHandler_ErrorMessage(string msg)
+		{
+			Dispatcher.Invoke(() => AppendOutput(msg));
+		}
+
+		private void NfcHandler_StatusMessage(string msg)
+		{
+			Dispatcher.Invoke(() => AppendOutput(msg));
+		}
+
+		private void NfcHandler_CardAdded(string reader)
+		{
+			Dispatcher.Invoke(() => ClearOutput());
+		}
+
+		private void ClearOutput(string msg = null)
+		{
+			outputTextBox.Clear();
+			if (msg != null)
+				outputTextBox.Text = msg + Environment.NewLine;
+		}
+
+		private void AppendOutput(string msg)
+		{
+			outputTextBox.AppendText(msg + Environment.NewLine);
+			outputTextBox.ScrollToEnd();
 		}
 
 		private void ExitItem_Click(object sender, RoutedEventArgs e)
@@ -32,6 +78,21 @@ namespace FlagCarrierWin
 		private void WriteTab_Unselected(object sender, RoutedEventArgs e)
 		{
 			writeControl.CancelWriting();
+		}
+
+		private void Window_Closed(object sender, EventArgs e)
+		{
+			if (nfcHandler != null)
+			{
+				nfcHandler.Dispose();
+				nfcHandler = null;
+			}
+		}
+
+		private void Window_Loaded(object sender, RoutedEventArgs e)
+		{
+			nfcHandler.StartMonitoring();
+			statusTextBlock.Text = "Monitoring all readers";
 		}
 	}
 }

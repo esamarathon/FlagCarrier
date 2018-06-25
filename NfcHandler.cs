@@ -68,8 +68,8 @@ namespace FlagCarrierWin
 
 		public event Action<string> StatusMessage;
 		public event Action<string> ErrorMessage;
-		public event Action CardAdded;
-		public event Action CardRemoved;
+		public event Action<string> CardAdded;
+		public event Action<string> CardRemoved;
 		public event Action<NdefMessage> ReceiveNdefMessage;
 
 		private byte[] ndefDataToWrite;
@@ -128,7 +128,7 @@ namespace FlagCarrierWin
 
 		private void Monitor_CardInserted(object sender, CardStatusEventArgs args)
 		{
-			CardAdded?.Invoke();
+			CardAdded?.Invoke(args.ReaderName);
 			StatusMessage?.Invoke("Tag detected on " + args.ReaderName);
 
 			try
@@ -143,8 +143,7 @@ namespace FlagCarrierWin
 
 		private void Monitor_CardRemoved(object sender, CardStatusEventArgs args)
 		{
-			CardRemoved?.Invoke();
-			StatusMessage?.Invoke("Tag removed");
+			CardRemoved?.Invoke(args.ReaderName);
 		}
 
 		private void Monitor_MonitorException(object sender, PCSCException exception)
