@@ -332,7 +332,7 @@ namespace FlagCarrierWin
 		{
 			InitializeMifareStandard(mifare);
 
-			int capacity = 15 * 3 * 16;
+			const int capacity = 15 * 3 * 16;
 
 			byte[] wrappedData = GenerateTLVData(ndefData);
 
@@ -368,18 +368,27 @@ namespace FlagCarrierWin
 			byte[] mad1 = mifare.Read(1, PcscSdk.MifareStandard.GeneralAuthenticate.GeneralAuthenticateKeyType.MifareKeyA, 0);
 			byte[] mad2 = mifare.Read(2, PcscSdk.MifareStandard.GeneralAuthenticate.GeneralAuthenticateKeyType.MifareKeyA, 0);
 
-			// One of my readers only has two key slots, another one does not allow overwriting them. So here we go...
+			// One of my readers only has two key slots, another one does not allow overwriting them, but has at least 3. So here we go...
+			// Also, the Microsoft IFD emulation(?) reports 0x0000 in response, but it still seems to have worked.
 			byte factoryKeySlot = 0;
 			try
 			{
 				mifare.LoadKey(PcscSdk.MifareStandard.DefaultKeys.FactoryDefault, 0);
 				StatusMessage?.Invoke("Loaded factory default key in slot 0.");
 			}
-			catch(Exception)
+			catch(ApduFailedException e)
 			{
-				mifare.LoadKey(PcscSdk.MifareStandard.DefaultKeys.FactoryDefault, 2);
-				StatusMessage?.Invoke("Loaded factory default key in slot 2.");
-				factoryKeySlot = 2;
+				if (e.Response.SW == 0x0000 && e.Response.ResponseData.Length == 0 && mifare.CardReader.Name.Contains("Microsoft IFD"))
+				{
+					StatusMessage?.Invoke("Loaded factory default key in slot 0. (MS Quirk)");
+				}
+				else
+				{
+					StatusMessage?.Invoke("Could not re-load to slot 0, trying slot 2: " + e.Message);
+					mifare.LoadKey(PcscSdk.MifareStandard.DefaultKeys.FactoryDefault, 2);
+					StatusMessage?.Invoke("Loaded factory default key in slot 2.");
+					factoryKeySlot = 2;
+				}
 			}
 
 			if (!mad1.SequenceEqual(ndefMadData[1]) || !mad2.SequenceEqual(ndefMadData[2]))
