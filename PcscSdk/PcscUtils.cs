@@ -15,9 +15,26 @@ using System.Threading.Tasks;
 using System.Linq;
 
 using PCSC;
+using System.Runtime.Serialization;
 
 namespace PcscSdk
 {
+	public class ApduFailedException : Exception
+	{
+		public Iso7816.ApduResponse Response { get; private set; }
+
+		public ApduFailedException(Iso7816.ApduResponse response)
+			:base()
+		{
+			Response = response;
+		}
+
+		public ApduFailedException(Iso7816.ApduResponse response, string message) : base(message)
+		{
+			Response = response;
+		}
+	}
+
 	public static class SCardReaderExtension
 	{
 		/// <summary>
@@ -73,7 +90,7 @@ namespace PcscSdk
 
 			if (!apduRes.Succeeded)
 			{
-				throw new Exception("Failure to start transparent session, " + apduRes.ToString());
+				throw new ApduFailedException(apduRes, "Failure to start transparent session, " + apduRes.ToString());
 			}
 
 			using (MemoryStream dataWriter = new MemoryStream())
@@ -87,7 +104,7 @@ namespace PcscSdk
 
 				if (!apduRes1.Succeeded)
 				{
-					throw new Exception("Failure transceive with card, " + apduRes1.ToString());
+					throw new ApduFailedException(apduRes1, "Failure transceive with card, " + apduRes1.ToString());
 				}
 
 				responseData = apduRes1.IccResponse;
@@ -97,7 +114,7 @@ namespace PcscSdk
 
 			if (!apduRes2.Succeeded)
 			{
-				throw new Exception("Failure to end transparent session, " + apduRes2.ToString());
+				throw new ApduFailedException(apduRes2, "Failure to end transparent session, " + apduRes2.ToString());
 			}
 
 			return responseData;

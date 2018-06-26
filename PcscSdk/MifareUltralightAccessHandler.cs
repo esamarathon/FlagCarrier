@@ -51,7 +51,7 @@ namespace PcscSdk.MifareUltralight
 
 			if (!apduRes.Succeeded)
 			{
-				throw new Exception("Failure reading MIFARE Ultralight card, " + apduRes.ToString());
+				throw new ApduFailedException(apduRes, "Failure reading MIFARE Ultralight card, " + apduRes.ToString());
 			}
 
 			return apduRes.ResponseData;
@@ -74,7 +74,7 @@ namespace PcscSdk.MifareUltralight
 
 			if (!apduRes.Succeeded)
 			{
-				throw new Exception("Failure writing MIFARE Ultralight card, " + apduRes.ToString());
+				throw new ApduFailedException(apduRes, "Failure writing MIFARE Ultralight card, " + apduRes.ToString());
 			}
 		}
 		/// <summary>
@@ -104,7 +104,7 @@ namespace PcscSdk.MifareUltralight
 
 			if (!apduRes.Succeeded)
 			{
-				throw new Exception("Failure getting UID of MIFARE Ultralight card, " + apduRes.ToString());
+				throw new ApduFailedException(apduRes, "Failure getting UID of MIFARE Ultralight card, " + apduRes.ToString());
 			}
 
 			return apduRes.ResponseData;

@@ -81,7 +81,7 @@ namespace PcscSdk.MifareStandard
 
 			if (!apduRes.Succeeded)
 			{
-				throw new Exception("Failure loading key for MIFARE Standard card, " + apduRes.ToString());
+				throw new ApduFailedException(apduRes, "Failure loading key for MIFARE Standard card, " + apduRes.ToString());
 			}
 
 			return;
@@ -106,13 +106,13 @@ namespace PcscSdk.MifareStandard
 			var genAuthRes = CardReader.Transceive(new MifareStandard.GeneralAuthenticate(blockNumber, keySlotNumber, keyType));
 			if (!genAuthRes.Succeeded)
 			{
-				throw new Exception("Failure authenticating to MIFARE Standard card, " + genAuthRes.ToString());
+				throw new ApduFailedException(genAuthRes, "Failure authenticating to MIFARE Standard card, " + genAuthRes.ToString());
 			}
 
 			var readRes = CardReader.Transceive(new MifareStandard.Read(blockNumber));
 			if (!readRes.Succeeded)
 			{
-				throw new Exception("Failure reading MIFARE Standard card, " + readRes.ToString());
+				throw new ApduFailedException(readRes, "Failure reading MIFARE Standard card, " + readRes.ToString());
 			}
 
 			return readRes.ResponseData;
@@ -140,13 +140,13 @@ namespace PcscSdk.MifareStandard
 			var genAuthRes = CardReader.Transceive(new MifareStandard.GeneralAuthenticate(blockNumber, keySlotNumber, keyType));
 			if (!genAuthRes.Succeeded)
 			{
-				throw new Exception("Failure authenticating to MIFARE Standard card, " + genAuthRes.ToString());
+				throw new ApduFailedException(genAuthRes, "Failure authenticating to MIFARE Standard card, " + genAuthRes.ToString());
 			}
 
 			var apduRes = CardReader.Transceive(new MifareStandard.Write(blockNumber, ref data));
 			if (!apduRes.Succeeded)
 			{
-				throw new Exception("Failure writing MIFARE Standard card, " + apduRes.ToString());
+				throw new ApduFailedException(apduRes, "Failure writing MIFARE Standard card, " + apduRes.ToString());
 			}
 		}
 		/// <summary>
@@ -175,7 +175,7 @@ namespace PcscSdk.MifareStandard
 			var apduRes = CardReader.Transceive(new MifareStandard.GetUid());
 			if (!apduRes.Succeeded)
 			{
-				throw new Exception("Failure getting UID of MIFARE Standard card, " + apduRes.ToString());
+				throw new ApduFailedException(apduRes, "Failure getting UID of MIFARE Standard card, " + apduRes.ToString());
 			}
 
 			return apduRes.ResponseData;
