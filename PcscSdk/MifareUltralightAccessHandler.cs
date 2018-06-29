@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 
 using PCSC;
 using System;
+using System.Linq;
 
 namespace PcscSdk.MifareUltralight
 {
@@ -108,6 +109,33 @@ namespace PcscSdk.MifareUltralight
 			}
 
 			return apduRes.ResponseData;
+		}
+
+		public byte[] GetVersion()
+		{
+			try
+			{
+				var res = CardReader.Transceive(new Iso7816.ApduCommand((byte)Iso7816.Cla.ProprietaryCla9x, (byte)Ins.GetVersion, 0x00, 0x00, null, 0x00));
+
+				if (!res.Succeeded)
+					throw new ApduFailedException(res);
+
+				return res.ResponseData;
+			}
+			catch (Exception)
+			{
+				var res = CardReader.Transceive(new Iso7816.ApduCommand(0xFF, 0x00, 0x00, 0x00, new byte[] { 0xD4, 0x42, 0x60 }, null));
+
+				if (!res.Succeeded)
+					throw new ApduFailedException(res, "Exhausted all methods of executing GET_VERSION. Giving up.");
+
+				Console.WriteLine("Response is: " + BitConverter.ToString(res.ResponseData));
+
+				if (res.ResponseData[0] != 0xD5 || res.ResponseData[1] != 0x43 || res.ResponseData[2] != 0x00)
+					throw new ApduFailedException(res, "Raw response data indicates failure " + BitConverter.ToString(new byte[] { res.ResponseData[2] }));
+
+				return res.ResponseData.Skip(3).ToArray();
+			}
 		}
 	}
 }

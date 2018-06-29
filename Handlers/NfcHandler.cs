@@ -198,6 +198,24 @@ namespace FlagCarrierWin
 			byte[] infoData = mifare.Read(0);
 			StatusMessage?.Invoke("CC: " + BitConverter.ToString(infoData.Skip(12).ToArray()));
 
+			try
+			{
+				byte[] versionData = mifare.GetVersion();
+				StatusMessage?.Invoke("Mifare Version: " + BitConverter.ToString(versionData));
+
+				int capacity = versionData[6] >> 1;
+				int capacityMax = capacity;
+				if ((versionData[6] & 1) == 1)
+					capacityMax += 1;
+				capacity = (int)Math.Pow(2, capacity);
+				capacityMax = (int)Math.Pow(2, capacityMax);
+				StatusMessage?.Invoke("Capacity is between " + capacity + " and " + capacityMax + " bytes");
+			}
+			catch(ApduFailedException e)
+			{
+				StatusMessage?.Invoke("Failed getting Mifare Version: " + e.Message);
+			}
+
 			byte identMagic = infoData[12];
 			byte identVersion = infoData[13];
 			int identCapacity = infoData[14] * 8;

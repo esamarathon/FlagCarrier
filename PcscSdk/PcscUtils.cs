@@ -19,6 +19,41 @@ using System.Runtime.Serialization;
 
 namespace PcscSdk
 {
+	public static class CRC
+	{
+		public static byte[] ISO14443a(byte[] data)
+		{
+			long crc = 0x6363;
+
+			for(int i = 0; i < data.Length; i++)
+			{
+				byte bt = data[i];
+				bt = (byte)(bt ^ (crc & 0x00FF));
+				bt = (byte)(bt ^ (bt << 4));
+				crc = (crc >> 8) ^ (bt << 8) ^ (bt << 3) ^ (bt >> 4);
+			}
+
+			return new byte[] { (byte)(crc & 0xFF), (byte)((crc >> 8) & 0xFF) };
+		}
+
+		public static byte[] ISO14443b(byte[] data)
+		{
+			long crc = 0xFFFF;
+
+			for (int i = 0; i < data.Length; i++)
+			{
+				byte bt = data[i];
+				bt = (byte)(bt ^ (crc & 0x00FF));
+				bt = (byte)(bt ^ (bt << 4));
+				crc = (crc >> 8) ^ (bt << 8) ^ (bt << 3) ^ (bt >> 4);
+			}
+
+			crc = ~crc;
+
+			return new byte[] { (byte)(crc & 0xFF), (byte)((crc >> 8) & 0xFF) };
+		}
+	}
+
 	public class ApduFailedException : Exception
 	{
 		public Iso7816.ApduResponse Response { get; private set; }
