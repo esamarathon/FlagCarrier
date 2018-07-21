@@ -74,7 +74,7 @@ namespace FlagCarrierWin
 			loginDataBox.AppendText(Environment.NewLine + Environment.NewLine);
 
 			Dictionary<string, string> extraData = new Dictionary<string, string>();
-			extraData.Add("position", positionComboBox.SelectedItem.ToString().ToLower());
+			extraData.Add("position", ((ComboBoxItem)positionComboBox.SelectedItem).Content.ToString().ToLower());
 
 			try
 			{
