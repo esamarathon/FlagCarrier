@@ -94,6 +94,9 @@ namespace FlagCarrierWin
 			foreach (string readerName in readerNames)
 				TryTurnOffBeep(readerName);
 
+			if (readerNames.Length == 0)
+				return;
+
 			monitor.Start(readerNames);
 		}
 
