@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlagCarrierWin", "FlagCarri
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlagCarrierBase", "FlagCarrierBase\FlagCarrierBase.csproj", "{2D2C480D-06C8-40A4-8D1C-E099314C556F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlagCarrierMini", "FlagCarrierMini\FlagCarrierMini.csproj", "{515036FC-0514-4F56-A3B2-CDAF8CB5E46F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,6 +22,10 @@ Global
 		{2D2C480D-06C8-40A4-8D1C-E099314C556F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2D2C480D-06C8-40A4-8D1C-E099314C556F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2D2C480D-06C8-40A4-8D1C-E099314C556F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{515036FC-0514-4F56-A3B2-CDAF8CB5E46F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{515036FC-0514-4F56-A3B2-CDAF8CB5E46F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{515036FC-0514-4F56-A3B2-CDAF8CB5E46F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{515036FC-0514-4F56-A3B2-CDAF8CB5E46F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
