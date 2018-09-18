@@ -1,18 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+
+using FlagCarrierBase;
 
 namespace FlagCarrierWin
 {
@@ -49,8 +41,10 @@ namespace FlagCarrierWin
 
 			foreach (string pos in positions)
 			{
-				var item = new ComboBoxItem();
-				item.Content = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(pos.Trim());
+				var item = new ComboBoxItem
+				{
+					Content = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(pos.Trim())
+				};
 				positionComboBox.Items.Add(item);
 			}
 
@@ -73,12 +67,18 @@ namespace FlagCarrierWin
 
 			loginDataBox.AppendText(Environment.NewLine + Environment.NewLine);
 
-			Dictionary<string, string> extraData = new Dictionary<string, string>();
-			extraData.Add("position", ((ComboBoxItem)positionComboBox.SelectedItem).Content.ToString().ToLower());
+			Dictionary<string, string> extraData = new Dictionary<string, string>
+			{
+				{ "position", ((ComboBoxItem)positionComboBox.SelectedItem).Content.ToString().ToLower() }
+			};
 
 			try
 			{
-				string response = await httpHandler.DoRequestAsync("login", loginData, extraData);
+				string targetUrl = Properties.Settings.Default.targetUrl;
+				string deviceId = Properties.Settings.Default.deviceID;
+				string groupId = Properties.Settings.Default.groupID;
+
+				string response = await httpHandler.DoRequestAsync(targetUrl, deviceId, groupId, "login", loginData, extraData);
 				loginDataBox.AppendText("Login successful:" + Environment.NewLine);
 				loginDataBox.AppendText(response);
 				loginData = null;
@@ -103,7 +103,11 @@ namespace FlagCarrierWin
 
 			try
 			{
-				string response = await httpHandler.DoRequestAsync("clear");
+				string targetUrl = Properties.Settings.Default.targetUrl;
+				string deviceId = Properties.Settings.Default.deviceID;
+				string groupId = Properties.Settings.Default.groupID;
+
+				string response = await httpHandler.DoRequestAsync(targetUrl, deviceId, groupId, "clear");
 				loginDataBox.AppendText("Clear successful:" + Environment.NewLine);
 				loginDataBox.AppendText(response);
 			}

@@ -8,7 +8,7 @@ using System.IO;
 using NdefLibrary.Ndef;
 using Ionic.Zlib;
 
-namespace FlagCarrierWin
+namespace FlagCarrierBase
 {
 	public class NdefHandlerException : Exception
 	{
@@ -27,7 +27,7 @@ namespace FlagCarrierWin
 		}
 	}
 
-	static class NdefHandler
+	public static class NdefHandler
 	{
 		static readonly string EXPECTED_MIME_TYPE = "application/vnd.de.oromit.flagcarrier";
 		static readonly string EXPECTED_APP_REC = "de.oromit.flagcarrier";
@@ -68,7 +68,7 @@ namespace FlagCarrierWin
 			return ParseInflatedPayload(res);
 		}
 
-		private static string readUTF(BinaryReader reader)
+		private static string ReadUTF(BinaryReader reader)
 		{
 			byte[] b = reader.ReadBytes(2);
 			if (BitConverter.IsLittleEndian)
@@ -90,8 +90,8 @@ namespace FlagCarrierWin
 			{
 				while (reader.BaseStream.Length - reader.BaseStream.Position > 4)
 				{
-					string key = readUTF(reader);
-					string val = readUTF(reader);
+					string key = ReadUTF(reader);
+					string val = ReadUTF(reader);
 
 					res.Add(key, val);
 				}
@@ -125,23 +125,29 @@ namespace FlagCarrierWin
 
 		public static NdefMessage GenerateNdefMessage(Dictionary<string, string> values)
 		{
-			NdefMessage res = new NdefMessage();
-			res.Add(GenerateMimeRecord(values));
-			res.Add(GenerateAppRecord());
+			NdefMessage res = new NdefMessage
+			{
+				GenerateMimeRecord(values),
+				GenerateAppRecord()
+			};
 			return res;
 		}
 
 		private static NdefRecord GenerateAppRecord()
 		{
-			NdefAndroidAppRecord rec = new NdefAndroidAppRecord();
-			rec.PackageName = EXPECTED_APP_REC;
+			NdefAndroidAppRecord rec = new NdefAndroidAppRecord
+			{
+				PackageName = EXPECTED_APP_REC
+			};
 			return rec;
 		}
 
 		private static NdefRecord GenerateMimeRecord(Dictionary<string, string> values)
 		{
-			NdefRecord rec = new NdefRecord(NdefRecord.TypeNameFormatType.Mime, Encoding.ASCII.GetBytes(EXPECTED_MIME_TYPE));
-			rec.Payload = GenerateCompressedPayload(values);
+			NdefRecord rec = new NdefRecord(NdefRecord.TypeNameFormatType.Mime, Encoding.ASCII.GetBytes(EXPECTED_MIME_TYPE))
+			{
+				Payload = GenerateCompressedPayload(values)
+			};
 			return rec;
 		}
 
@@ -171,8 +177,8 @@ namespace FlagCarrierWin
 						String val = entry.Value.Trim();
 						if (String.IsNullOrEmpty(val))
 							continue;
-						writeUTF(writer, key);
-						writeUTF(writer, val);
+						WriteUTF(writer, key);
+						WriteUTF(writer, val);
 					}
 				}
 
@@ -180,7 +186,7 @@ namespace FlagCarrierWin
 			}
 		}
 
-		private static void writeUTF(BinaryWriter writer, string str)
+		private static void WriteUTF(BinaryWriter writer, string str)
 		{
 			byte[] data = Encoding.UTF8.GetBytes(str);
 			byte[] len = BitConverter.GetBytes((ushort)data.Length);

@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>FlagCarrier</RootNamespace>
+    <AssemblyName>FlagCarrierBase</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotNetZip" Version="1.11.0" />
+    <PackageReference Include="NdefLibrary" Version="4.1.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="PCSC" Version="4.0.0" />
+  </ItemGroup>
+
+</Project>

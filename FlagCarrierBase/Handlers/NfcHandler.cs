@@ -13,7 +13,7 @@ using PCSC.Exceptions;
 using PcscSdk;
 using PcscSdk.Common;
 
-namespace FlagCarrierWin
+namespace FlagCarrierBase
 {
 	public class NfcHandlerException : Exception
 	{
@@ -32,7 +32,7 @@ namespace FlagCarrierWin
 		}
 	}
 
-	class NfcHandler : IDisposable
+	public class NfcHandler : IDisposable
 	{
 		private static readonly IContextFactory contextFactory = ContextFactory.Instance;
 
