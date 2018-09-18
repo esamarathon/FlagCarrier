@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
+using FlagCarrierBase.Zlib;
 using NdefLibrary.Ndef;
-using Ionic.Zlib;
 
 namespace FlagCarrierBase
 {
