@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Security;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.IO;
 
 using FlagCarrierBase.Zlib;
 using NdefLibrary.Ndef;
+using Sodium;
 
 namespace FlagCarrierBase
 {
@@ -33,26 +32,54 @@ namespace FlagCarrierBase
 		static readonly string EXPECTED_MIME_TYPE = "application/vnd.de.oromit.flagcarrier";
 		static readonly string EXPECTED_APP_REC = "de.oromit.flagcarrier";
 
-		// The certificate in the pfx is ignored, only the public and, if present, private key are used.
-		// Generate pfx using:
-		// openssl req -x509 -sha512 -nodes -days 18250 -newkey rsa:2048 -keyout key.pem -out cert.pem
-		// openssl pkcs12 -passout pass: -export -nokeys -in cert.pem -out flagcarrier_public.pfx
-		// openssl pkcs12 -export -inkey key.pem -in cert.pem -out flagcarrier_private.pfx
-		private static X509Certificate2 cert;
+		static private byte[] privateKey = null;
+		static private byte[] publicKey = null;
 
 		#region Signing
 
-		public static void ClearCert()
+		static NdefHandler()
 		{
-			cert = null;
+			string subDir = null;
+			string pathSep = ":";
+			if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			{
+				subDir = @"libsodium-native\win-";
+				pathSep = ";";
+			}
+			else if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+			{
+				subDir = @"libsodium-native/linux-";
+			}
+			else
+			{
+				return;
+			}
+
+			subDir += RuntimeInformation.ProcessArchitecture.ToString().ToLower();
+
+			string path = Environment.GetEnvironmentVariable("PATH");
+			string binDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, subDir);
+			Environment.SetEnvironmentVariable("PATH", binDir + pathSep + path);
 		}
 
-		public static void LoadCert(string pfxPath, SecureString password=null)
+		public static void ClearKeys()
 		{
-			if (password == null)
-				cert = new X509Certificate2(pfxPath);
-			else
-				cert = new X509Certificate2(pfxPath, password);
+			privateKey = null;
+			publicKey = null;
+		}
+
+		public static void SetKeys(byte[] publicKey, byte[] privateKey=null)
+		{
+			NdefHandler.privateKey = privateKey;
+			NdefHandler.publicKey = publicKey;
+		}
+
+		public static KeyPair GenKeys()
+		{
+			KeyPair pair = PublicKeyAuth.GenerateKeyPair();
+			privateKey = pair.PrivateKey;
+			publicKey = pair.PublicKey;
+			return pair;
 		}
 		
 		#endregion
@@ -192,6 +219,8 @@ namespace FlagCarrierBase
 
 		private static byte[] GeneratePayload(Dictionary<string, string> values)
 		{
+			byte[] rawData = null;
+
 			using (MemoryStream mem = new MemoryStream())
 			{
 				using (BinaryWriter writer = new BinaryWriter(mem))
@@ -205,6 +234,24 @@ namespace FlagCarrierBase
 						WriteUTF(writer, key);
 						WriteUTF(writer, val);
 					}
+				}
+
+				rawData = mem.ToArray();
+			}
+
+			if (privateKey == null || privateKey.Length == 0)
+				return rawData;
+
+			byte[] sig = PublicKeyAuth.Sign(rawData, privateKey);
+			string sigStr = Convert.ToBase64String(sig);
+
+			using (MemoryStream mem = new MemoryStream())
+			{
+				using (BinaryWriter writer = new BinaryWriter(mem))
+				{
+					WriteUTF(writer, "sig");
+					WriteUTF(writer, sigStr);
+					writer.Write(rawData);
 				}
 
 				return mem.ToArray();

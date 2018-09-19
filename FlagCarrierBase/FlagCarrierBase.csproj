@@ -10,6 +10,25 @@
     <PackageReference Include="NdefLibrary" Version="4.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="PCSC" Version="4.0.0" />
+    <PackageReference Include="Sodium.Core" Version="1.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="libsodium-native\linux-arm64\libsodium.so">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="libsodium-native\linux-arm\libsodium.so">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="libsodium-native\linux-x64\libsodium.so">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="libsodium-native\win-x64\libsodium.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="libsodium-native\win-x86\libsodium.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

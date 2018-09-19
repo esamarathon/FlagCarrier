@@ -35,7 +35,6 @@ namespace FlagCarrierWin.Controls
 	{
 		Dictionary<string, CountryDropdownItem> codeToItem = new Dictionary<string, CountryDropdownItem>();
 
-		private string code;
 		public string Code
 		{
 			get
@@ -69,16 +68,20 @@ namespace FlagCarrierWin.Controls
 				string cca2 = xn.Attributes["cca2"].Value;
 				string names = xn.Attributes["name"].Value;
 
-				CountryDropdownItem item = new CountryDropdownItem();
-				item.Text = cca2 + " [" + cca2 + "]";
-				item.Code = cca2;
+				CountryDropdownItem item = new CountryDropdownItem
+				{
+					Text = cca2 + " [" + cca2 + "]",
+					Code = cca2
+				};
 				countryBox.Items.Add(item);
 
 				foreach (string name in names.Split(','))
 				{
-					item = new CountryDropdownItem();
-					item.Text = name + " [" + cca2 + "]";
-					item.Code = cca2;
+					item = new CountryDropdownItem
+					{
+						Text = name + " [" + cca2 + "]",
+						Code = cca2
+					};
 					countryBox.Items.Add(item);
 
 					if (!codeToItem.ContainsKey(cca2))
@@ -89,14 +92,14 @@ namespace FlagCarrierWin.Controls
 			Code = "DE";
 		}
 
-		private void countryBox_TextChanged(object sender, TextChangedEventArgs e)
+		private void CountryBox_TextChanged(object sender, TextChangedEventArgs e)
 		{
 			string t = countryBox.Text.ToUpper();
 			if (codeToItem.ContainsKey(t))
 				countryBox.SelectedItem = codeToItem[t];
 		}
 
-		private void countryBox_LostFocus(object sender, RoutedEventArgs e)
+		private void CountryBox_LostFocus(object sender, RoutedEventArgs e)
 		{
 			CountryDropdownItem item = (CountryDropdownItem)countryBox.SelectedItem;
 			if (item == null)

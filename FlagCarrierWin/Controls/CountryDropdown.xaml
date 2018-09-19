@@ -7,6 +7,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="40" d:DesignWidth="200">
     <Grid>
-		<ComboBox Name="countryBox" IsTextSearchEnabled="True" IsEditable="True" TextBoxBase.TextChanged="countryBox_TextChanged" LostFocus="countryBox_LostFocus" />
+		<ComboBox Name="countryBox" IsTextSearchEnabled="True" IsEditable="True" TextBoxBase.TextChanged="CountryBox_TextChanged" LostFocus="CountryBox_LostFocus" />
 	</Grid>
 </UserControl>
