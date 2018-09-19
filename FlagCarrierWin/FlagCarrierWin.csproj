@@ -62,6 +62,9 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
+    <Compile Include="Controls\PasswordDialog.xaml.cs">
+      <DependentUpon>PasswordDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Definitions.cs" />
     <Compile Include="Controls\SettingsControl.xaml.cs">
       <DependentUpon>SettingsControl.xaml</DependentUpon>
@@ -108,6 +111,10 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Page Include="Controls\PasswordDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\SettingsControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

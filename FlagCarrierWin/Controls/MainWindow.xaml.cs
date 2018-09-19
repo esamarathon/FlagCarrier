@@ -1,5 +1,7 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Windows;
 
 using FlagCarrierBase;
@@ -36,6 +38,42 @@ namespace FlagCarrierWin
 		{
 			nfcHandler.StartMonitoring();
 			statusTextBlock.Text = "Monitoring all readers";
+
+			LoadCert();
+		}
+
+		private void LoadCert()
+		{
+			string appLoc = System.Reflection.Assembly.GetExecutingAssembly().Location;
+			string appPath = Path.GetDirectoryName(appLoc);
+			string appName = Path.GetFileNameWithoutExtension(appLoc);
+			string certPath = Path.Combine(appPath, appName + ".pfx");
+
+			if (!File.Exists(certPath))
+				return;
+
+			try
+			{
+				NdefHandler.LoadCert(certPath);
+			}
+			catch (CryptographicException)
+			{
+				try
+				{
+					Controls.PasswordDialog pwDialog = new Controls.PasswordDialog();
+					pwDialog.Owner = this;
+					pwDialog.ShowDialog();
+
+					if (pwDialog.Password == null)
+						return;
+
+					NdefHandler.LoadCert(certPath, pwDialog.Password);
+				}
+				catch (CryptographicException e)
+				{
+					MessageBox.Show(this, "Certificate could not be loaded:\n" + e.Message, "Error");
+				}
+			}
 		}
 
 		private void SettingsControl_WriteToTagRequest(Dictionary<string, string> settings)

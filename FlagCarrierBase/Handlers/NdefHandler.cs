@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Security;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.IO;
 
@@ -29,6 +32,30 @@ namespace FlagCarrierBase
 	{
 		static readonly string EXPECTED_MIME_TYPE = "application/vnd.de.oromit.flagcarrier";
 		static readonly string EXPECTED_APP_REC = "de.oromit.flagcarrier";
+
+		// The certificate in the pfx is ignored, only the public and, if present, private key are used.
+		// Generate pfx using:
+		// openssl req -x509 -sha512 -nodes -days 18250 -newkey rsa:2048 -keyout key.pem -out cert.pem
+		// openssl pkcs12 -passout pass: -export -nokeys -in cert.pem -out flagcarrier_public.pfx
+		// openssl pkcs12 -export -inkey key.pem -in cert.pem -out flagcarrier_private.pfx
+		private static X509Certificate2 cert;
+
+		#region Signing
+
+		public static void ClearCert()
+		{
+			cert = null;
+		}
+
+		public static void LoadCert(string pfxPath, SecureString password=null)
+		{
+			if (password == null)
+				cert = new X509Certificate2(pfxPath);
+			else
+				cert = new X509Certificate2(pfxPath, password);
+		}
+		
+		#endregion
 
 		#region TagReading
 
