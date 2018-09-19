@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "FlagCarrierMini": {
+      "commandName": "Project",
+      "commandLineArgs": "-k lb/AUG57esK+8UroeQX/3gR51P59WwZWezT8mZkIf5I= -v"
+    }
+  }
+}

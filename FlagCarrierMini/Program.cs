@@ -1,8 +1,7 @@
 using System;
 using System.Threading;
 
-using FlagCarrierBase;
-using NdefLibrary.Ndef;
+using CommandLine;
 
 namespace FlagCarrierMini
 {
@@ -19,7 +18,17 @@ namespace FlagCarrierMini
 			};
 
 			FlagCarrierMini fcm = new FlagCarrierMini();
-			fcm.Start();
+
+			Parser.Default.ParseArguments<Options>(args)
+				.WithNotParsed(options =>
+				{
+					exitEvent.Set();
+				})
+				.WithParsed(options =>
+				{
+					fcm.Options = options;
+					fcm.Start();
+				});
 
 			exitEvent.WaitOne();
         }

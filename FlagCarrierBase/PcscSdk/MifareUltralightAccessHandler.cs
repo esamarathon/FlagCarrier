@@ -129,8 +129,6 @@ namespace PcscSdk.MifareUltralight
 				if (!res.Succeeded)
 					throw new ApduFailedException(res, "Exhausted all methods of executing GET_VERSION. Giving up.");
 
-				Console.WriteLine("Response is: " + BitConverter.ToString(res.ResponseData));
-
 				if (res.ResponseData[0] != 0xD5 || res.ResponseData[1] != 0x43 || res.ResponseData[2] != 0x00)
 					throw new ApduFailedException(res, "Raw response data indicates failure " + BitConverter.ToString(new byte[] { res.ResponseData[2] }));
 
