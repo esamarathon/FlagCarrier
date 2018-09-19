@@ -59,7 +59,7 @@ namespace FlagCarrierBase
 
 			string path = Environment.GetEnvironmentVariable("PATH");
 			string binDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, subDir);
-			Environment.SetEnvironmentVariable("PATH", binDir + pathSep + path);
+			Environment.SetEnvironmentVariable("PATH", path + pathSep + binDir);
 		}
 
 		public static void ClearKeys()
@@ -139,8 +139,22 @@ namespace FlagCarrierBase
 			{
 				while (reader.BaseStream.Length - reader.BaseStream.Position > 4)
 				{
+					long initPos = reader.BaseStream.Position;
 					string key = ReadUTF(reader);
 					string val = ReadUTF(reader);
+
+					if (key == "sig_valid")
+						continue;
+
+					if (initPos == 0 && key == "sig" && publicKey != null && publicKey.Length != 0)
+					{
+						long prePos = reader.BaseStream.Position;
+						byte[] msg = reader.ReadBytes((int)(reader.BaseStream.Length - reader.BaseStream.Position));
+						reader.BaseStream.Position = prePos;
+						byte[] sig = Convert.FromBase64String(val);
+
+						res.Add("sig_valid", PublicKeyAuth.VerifyDetached(sig, msg, publicKey).ToString());
+					}
 
 					res.Add(key, val);
 				}
