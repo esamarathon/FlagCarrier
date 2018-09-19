@@ -25,7 +25,7 @@ namespace FlagCarrierWin
 		public void PrefillWithSettings(Dictionary<string, string> settings)
 		{
 			displayNameBox.Text = "set";
-			countryCodeBox.Text = "XX";
+			countryCodeBox.Code = "DE";
 			srcomNameBox.Text = "";
 			twitchNameBox.Text = "";
 			twitterHandleBox.Text = "";
@@ -61,7 +61,7 @@ namespace FlagCarrierWin
 			Dictionary<string, string> vals = new Dictionary<string, string>();
 
 			var dspName = displayNameBox.Text.Trim();
-			var ctrCode = countryCodeBox.Text.Trim();
+			var ctrCode = countryCodeBox.Code;
 			if (dspName == "" || ctrCode == "")
 			{
 				ErrorMessage?.Invoke("Display Name and Country Code are required!");
