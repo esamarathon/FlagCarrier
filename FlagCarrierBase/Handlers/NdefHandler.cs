@@ -76,10 +76,7 @@ namespace FlagCarrierBase
 
 		public static KeyPair GenKeys()
 		{
-			KeyPair pair = PublicKeyAuth.GenerateKeyPair();
-			privateKey = pair.PrivateKey;
-			publicKey = pair.PublicKey;
-			return pair;
+			return PublicKeyAuth.GenerateKeyPair();
 		}
 		
 		#endregion
@@ -242,7 +239,7 @@ namespace FlagCarrierBase
 			if (privateKey == null || privateKey.Length == 0)
 				return rawData;
 
-			byte[] sig = PublicKeyAuth.Sign(rawData, privateKey);
+			byte[] sig = PublicKeyAuth.SignDetached(rawData, privateKey);
 			string sigStr = Convert.ToBase64String(sig);
 
 			using (MemoryStream mem = new MemoryStream())

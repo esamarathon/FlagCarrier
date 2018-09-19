@@ -14,5 +14,11 @@
     <Setting Name="targetUrl" Type="System.String" Scope="User">
       <Value Profile="(Default)">https://oromit.de/hosts.php</Value>
     </Setting>
+    <Setting Name="privateKey" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="publicKey" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

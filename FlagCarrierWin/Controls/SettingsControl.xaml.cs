@@ -28,7 +28,7 @@ namespace FlagCarrierWin
             InitializeComponent();
 
 			ResetSettings();
-
+			ApplyKeyPair();
 		}
 
 		private void TextChanged(object sender, TextChangedEventArgs e)
@@ -42,8 +42,11 @@ namespace FlagCarrierWin
 			Properties.Settings.Default.groupID = groupIdBox.Text;
 			Properties.Settings.Default.positionsAvail = positionsBox.Text;
 			Properties.Settings.Default.targetUrl = targetUrlBox.Text;
+			Properties.Settings.Default.publicKey = pubKeyBox.Text;
+			Properties.Settings.Default.privateKey = privKeyBox.Text;
 			Properties.Settings.Default.Save();
 			applyButton.IsEnabled = false;
+			ApplyKeyPair();
 			UpdatedSettings?.Invoke();
 		}
 
@@ -54,6 +57,9 @@ namespace FlagCarrierWin
 			data.Add("pos_avail", positionsBox.Text);
 			data.Add("group_id", groupIdBox.Text);
 			data.Add("target_url", targetUrlBox.Text);
+
+			if (pubKeyBox.Text.Trim().Length != 0)
+				data.Add("pub_key", pubKeyBox.Text);
 
 			WriteToTagRequest?.Invoke(data);
 		}
@@ -69,7 +75,37 @@ namespace FlagCarrierWin
 			groupIdBox.Text = Properties.Settings.Default.groupID;
 			positionsBox.Text = Properties.Settings.Default.positionsAvail;
 			targetUrlBox.Text = Properties.Settings.Default.targetUrl;
+			pubKeyBox.Text = Properties.Settings.Default.publicKey;
+			privKeyBox.Text = Properties.Settings.Default.privateKey;
 			applyButton.IsEnabled = false;
+		}
+
+		private void GeneratePair_Click(object sender, RoutedEventArgs e)
+		{
+			var pair = FlagCarrierBase.NdefHandler.GenKeys();
+			pubKeyBox.Text = Convert.ToBase64String(pair.PublicKey);
+			privKeyBox.Text = Convert.ToBase64String(pair.PrivateKey);
+			applyButton.IsEnabled = true;
+		}
+
+		private void ApplyKeyPair()
+		{
+			try
+			{
+				byte[] pubKey = Convert.FromBase64String(Properties.Settings.Default.publicKey);
+				byte[] privKey = Convert.FromBase64String(Properties.Settings.Default.privateKey);
+
+				if (Properties.Settings.Default.publicKey.Trim().Length == 0)
+					pubKey = null;
+				if (Properties.Settings.Default.privateKey.Trim().Length == 0)
+					privKey = null;
+
+				FlagCarrierBase.NdefHandler.SetKeys(pubKey, privKey);
+			} catch(FormatException)
+			{
+				MessageBox.Show("Invalid base64 in keypair!", "Error");
+				return;
+			}
 		}
 	}
 }
