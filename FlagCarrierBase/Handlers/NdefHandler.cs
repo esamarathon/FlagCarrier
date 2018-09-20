@@ -40,6 +40,7 @@ namespace FlagCarrierBase
 		static NdefHandler()
 		{
 			string subDir = null;
+			string pathVar = "PATH";
 			string pathSep = ":";
 			if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
@@ -49,6 +50,7 @@ namespace FlagCarrierBase
 			else if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
 			{
 				subDir = @"libsodium-native/linux-";
+				pathVar = "LD_LIBRARY_PATH";
 			}
 			else
 			{
@@ -57,9 +59,9 @@ namespace FlagCarrierBase
 
 			subDir += RuntimeInformation.ProcessArchitecture.ToString().ToLower();
 
-			string path = Environment.GetEnvironmentVariable("PATH");
+			string path = Environment.GetEnvironmentVariable(pathVar);
 			string binDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, subDir);
-			Environment.SetEnvironmentVariable("PATH", path + pathSep + binDir);
+			Environment.SetEnvironmentVariable(pathVar, path + (path.Length != 0 ? pathSep : string.Empty) + binDir);
 		}
 
 		public static void ClearKeys()
