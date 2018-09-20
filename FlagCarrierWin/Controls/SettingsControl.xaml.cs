@@ -52,11 +52,12 @@ namespace FlagCarrierWin
 
 		private void WriteToTagButton_Click(object sender, RoutedEventArgs args)
 		{
-			Dictionary<string, string> data = new Dictionary<string, string>();
-
-			data.Add("pos_avail", positionsBox.Text);
-			data.Add("group_id", groupIdBox.Text);
-			data.Add("target_url", targetUrlBox.Text);
+			Dictionary<string, string> data = new Dictionary<string, string>
+			{
+				{ "pos_avail", positionsBox.Text },
+				{ "group_id", groupIdBox.Text },
+				{ "target_url", targetUrlBox.Text }
+			};
 
 			if (pubKeyBox.Text.Trim().Length != 0)
 				data.Add("pub_key", pubKeyBox.Text);
@@ -82,7 +83,7 @@ namespace FlagCarrierWin
 
 		private void GeneratePair_Click(object sender, RoutedEventArgs e)
 		{
-			var pair = FlagCarrierBase.NdefHandler.GenKeys();
+			var pair = FlagCarrierBase.CryptoHandler.GenKeyPair();
 			pubKeyBox.Text = Convert.ToBase64String(pair.PublicKey);
 			privKeyBox.Text = Convert.ToBase64String(pair.PrivateKey);
 			applyButton.IsEnabled = true;

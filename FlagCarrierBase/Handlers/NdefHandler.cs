@@ -6,8 +6,6 @@ using System.IO;
 using FlagCarrierBase.Zlib;
 using NdefLibrary.Ndef;
 
-using Org.BouncyCastle.Security;
-using Org.BouncyCastle.Math.EC.Rfc8032;
 
 namespace FlagCarrierBase
 {
@@ -28,12 +26,6 @@ namespace FlagCarrierBase
 		}
 	}
 
-	public class KeyPair
-	{
-		public byte[] PublicKey { get; set; }
-		public byte[] PrivateKey { get; set; }
-	}
-
 	public static class NdefHandler
 	{
 		static readonly string EXPECTED_MIME_TYPE = "application/vnd.de.oromit.flagcarrier";
@@ -41,15 +33,6 @@ namespace FlagCarrierBase
 
 		static private byte[] privateKey = null;
 		static private byte[] publicKey = null;
-
-		#region Signing
-
-		private static SecureRandom random = new SecureRandom();
-
-		static NdefHandler()
-		{
-			Ed25519.Precompute();
-		}
 
 		public static void ClearKeys()
 		{
@@ -62,23 +45,6 @@ namespace FlagCarrierBase
 			NdefHandler.privateKey = privateKey;
 			NdefHandler.publicKey = publicKey;
 		}
-
-		public static KeyPair GenKeys()
-		{
-			byte[] privKey = new byte[Ed25519.SecretKeySize];
-			byte[] pubKey = new byte[Ed25519.PublicKeySize];
-
-			random.NextBytes(privKey);
-			Ed25519.GeneratePublicKey(privKey, 0, pubKey, 0);
-
-			return new KeyPair
-			{
-				PrivateKey = privKey,
-				PublicKey = pubKey
-			};
-		}
-		
-		#endregion
 
 		#region TagReading
 
@@ -145,19 +111,14 @@ namespace FlagCarrierBase
 					if (key == "sig_valid")
 						continue;
 
-					if (initPos == 0 && key == "sig" && publicKey != null && publicKey.Length == Ed25519.PublicKeySize)
+					if (initPos == 0 && key == "sig" && publicKey != null && publicKey.Length != 0)
 					{
 						long prePos = reader.BaseStream.Position;
 						byte[] msg = reader.ReadBytes((int)(reader.BaseStream.Length - reader.BaseStream.Position));
 						reader.BaseStream.Position = prePos;
 						byte[] sig = Convert.FromBase64String(val);
 
-						bool sigValid = false;
-
-						if (sig.Length == Ed25519.SignatureSize)
-							sigValid = Ed25519.Verify(sig, 0, publicKey, 0, msg, 0, msg.Length);
-
-						res.Add("sig_valid", sigValid.ToString());
+						res.Add("sig_valid", CryptoHandler.VerifyDetached(sig, msg, publicKey).ToString());
 					}
 
 					res.Add(key, val);
@@ -254,11 +215,10 @@ namespace FlagCarrierBase
 				rawData = mem.ToArray();
 			}
 
-			if (privateKey == null || privateKey.Length != Ed25519.SecretKeySize)
+			if (privateKey == null || privateKey.Length == 0)
 				return rawData;
 
-			byte[] sig = new byte[Ed25519.SignatureSize];
-			Ed25519.Sign(privateKey, 0, rawData, 0, rawData.Length, sig, 0);
+			byte[] sig = CryptoHandler.SignDetached(rawData, privateKey);
 			string sigStr = Convert.ToBase64String(sig);
 
 			using (MemoryStream mem = new MemoryStream())
