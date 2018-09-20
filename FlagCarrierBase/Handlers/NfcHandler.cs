@@ -77,27 +77,34 @@ namespace FlagCarrierBase
 
 		public void StartMonitoring(string[] readerNames = null)
 		{
-			if (monitor == null)
+			try
 			{
-				var monitorFactory = MonitorFactory.Instance;
-				monitor = monitorFactory.Create(SCardScope.System);
-				monitor.MonitorException += Monitor_MonitorException;
-				monitor.CardInserted += Monitor_CardInserted;
-				monitor.CardRemoved += Monitor_CardRemoved;
+				if (monitor == null)
+				{
+					var monitorFactory = MonitorFactory.Instance;
+					monitor = monitorFactory.Create(SCardScope.System);
+					monitor.MonitorException += Monitor_MonitorException;
+					monitor.CardInserted += Monitor_CardInserted;
+					monitor.CardRemoved += Monitor_CardRemoved;
+				}
+
+				monitor.Cancel();
+
+				if (readerNames == null)
+					readerNames = GetReaderNames();
+
+				foreach (string readerName in readerNames)
+					TryTurnOffBeep(readerName);
+
+				if (readerNames.Length == 0)
+					return;
+
+				monitor.Start(readerNames);
 			}
-
-			monitor.Cancel();
-
-			if (readerNames == null)
-				readerNames = GetReaderNames();
-
-			foreach (string readerName in readerNames)
-				TryTurnOffBeep(readerName);
-
-			if (readerNames.Length == 0)
-				return;
-
-			monitor.Start(readerNames);
+			catch(PCSCException e)
+			{
+				throw new NfcHandlerException("Failed monitoring readers\n" + e.Message, e);
+			}
 		}
 
 		private void TryTurnOffBeep(string readerName)

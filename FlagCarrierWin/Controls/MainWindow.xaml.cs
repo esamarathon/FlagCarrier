@@ -36,8 +36,15 @@ namespace FlagCarrierWin
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
-			nfcHandler.StartMonitoring();
-			statusTextBlock.Text = "Monitoring all readers";
+			try
+			{
+				nfcHandler.StartMonitoring();
+				statusTextBlock.Text = "Monitoring all readers";
+			}
+			catch (Exception ex)
+			{
+				ClearOutput(ex.Message);
+			}
 		}
 
 		private void SettingsControl_WriteToTagRequest(Dictionary<string, string> settings)
