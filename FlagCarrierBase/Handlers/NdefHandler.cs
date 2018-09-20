@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.IO;
 
 using FlagCarrierBase.Zlib;
 using NdefLibrary.Ndef;
-using Sodium;
+
+using Org.BouncyCastle.Security;
+using Org.BouncyCastle.Math.EC.Rfc8032;
 
 namespace FlagCarrierBase
 {
@@ -27,6 +28,12 @@ namespace FlagCarrierBase
 		}
 	}
 
+	public class KeyPair
+	{
+		public byte[] PublicKey { get; set; }
+		public byte[] PrivateKey { get; set; }
+	}
+
 	public static class NdefHandler
 	{
 		static readonly string EXPECTED_MIME_TYPE = "application/vnd.de.oromit.flagcarrier";
@@ -37,31 +44,11 @@ namespace FlagCarrierBase
 
 		#region Signing
 
+		private static SecureRandom random = new SecureRandom();
+
 		static NdefHandler()
 		{
-			string subDir = null;
-			string pathVar = "PATH";
-			string pathSep = ":";
-			if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-			{
-				subDir = @"libsodium-native\win-";
-				pathSep = ";";
-			}
-			else if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-			{
-				subDir = @"libsodium-native/linux-";
-				pathVar = "LD_LIBRARY_PATH";
-			}
-			else
-			{
-				return;
-			}
-
-			subDir += RuntimeInformation.ProcessArchitecture.ToString().ToLower();
-
-			string path = Environment.GetEnvironmentVariable(pathVar);
-			string binDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, subDir);
-			Environment.SetEnvironmentVariable(pathVar, path + (path.Length != 0 ? pathSep : string.Empty) + binDir);
+			Ed25519.Precompute();
 		}
 
 		public static void ClearKeys()
@@ -78,7 +65,17 @@ namespace FlagCarrierBase
 
 		public static KeyPair GenKeys()
 		{
-			return PublicKeyAuth.GenerateKeyPair();
+			byte[] privKey = new byte[Ed25519.SecretKeySize];
+			byte[] pubKey = new byte[Ed25519.PublicKeySize];
+
+			random.NextBytes(privKey);
+			Ed25519.GeneratePublicKey(privKey, 0, pubKey, 0);
+
+			return new KeyPair
+			{
+				PrivateKey = privKey,
+				PublicKey = pubKey
+			};
 		}
 		
 		#endregion
@@ -148,14 +145,19 @@ namespace FlagCarrierBase
 					if (key == "sig_valid")
 						continue;
 
-					if (initPos == 0 && key == "sig" && publicKey != null && publicKey.Length != 0)
+					if (initPos == 0 && key == "sig" && publicKey != null && publicKey.Length == Ed25519.PublicKeySize)
 					{
 						long prePos = reader.BaseStream.Position;
 						byte[] msg = reader.ReadBytes((int)(reader.BaseStream.Length - reader.BaseStream.Position));
 						reader.BaseStream.Position = prePos;
 						byte[] sig = Convert.FromBase64String(val);
 
-						res.Add("sig_valid", PublicKeyAuth.VerifyDetached(sig, msg, publicKey).ToString());
+						bool sigValid = false;
+
+						if (sig.Length == Ed25519.SignatureSize)
+							sigValid = Ed25519.Verify(sig, 0, publicKey, 0, msg, 0, msg.Length);
+
+						res.Add("sig_valid", sigValid.ToString());
 					}
 
 					res.Add(key, val);
@@ -252,10 +254,11 @@ namespace FlagCarrierBase
 				rawData = mem.ToArray();
 			}
 
-			if (privateKey == null || privateKey.Length == 0)
+			if (privateKey == null || privateKey.Length != Ed25519.SecretKeySize)
 				return rawData;
 
-			byte[] sig = PublicKeyAuth.SignDetached(rawData, privateKey);
+			byte[] sig = new byte[Ed25519.SignatureSize];
+			Ed25519.Sign(privateKey, 0, rawData, 0, rawData.Length, sig, 0);
 			string sigStr = Convert.ToBase64String(sig);
 
 			using (MemoryStream mem = new MemoryStream())
