@@ -10,6 +10,8 @@ namespace FlagCarrierMini
 	class FlagCarrierMini
 	{
 		private NfcHandler nfcHandler;
+		private string acrReader = null;
+		private bool signalSuccess, signalFailure;
 
 		private Options options = new Options();
 		public Options Options
@@ -40,6 +42,19 @@ namespace FlagCarrierMini
 			nfcHandler.StatusMessage += NfcHandler_StatusMessage;
 			nfcHandler.ErrorMessage += NfcHandler_ErrorMessage;
 			nfcHandler.ReceiveNdefMessage += NfcHandler_ReceiveNdefMessage;
+			nfcHandler.CardHandlingDone += NfcHandler_CardHandlingDone;
+
+			acrReader = nfcHandler.GetACRReader();
+		}
+
+		private void NfcHandler_CardHandlingDone(string obj)
+		{
+			if (signalFailure && acrReader != null)
+				nfcHandler.SignalFailure(acrReader);
+			else if (signalSuccess && acrReader != null)
+				nfcHandler.SignalSuccess(acrReader);
+
+			signalSuccess = signalFailure = false;
 		}
 
 		public void Start()
@@ -60,12 +75,16 @@ namespace FlagCarrierMini
 
 			if (!vals.ContainsKey("sig_valid") || vals["sig_valid"] != "True")
 			{
+				signalFailure = true;
 
 				Console.WriteLine("Invalid signature trying to parse tag for " + disp_name);
 				return;
 			}
 
+			signalSuccess = true;
+
 			Console.WriteLine("Successfully detected valid tag owned by " + disp_name);
+
 			//TODO: Actually do stuff. Trigger the relaise!
 		}
 

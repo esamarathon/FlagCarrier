@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Linq;
 using System.IO;
 
@@ -32,6 +33,7 @@ namespace FlagCarrierBase
 	public class NfcHandler : IDisposable
 	{
 		private static readonly IContextFactory contextFactory = ContextFactory.Instance;
+		private volatile int blockCardEvents = 0;
 
 		public static string[] GetReaderNames()
 		{
@@ -66,6 +68,7 @@ namespace FlagCarrierBase
 		public event Action<string> StatusMessage;
 		public event Action<string> ErrorMessage;
 		public event Action<string> CardAdded;
+		public event Action<string> CardHandlingDone;
 		public event Action<string> CardRemoved;
 		public event Action<NdefMessage> ReceiveNdefMessage;
 
@@ -118,6 +121,113 @@ namespace FlagCarrierBase
 			}
 		}
 
+		public string GetACRReader()
+		{
+			string[] readerNames = GetReaderNames();
+			foreach (string readerName in readerNames)
+				if (readerName.Contains("ACR"))
+					return readerName;
+			return null;
+		}
+
+		public class ACRReaderControl
+		{
+			public bool finalRed; // Final Red LED State (On/Off)
+			public bool finalGreen; // Final Green LED State (On/Off)
+			public bool redMask; // Red LED State Mask (Update the State/No change)
+			public bool greenMask; // Green LED State Mask (Update the State/No change)
+			public bool initRedBlink; // Initial Red LED Blinking State (On/Off)
+			public bool initGreenBlink; // Initial Green LED Blinking State (On/Off)
+			public bool redBlinkMask; // Red LED Blinking Mask (Blink/Not Blink)
+			public bool greenBlinkMask; // Green LED Blinking Mask (Blink/Not Blink)
+
+			public byte t1Duration; // T1 Duration Initial Blinking State, unit: 100ms
+			public byte t2Duration; // T2 Duration Toggle Blinking State, unit: 100ms
+			public byte reps; // Nuber of repetition
+			public byte buzzer; // bitmask, 1 = on during T1, 2 = on during T2, 3 = on during both
+		}
+
+		public Iso7816.ApduResponse SignalACR(string readerName, ACRReaderControl ctrl)
+		{
+			byte ledStateCtrl = 0;
+			if (ctrl.finalRed)
+				ledStateCtrl |= 1 << 0;
+			if (ctrl.finalGreen)
+				ledStateCtrl |= 1 << 1;
+			if (ctrl.redMask)
+				ledStateCtrl |= 1 << 2;
+			if (ctrl.greenMask)
+				ledStateCtrl |= 1 << 3;
+			if (ctrl.initRedBlink)
+				ledStateCtrl |= 1 << 4;
+			if (ctrl.initGreenBlink)
+				ledStateCtrl |= 1 << 5;
+			if (ctrl.redBlinkMask)
+				ledStateCtrl |= 1 << 6;
+			if (ctrl.greenBlinkMask)
+				ledStateCtrl |= 1 << 7;
+			byte[] ctrlData = new byte[] { ctrl.t1Duration, ctrl.t2Duration, ctrl.reps, ctrl.buzzer };
+
+			blockCardEvents += 1;
+
+			try
+			{
+				using (ISCardContext ctx = contextFactory.Establish(SCardScope.System))
+				using (ICardReader reader = ctx.ConnectReader(readerName, SCardShareMode.Direct, SCardProtocol.Unset))
+				{
+					var apdu = new Iso7816.ApduCommand(0xFF, 0x00, 0x40, ledStateCtrl, ctrlData, null);
+					return reader.Control(apdu);
+				}
+			}
+			finally
+			{
+				new Thread(() =>
+				{
+					Thread.Sleep(((ctrl.t1Duration * 100) + (ctrl.t2Duration * 100)) * ctrl.reps);
+					blockCardEvents -= 1;
+				}).Start();
+			}
+
+			// For all I'm aware, this always returns a failure APDU, but the reader does perform the specified action.
+		}
+
+		public void SignalSuccess(string readerName)
+		{
+			ACRReaderControl ctrl = new ACRReaderControl
+			{
+				finalRed = true,
+				initGreenBlink = true,
+				greenBlinkMask = true,
+				redMask = true,
+				greenMask = true,
+
+				t1Duration = 4,
+				t2Duration = 4,
+				reps = 5
+			};
+
+			SignalACR(readerName, ctrl);
+		}
+
+		public void SignalFailure(string readerName)
+		{
+			ACRReaderControl ctrl = new ACRReaderControl
+			{
+				finalRed = true,
+				initRedBlink = true,
+				redBlinkMask = true,
+				redMask = true,
+				greenMask = true,
+
+				t1Duration = 6,
+				t2Duration = 4,
+				reps = 3,
+				buzzer = 1
+			};
+
+			SignalACR(readerName, ctrl);
+		}
+
 		public void WriteNdefMessage(NdefMessage msg)
 		{
 			if (msg != null)
@@ -128,6 +238,9 @@ namespace FlagCarrierBase
 
 		private void Monitor_CardInserted(object sender, CardStatusEventArgs args)
 		{
+			if (blockCardEvents > 0)
+				return;
+
 			CardAdded?.Invoke(args.ReaderName);
 			StatusMessage?.Invoke("Tag detected on " + args.ReaderName);
 
@@ -139,10 +252,17 @@ namespace FlagCarrierBase
 			{
 				ErrorMessage?.Invoke("Error handling tag: " + e.Message);
 			}
+
+			CardHandlingDone?.Invoke(args.ReaderName);
 		}
 
 		private void Monitor_CardRemoved(object sender, CardStatusEventArgs args)
 		{
+			if (blockCardEvents > 0)
+				return;
+
+			StatusMessage?.Invoke("Tag removed on " + args.ReaderName);
+
 			CardRemoved?.Invoke(args.ReaderName);
 		}
 
