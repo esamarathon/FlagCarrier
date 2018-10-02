@@ -79,6 +79,7 @@ namespace FlagCarrierWin
 		private void NfcHandler_CardAdded(string reader)
 		{
 			Dispatcher.Invoke(() => ClearOutput());
+			NdefHandler.ClearExtraSignData();
 		}
 
 		private void StatusMessage(string msg)

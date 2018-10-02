@@ -103,6 +103,7 @@ namespace FlagCarrierMini
 		private void NfcHandler_CardAdded(string readerName)
 		{
 			Console.WriteLine("Card added!");
+			NdefHandler.ClearExtraSignData();
 		}
 	}
 }
