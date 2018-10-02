@@ -322,6 +322,8 @@ namespace FlagCarrierBase
 
 			byte[] uid = mifare.GetUid();
 			StatusMessage?.Invoke("UID: " + BitConverter.ToString(uid));
+			Array.Resize(ref uid, uid.Length + 1);
+			uid[uid.Length - 1] = 0xAA;
 			NewTagUid?.Invoke(uid);
 
 			byte[] infoData = mifare.Read(0);
@@ -420,6 +422,8 @@ namespace FlagCarrierBase
 
 			byte[] uid = mifare.GetUid();
 			StatusMessage?.Invoke("UID: " + BitConverter.ToString(uid));
+			Array.Resize(ref uid, uid.Length + 1);
+			uid[uid.Length - 1] = 0xBB;
 			NewTagUid?.Invoke(uid);
 
 			byte gpByte = InitAndGetGPMifareStandard(mifare);
