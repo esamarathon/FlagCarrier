@@ -33,6 +33,7 @@ namespace FlagCarrierBase
 
 		static private byte[] privateKey = null;
 		static private byte[] publicKey = null;
+		static private byte[] extraSignData = null;
 
 		public static void ClearKeys()
 		{
@@ -44,6 +45,16 @@ namespace FlagCarrierBase
 		{
 			NdefHandler.privateKey = privateKey;
 			NdefHandler.publicKey = publicKey;
+		}
+
+		public static void ClearExtraSignData()
+		{
+			extraSignData = null;
+		}
+
+		public static void SetExtraSignData(byte[] extraSignData)
+		{
+			NdefHandler.extraSignData = extraSignData;
 		}
 
 		#region TagReading
@@ -117,6 +128,13 @@ namespace FlagCarrierBase
 						byte[] msg = reader.ReadBytes((int)(reader.BaseStream.Length - reader.BaseStream.Position));
 						reader.BaseStream.Position = prePos;
 						byte[] sig = Convert.FromBase64String(val);
+
+						if (extraSignData != null)
+						{
+							int preLen = msg.Length;
+							Array.Resize(ref msg, preLen + extraSignData.Length);
+							extraSignData.CopyTo(msg, preLen);
+						}
 
 						res.Add("sig_valid", CryptoHandler.VerifyDetached(sig, msg, publicKey).ToString());
 					}
@@ -218,7 +236,15 @@ namespace FlagCarrierBase
 			if (privateKey == null || privateKey.Length == 0)
 				return rawData;
 
-			byte[] sig = CryptoHandler.SignDetached(rawData, privateKey);
+			byte[] signData = rawData;
+			if (extraSignData != null)
+			{
+				signData = new byte[rawData.Length + extraSignData.Length];
+				rawData.CopyTo(signData, 0);
+				extraSignData.CopyTo(signData, rawData.Length);
+			}
+
+			byte[] sig = CryptoHandler.SignDetached(signData, privateKey);
 			string sigStr = Convert.ToBase64String(sig);
 
 			using (MemoryStream mem = new MemoryStream())
