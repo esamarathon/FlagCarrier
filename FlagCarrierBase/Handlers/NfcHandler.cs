@@ -71,6 +71,7 @@ namespace FlagCarrierBase
 		public event Action<string> CardHandlingDone;
 		public event Action<string> CardRemoved;
 		public event Action<NdefMessage> ReceiveNdefMessage;
+		public event Action<byte[]> NewTagUid;
 
 		private byte[] ndefDataToWrite;
 		private ISCardMonitor monitor;
@@ -321,6 +322,7 @@ namespace FlagCarrierBase
 
 			byte[] uid = mifare.GetUid();
 			StatusMessage?.Invoke("UID: " + BitConverter.ToString(uid));
+			NewTagUid?.Invoke(uid);
 
 			byte[] infoData = mifare.Read(0);
 			StatusMessage?.Invoke("CC: " + BitConverter.ToString(infoData.Skip(12).ToArray()));
@@ -418,6 +420,7 @@ namespace FlagCarrierBase
 
 			byte[] uid = mifare.GetUid();
 			StatusMessage?.Invoke("UID: " + BitConverter.ToString(uid));
+			NewTagUid?.Invoke(uid);
 
 			byte gpByte = InitAndGetGPMifareStandard(mifare);
 
