@@ -25,6 +25,7 @@ namespace FlagCarrierWin
 			nfcHandler.StatusMessage += StatusMessage;
 			nfcHandler.ErrorMessage += StatusMessage;
 			nfcHandler.ReceiveNdefMessage += NfcHandler_ReceiveNdefMessage;
+			nfcHandler.NewTagUid += NdefHandler.SetExtraSignData;
 
 			writeControl.ManualLoginRequest += WriteControl_ManualLoginRequest;
 			writeControl.WriteMessageRequest += WriteControl_WriteMessageRequest;

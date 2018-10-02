@@ -43,6 +43,7 @@ namespace FlagCarrierMini
 			nfcHandler.ErrorMessage += NfcHandler_ErrorMessage;
 			nfcHandler.ReceiveNdefMessage += NfcHandler_ReceiveNdefMessage;
 			nfcHandler.CardHandlingDone += NfcHandler_CardHandlingDone;
+			nfcHandler.NewTagUid += NdefHandler.SetExtraSignData;
 
 			acrReader = nfcHandler.GetACRReader();
 		}
