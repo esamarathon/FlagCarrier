@@ -50,10 +50,17 @@ namespace FlagCarrierMini
 
 		private void NfcHandler_CardHandlingDone(string obj)
 		{
-			if (signalFailure && acrReader != null)
-				nfcHandler.SignalFailure(acrReader);
-			else if (signalSuccess && acrReader != null)
-				nfcHandler.SignalSuccess(acrReader);
+			try
+			{
+				if (signalFailure && acrReader != null)
+					nfcHandler.SignalFailure(acrReader);
+				else if (signalSuccess && acrReader != null)
+					nfcHandler.SignalSuccess(acrReader);
+			}
+			catch (PCSC.Exceptions.PCSCException e)
+			{
+				Console.WriteLine("Failed signaling: " + e.Message);
+			}
 
 			signalSuccess = signalFailure = false;
 		}
