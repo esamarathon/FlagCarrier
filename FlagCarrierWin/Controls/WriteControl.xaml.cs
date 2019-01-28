@@ -2,9 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Net;
+using System.Net.Http;
+using System.Web;
+using System.Linq;
 
 using FlagCarrierBase;
 using NdefLibrary.Ndef;
+using Newtonsoft.Json.Linq;
 
 namespace FlagCarrierWin
 {
@@ -13,6 +18,8 @@ namespace FlagCarrierWin
     /// </summary>
     public partial class WriteControl : UserControl
     {
+		private readonly HttpClient httpClient = new HttpClient();
+
 		public event Action<Dictionary<string, string>> ManualLoginRequest;
 		public event Action<NdefMessage> WriteMessageRequest;
 		public event Action<string> ErrorMessage;
@@ -54,6 +61,95 @@ namespace FlagCarrierWin
 				return;
 
 			ManualLoginRequest?.Invoke(data);
+		}
+
+		private void ClearButton_Click(object sender, RoutedEventArgs e)
+		{
+			displayNameBox.Text = "0";
+			countryCodeBox.Code = "DE";
+			srcomNameBox.Text = "";
+			twitchNameBox.Text = "";
+			twitterHandleBox.Text = "";
+			extraDataBox.Clear();
+		}
+
+		private async void FromSrComButton_Click(object sender, RoutedEventArgs e)
+		{
+			string lookup_name = srcomNameBox.Text.Trim();
+
+			if (lookup_name == "")
+				lookup_name = displayNameBox.Text.Trim();
+
+			if (lookup_name == "")
+				return;
+
+			HttpResponseMessage response = await httpClient.GetAsync("https://www.speedrun.com/api/v1/users?lookup=" + HttpUtility.UrlEncode(lookup_name));
+
+			if (response.StatusCode != HttpStatusCode.OK)
+			{
+				ErrorMessage?.Invoke("sr.com request failed: " + response.StatusCode.ToString());
+				return;
+			}
+
+			string data = await response.Content.ReadAsStringAsync();
+
+			try
+			{
+				var srdata = JObject.Parse(data);
+				var userdata = srdata["data"][0];
+
+				try
+				{
+					displayNameBox.Text = (string)userdata["names"]["international"];
+				}
+				catch (Exception)
+				{
+					displayNameBox.Text = "";
+				}
+
+				try
+				{
+					countryCodeBox.Code = (string)userdata["location"]["country"]["code"];
+				}
+				catch (Exception)
+				{
+					countryCodeBox.Code = "de";
+				}
+
+				try
+				{
+					string srname = (string)userdata["weblink"];
+					srcomNameBox.Text = srname.Split('/').Last();
+				}
+				catch (Exception)
+				{
+					srcomNameBox.Text = "";
+				}
+
+				try
+				{
+					string twitch = (string)userdata["twitch"]["uri"];
+					twitchNameBox.Text = twitch.Split('/').Last();
+				}
+				catch (Exception)
+				{
+					twitchNameBox.Text = "";
+				}
+
+				try
+				{
+					string twitter = (string)userdata["twitter"]["uri"];
+					twitterHandleBox.Text = twitter.Split('/').Last();
+				}
+				catch (Exception)
+				{
+					twitterHandleBox.Text = "";
+				}
+			}
+			catch(Exception ex)
+			{
+				ErrorMessage?.Invoke("Failed parsing sr.com data:\n" + ex.Message);
+			}
 		}
 
 		private Dictionary<string, string> GetWriteData()
