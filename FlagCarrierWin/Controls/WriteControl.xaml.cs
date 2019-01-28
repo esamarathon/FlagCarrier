@@ -123,8 +123,7 @@ namespace FlagCarrierWin
 
 				try
 				{
-					string country = (string)userdata["location"]["country"]["code"];
-					countryCodeBox.Code = country.Substring(0, 2);
+					countryCodeBox.Code = (string)userdata["location"]["country"]["code"];
 				}
 				catch (Exception)
 				{
