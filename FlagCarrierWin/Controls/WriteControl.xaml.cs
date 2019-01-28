@@ -19,6 +19,7 @@ namespace FlagCarrierWin
     public partial class WriteControl : UserControl
     {
 		private readonly HttpClient httpClient = new HttpClient();
+		private TextBox lastChangedTextBox = null;
 
 		public event Action<Dictionary<string, string>> ManualLoginRequest;
 		public event Action<NdefMessage> WriteMessageRequest;
@@ -27,7 +28,10 @@ namespace FlagCarrierWin
         public WriteControl()
         {
             InitializeComponent();
-        }
+
+			lastChangedTextBox = displayNameBox;
+
+		}
 
 		public void PrefillWithSettings(Dictionary<string, string> settings)
 		{
@@ -65,7 +69,7 @@ namespace FlagCarrierWin
 
 		private void ClearButton_Click(object sender, RoutedEventArgs e)
 		{
-			displayNameBox.Text = "0";
+			displayNameBox.Text = "";
 			countryCodeBox.Code = "DE";
 			srcomNameBox.Text = "";
 			twitchNameBox.Text = "";
@@ -75,10 +79,7 @@ namespace FlagCarrierWin
 
 		private async void FromSrComButton_Click(object sender, RoutedEventArgs e)
 		{
-			string lookup_name = srcomNameBox.Text.Trim();
-
-			if (lookup_name == "")
-				lookup_name = displayNameBox.Text.Trim();
+			string lookup_name = lastChangedTextBox.Text.Trim();
 
 			if (lookup_name == "")
 				return;
@@ -96,7 +97,20 @@ namespace FlagCarrierWin
 			try
 			{
 				var srdata = JObject.Parse(data);
-				var userdata = srdata["data"][0];
+				var userdata = srdata["data"];
+
+				if (userdata.Count() <= 0)
+				{
+					ErrorMessage?.Invoke("Not found on speedrun.com: " + lookup_name);
+					return;
+				}
+
+				if (userdata.Count() != 1)
+				{
+					ErrorMessage?.Invoke("Multiple results for \"" + lookup_name + "\", using first one.");
+				}
+
+				userdata = userdata[0];
 
 				try
 				{
@@ -109,7 +123,8 @@ namespace FlagCarrierWin
 
 				try
 				{
-					countryCodeBox.Code = (string)userdata["location"]["country"]["code"];
+					string country = (string)userdata["location"]["country"]["code"];
+					countryCodeBox.Code = country.Substring(0, 2);
 				}
 				catch (Exception)
 				{
@@ -193,6 +208,14 @@ namespace FlagCarrierWin
 			}
 
 			return vals;
+		}
+
+		private void AnyBox_TextChanged(object sender, TextChangedEventArgs e)
+		{
+			TextBox box = sender as TextBox;
+			if (box == null)
+				return;
+			lastChangedTextBox = box;
 		}
 	}
 }
