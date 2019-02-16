@@ -36,6 +36,11 @@ namespace FlagCarrierWin
 			applyButton.IsEnabled = true;
 		}
 
+		private void HideSettings_Click(object sender, RoutedEventArgs e)
+		{
+			applyButton.IsEnabled = true;
+		}
+
 		private void ApplyButton_Click(object sender, RoutedEventArgs args)
 		{
 			Properties.Settings.Default.deviceID = deviceIdBox.Text;
@@ -44,6 +49,7 @@ namespace FlagCarrierWin
 			Properties.Settings.Default.targetUrl = targetUrlBox.Text;
 			Properties.Settings.Default.publicKey = pubKeyBox.Text;
 			Properties.Settings.Default.privateKey = privKeyBox.Text;
+			Properties.Settings.Default.hideSettings = (bool)hideSettingsCheckBox.IsChecked;
 			Properties.Settings.Default.Save();
 			applyButton.IsEnabled = false;
 			ApplyKeyPair();
@@ -78,6 +84,7 @@ namespace FlagCarrierWin
 			targetUrlBox.Text = Properties.Settings.Default.targetUrl;
 			pubKeyBox.Text = Properties.Settings.Default.publicKey;
 			privKeyBox.Text = Properties.Settings.Default.privateKey;
+			hideSettingsCheckBox.IsChecked = Properties.Settings.Default.hideSettings;
 			applyButton.IsEnabled = false;
 		}
 
@@ -102,7 +109,8 @@ namespace FlagCarrierWin
 					privKey = null;
 
 				FlagCarrierBase.NdefHandler.SetKeys(pubKey, privKey);
-			} catch(FormatException)
+			}
+			catch (FormatException)
 			{
 				MessageBox.Show("Invalid base64 in keypair!", "Error");
 				return;

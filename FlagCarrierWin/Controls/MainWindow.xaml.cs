@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Windows;
+using System.Windows.Input;
 
 using FlagCarrierBase;
 using NdefLibrary.Ndef;
@@ -20,6 +21,10 @@ namespace FlagCarrierWin
 		{
 			InitializeComponent();
 
+			RoutedCommand jumpToSettings = new RoutedCommand();
+			jumpToSettings.InputGestures.Add(new KeyGesture(Key.O, ModifierKeys.Control | ModifierKeys.Shift));
+			CommandBindings.Add(new CommandBinding(jumpToSettings, JumpToSettings));
+
 			nfcHandler = new NfcHandler();
 			nfcHandler.CardAdded += NfcHandler_CardAdded;
 			nfcHandler.StatusMessage += StatusMessage;
@@ -33,6 +38,21 @@ namespace FlagCarrierWin
 
 			settingsControl.WriteToTagRequest += SettingsControl_WriteToTagRequest;
 			settingsControl.UpdatedSettings += loginControl.SettingsChanged;
+			settingsControl.UpdatedSettings += UpdatedSettings;
+
+			UpdatedSettings();
+		}
+
+		private void JumpToSettings(object sender, ExecutedRoutedEventArgs e)
+		{
+			mainTabControl.SelectedItem = settingsTab;
+		}
+
+		private void UpdatedSettings()
+		{
+			settingsTab.Visibility = Properties.Settings.Default.hideSettings
+				? Visibility.Hidden
+				: Visibility.Visible;
 		}
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)

@@ -33,6 +33,7 @@
 			<TextBlock Margin="0,2,0,5">Private Key</TextBlock>
 			<TextBox Name="privKeyBox" TextChanged="TextChanged" />
 			<Button Margin="0,5,0,5" Click="GeneratePair_Click">Generate Keypair</Button>
+			<CheckBox Name="hideSettingsCheckBox" Margin="0,5,0,5" Click="HideSettings_Click">Hide Settings</CheckBox>
 		</StackPanel>
 		<Button Name="applyButton" IsEnabled="False" Margin="2" Grid.Row="2" Grid.Column="0" Click="ApplyButton_Click">Apply</Button>
 		<Button Margin="2" Grid.Row="2" Grid.Column="1" Click="WriteToTagButton_Click">Write to tag</Button>
