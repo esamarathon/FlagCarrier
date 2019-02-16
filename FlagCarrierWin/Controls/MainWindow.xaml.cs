@@ -15,6 +15,7 @@ namespace FlagCarrierWin
 	/// </summary>
 	public partial class MainWindow : Window
 	{
+		Dictionary<string, string> dataToWrite;
 		NfcHandler nfcHandler;
 
 		public MainWindow()
@@ -27,13 +28,14 @@ namespace FlagCarrierWin
 
 			nfcHandler = new NfcHandler();
 			nfcHandler.CardAdded += NfcHandler_CardAdded;
+			nfcHandler.CardRemoved += NfcHandler_CardRemoved;
 			nfcHandler.StatusMessage += StatusMessage;
 			nfcHandler.ErrorMessage += StatusMessage;
 			nfcHandler.ReceiveNdefMessage += NfcHandler_ReceiveNdefMessage;
-			nfcHandler.NewTagUid += NdefHandler.SetExtraSignData;
+			nfcHandler.NewTagUid += NfcHandler_NewTagUid;
 
 			writeControl.ManualLoginRequest += WriteControl_ManualLoginRequest;
-			writeControl.WriteMessageRequest += WriteControl_WriteMessageRequest;
+			writeControl.WriteDataRequest += WriteControl_WriteDataRequest;
 			writeControl.ErrorMessage += StatusMessage;
 
 			settingsControl.WriteToTagRequest += SettingsControl_WriteToTagRequest;
@@ -41,6 +43,22 @@ namespace FlagCarrierWin
 			settingsControl.UpdatedSettings += UpdatedSettings;
 
 			UpdatedSettings();
+		}
+
+		private void NfcHandler_CardRemoved(string name)
+		{
+			NdefHandler.ClearExtraSignData();
+		}
+
+		private void NfcHandler_NewTagUid(byte[] uid)
+		{
+			NdefHandler.SetExtraSignData(uid);
+
+			if (dataToWrite != null) {
+				var msg = NdefHandler.GenerateNdefMessage(dataToWrite);
+				nfcHandler.WriteNdefMessage(msg);
+				dataToWrite = null;
+			}
 		}
 
 		private void JumpToSettings(object sender, ExecutedRoutedEventArgs e)
@@ -74,10 +92,11 @@ namespace FlagCarrierWin
 			writeTab.IsSelected = true;
 		}
 
-		private void WriteControl_WriteMessageRequest(NdefMessage msg)
+		private void WriteControl_WriteDataRequest(Dictionary<string, string> msg)
 		{
-			nfcHandler.WriteNdefMessage(msg);
-			ClearOutput("Scan tag to write.");
+			dataToWrite = msg;
+			if (msg != null)
+				ClearOutput("Scan tag to write.");
 		}
 
 		private void WriteControl_ManualLoginRequest(Dictionary<string, string> data)

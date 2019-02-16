@@ -22,7 +22,7 @@ namespace FlagCarrierWin
 		private TextBox lastChangedTextBox = null;
 
 		public event Action<Dictionary<string, string>> ManualLoginRequest;
-		public event Action<NdefMessage> WriteMessageRequest;
+		public event Action<Dictionary<string, string>> WriteDataRequest;
 		public event Action<string> ErrorMessage;
 
         public WriteControl()
@@ -53,9 +53,7 @@ namespace FlagCarrierWin
 			if (data == null)
 				return;
 
-			var msg = NdefHandler.GenerateNdefMessage(data);
-
-			WriteMessageRequest?.Invoke(msg);
+			WriteDataRequest?.Invoke(data);
 		}
 
 		private void SendToLoginButton_Click(object sender, RoutedEventArgs e)
@@ -211,7 +209,7 @@ namespace FlagCarrierWin
 
 		private void AnyBox_TextChanged(object sender, TextChangedEventArgs e)
 		{
-			TextBox box = sender as TextBox;
+			var box = sender as TextBox;
 			if (box == null)
 				return;
 			lastChangedTextBox = box;
