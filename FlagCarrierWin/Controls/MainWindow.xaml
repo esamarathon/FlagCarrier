@@ -33,7 +33,9 @@
 					<local:WriteControl x:Name="writeControl" />
 				</TabItem>
 				<TabItem Header="Settings" Name="settingsTab">
-					<local:SettingsControl x:Name="settingsControl" />
+					<ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+						<local:SettingsControl x:Name="settingsControl" />
+					</ScrollViewer>
 				</TabItem>
 			</TabControl>
 			<GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" />

@@ -71,6 +71,9 @@ namespace FlagCarrierWin
 			settingsTab.Visibility = Properties.Settings.Default.hideSettings
 				? Visibility.Hidden
 				: Visibility.Visible;
+			writeTab.Visibility = Properties.Settings.Default.hideWrite
+				? Visibility.Hidden
+				: Visibility.Visible;
 		}
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)

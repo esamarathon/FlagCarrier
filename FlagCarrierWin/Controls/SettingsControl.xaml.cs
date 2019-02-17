@@ -41,6 +41,11 @@ namespace FlagCarrierWin
 			applyButton.IsEnabled = true;
 		}
 
+		private void HideWrite_Click(object sender, RoutedEventArgs e)
+		{
+			applyButton.IsEnabled = true;
+		}
+
 		private void ApplyButton_Click(object sender, RoutedEventArgs args)
 		{
 			Properties.Settings.Default.deviceID = deviceIdBox.Text;
@@ -50,6 +55,7 @@ namespace FlagCarrierWin
 			Properties.Settings.Default.publicKey = pubKeyBox.Text;
 			Properties.Settings.Default.privateKey = privKeyBox.Text;
 			Properties.Settings.Default.hideSettings = (bool)hideSettingsCheckBox.IsChecked;
+			Properties.Settings.Default.hideWrite = (bool)hideWriteCheckBox.IsChecked;
 			Properties.Settings.Default.Save();
 			applyButton.IsEnabled = false;
 			ApplyKeyPair();
@@ -85,6 +91,7 @@ namespace FlagCarrierWin
 			pubKeyBox.Text = Properties.Settings.Default.publicKey;
 			privKeyBox.Text = Properties.Settings.Default.privateKey;
 			hideSettingsCheckBox.IsChecked = Properties.Settings.Default.hideSettings;
+			hideWriteCheckBox.IsChecked = Properties.Settings.Default.hideWrite;
 			applyButton.IsEnabled = false;
 		}
 

@@ -106,5 +106,17 @@ namespace FlagCarrierWin.Properties {
                 this["hideSettings"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool hideWrite {
+            get {
+                return ((bool)(this["hideWrite"]));
+            }
+            set {
+                this["hideWrite"] = value;
+            }
+        }
     }
 }
