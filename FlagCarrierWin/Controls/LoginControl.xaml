@@ -21,7 +21,7 @@
         <TextBox  Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Name="loginDataBox" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Margin="2" />
         <TextBlock Grid.Row="1" Grid.Column="0">Position</TextBlock>
 		<ComboBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Name="positionComboBox" Margin="2,2,2,12" SelectedValuePath="Content"></ComboBox>
-        <Button Margin="2" Grid.Row="3" Grid.Column="0" Click="LoginButton_Click">Login</Button>
+        <Button Margin="2" Grid.Row="3" Grid.Column="0" Name="loginButton" Click="LoginButton_Click">Login</Button>
         <Button Margin="8,2,2,2" Grid.Row="3" Grid.Column="1" Click="ClearButton_Click">Clear</Button>
     </Grid>
 </UserControl>

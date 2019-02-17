@@ -52,6 +52,16 @@ namespace FlagCarrierBase
 			extraSignData = null;
 		}
 
+		public static bool HasPubKey()
+		{
+			return publicKey != null && publicKey.Length != 0;
+		}
+
+		public static bool HasPrivKey()
+		{
+			return privateKey != null && privateKey.Length != 0;
+		}
+
 		public static void SetExtraSignData(byte[] extraSignData)
 		{
 			NdefHandler.extraSignData = extraSignData;

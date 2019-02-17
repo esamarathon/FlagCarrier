@@ -195,7 +195,7 @@ namespace FlagCarrierWin
 			{
 				string[] kv = line.Split(new[] { '=' }, 2, StringSplitOptions.None);
 
-				if (kv.Length != 2)
+				if (kv.Length != 2 || kv[0] == "sig_valid")
 				{
 					ErrorMessage?.Invoke("Invalid extra data!");
 					return null;

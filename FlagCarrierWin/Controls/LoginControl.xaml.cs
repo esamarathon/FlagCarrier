@@ -122,6 +122,22 @@ namespace FlagCarrierWin
 		{
 			loginData = data;
 			ShowLoginData();
+
+			if (loginData.ContainsKey("sig_valid"))
+			{
+				bool sigValid = Convert.ToBoolean(loginData["sig_valid"]);
+
+				loginButton.IsEnabled = sigValid;
+
+				if (sigValid)
+					loginDataBox.AppendText(Environment.NewLine + "Valid signature!" + Environment.NewLine);
+				else
+					loginDataBox.AppendText(Environment.NewLine + "INVALID signature!" + Environment.NewLine);
+			}
+			else
+			{
+				loginButton.IsEnabled = NdefHandler.HasPrivKey() || !NdefHandler.HasPubKey();
+			}
 		}
 
 		private void ShowLoginData()
@@ -138,6 +154,8 @@ namespace FlagCarrierWin
 			foreach (var element in loginData)
 			{
 				if (Definitions.KV_DISPLAY_VALUES.ContainsKey(element.Key))
+					continue;
+				if (element.Key == "sig" || element.Key == "sig_valid")
 					continue;
 				if (!writtenHeader)
 				{
