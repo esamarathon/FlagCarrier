@@ -7,7 +7,7 @@ namespace FlagCarrierMini
 {
 	class Options
 	{
-		[Option('k', "pubkey", Required = true, HelpText = "Base64 encoded ed25519 public key for signature verification.")]
+		[Option('k', "pubkey", Required = false, HelpText = "Base64 encoded ed25519 public key for signature verification.")]
 		public string PubKey { get; set; }
 
 		public byte[] PubKeyBin

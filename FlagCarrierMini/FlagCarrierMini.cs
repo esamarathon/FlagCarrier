@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Text;
 
 using FlagCarrierBase;
@@ -11,7 +12,6 @@ namespace FlagCarrierMini
 	{
 		private NfcHandler nfcHandler;
 		private string acrReader = null;
-		private bool signalSuccess, signalFailure;
 
 		private Options options = new Options();
 		public Options Options
@@ -48,10 +48,25 @@ namespace FlagCarrierMini
 			acrReader = nfcHandler.GetACRReader();
 		}
 
+		private bool signalSuccess, signalFailure;
+
+		private void SignalSuccess()
+		{
+			signalSuccess = true;
+			signalFailure = false;
+		}
+
+		private void SignalFailure()
+		{
+			signalSuccess = false;
+			signalFailure = true;
+		}
+
 		private void NfcHandler_CardHandlingDone(string obj)
 		{
 			try
 			{
+				// This cannot be done in the middle of handling a card, hence this construct.
 				if (signalFailure && acrReader != null)
 					nfcHandler.SignalFailure(acrReader);
 				else if (signalSuccess && acrReader != null)
@@ -67,10 +82,26 @@ namespace FlagCarrierMini
 
 		public void Start()
 		{
-			NdefHandler.SetKeys(options.PubKeyBin);
+			HandleSettings();
 
 			nfcHandler.StartMonitoring();
 			Console.WriteLine("Monitoring all readers");
+		}
+
+		private void HandleSettings()
+		{
+			if (Options.PubKey != null && Options.PubKey.Trim() != "")
+			{
+				Console.WriteLine("Updated public key from commandline.");
+				AppSettings.PubKey = Options.PubKeyBin;
+			}
+
+			byte[] pubKey = AppSettings.PubKey;
+			if (pubKey != null)
+			{
+				Console.WriteLine("Applied public key!");
+				NdefHandler.SetKeys(pubKey);
+			}
 		}
 
 		private void NfcHandler_ReceiveNdefMessage(NdefMessage msg)
@@ -81,19 +112,26 @@ namespace FlagCarrierMini
 			if (vals.ContainsKey("display_name"))
 				disp_name = vals["display_name"];
 
-			if (!vals.ContainsKey("sig_valid") || vals["sig_valid"] != "True")
+			if (vals.ContainsKey("sig_valid"))
 			{
-				signalFailure = true;
+				if (vals["sig_valid"] != "True")
+				{
+					SignalFailure();
+					Console.WriteLine("Invalid signature trying to parse tag for " + disp_name);
 
-				Console.WriteLine("Invalid signature trying to parse tag for " + disp_name);
-				return;
+					return;
+				}
+
+				SignalSuccess();
+				Console.WriteLine("Successfully detected valid tag owned by " + disp_name);
+			}
+			else
+			{
+				SignalSuccess();
+				Console.WriteLine("Successfully detected unverified tag owned by " + disp_name);
 			}
 
-			signalSuccess = true;
-
-			Console.WriteLine("Successfully detected valid tag owned by " + disp_name);
-
-			//TODO: Actually do stuff. Trigger the relaise!
+			//TODO: Actually do stuff.
 		}
 
 		private void NfcHandler_ErrorMessage(string msg)
