@@ -108,6 +108,16 @@ namespace FlagCarrierBase
 			}
 		}
 
+		public void WriteNdefMessage(NdefMessage msg)
+		{
+			if (msg != null)
+				ndefDataToWrite = msg.ToByteArray();
+			else
+				ndefDataToWrite = null;
+		}
+
+		#region ACR122U Specifics
+
 		private void TryTurnOffBeep(string readerName)
 		{
 			if (!readerName.Contains("ACR"))
@@ -236,13 +246,7 @@ namespace FlagCarrierBase
 			SignalACR(readerName, ctrl);
 		}
 
-		public void WriteNdefMessage(NdefMessage msg)
-		{
-			if (msg != null)
-				ndefDataToWrite = msg.ToByteArray();
-			else
-				ndefDataToWrite = null;
-		}
+		#endregion
 
 		private void Monitor_CardInserted(object sender, CardStatusEventArgs args)
 		{
@@ -308,10 +312,30 @@ namespace FlagCarrierBase
 				}
 				else
 				{
-					throw new NfcHandlerException("Unsupported tag type");
+					HandleHCEClient(reader);
 				}
 			}
 		}
+
+		#region Host Emulation Client
+
+		public static readonly byte[] FLAGCARRIER_HCE_AID = new byte[] { 0xf0, 0x5a, 0x25, 0x58, 0x83, 0x6e, 0x09, 0x66, 0xae, 0xd5, 0x27, 0xce };
+
+		private void HandleHCEClient(ICardReader reader)
+		{
+			StatusMessage?.Invoke("Attemtping to talk to Android HCE device.");
+
+			var select_cmd = new Iso7816.SelectCommand(FLAGCARRIER_HCE_AID, 0);
+			var res = reader.Transceive(select_cmd);
+
+			if (res.SW == 0x6a82)
+			{
+				StatusMessage?.Invoke("Device has no idea who we are.");
+				return;
+			}
+		}
+
+		#endregion
 
 		#region Mifare Ultralight
 		private void HandleMifareUL(ICardReader reader)
