@@ -7,7 +7,7 @@ namespace FlagCarrierMini
 {
 	class AppSettings
 	{
-		private static Configuration config = ConfigurationManager.OpenExeConfiguration(Assembly.GetExecutingAssembly().Location);
+		private static readonly Configuration config = ConfigurationManager.OpenExeConfiguration(Assembly.GetExecutingAssembly().Location);
 
 		static AppSettings()
 		{
@@ -15,16 +15,16 @@ namespace FlagCarrierMini
 				prop.SetValue(null, prop.GetValue(null));
 		}
 
-		private static string Get([CallerMemberName] string name = null, string defaultValue = null)
+		private static string Get(string defaultValue = null, [CallerMemberName] string name = null)
 		{
 			var cfg = config.AppSettings.Settings[name];
 			if (cfg != null)
 				return cfg.Value;
 			else
-				return null;
+				return defaultValue;
 		}
 
-		private static void Set(string value, [CallerMemberName] string name = "")
+		private static void Set(string value, [CallerMemberName] string name = null)
 		{
 			if (config.AppSettings.Settings[name] != null)
 				config.AppSettings.Settings.Remove(name);
@@ -38,7 +38,7 @@ namespace FlagCarrierMini
 
 		public static string ID
 		{
-			get => Get() ?? "";
+			get => Get("unset");
 			set => Set(value);
 		}
 
@@ -46,36 +46,59 @@ namespace FlagCarrierMini
 		{
 			get
 			{
-				string b64 = Get();
-				return b64 != null ? Convert.FromBase64String(b64) : null;
+				string v = Get();
+				if (v != null)
+					return Convert.FromBase64String(v);
+				return null;
 			}
 			set
 			{
-				Set(value != null ? Convert.ToBase64String(value) : null);
+				if (value != null)
+					Set(Convert.ToBase64String(value));
+				else
+					Set(null);
 			}
+		}
+
+		public static bool ReportAllScans
+		{
+			get => bool.Parse(Get("False"));
+			set => Set(value.ToString());
 		}
 
 		public static string MqHost
 		{
-			get => Get() ?? "";
+			get => Get("");
 			set => Set(value);
 		}
 
 		public static ushort MqPort
 		{
-			get => ushort.Parse(Get() ?? "0");
+			get => ushort.Parse(Get("0"));
 			set => Set(value.ToString());
+		}
+
+		public static bool MqTls
+		{
+			get => bool.Parse(Get("True"));
+			set => Set(value.ToString());
+		}
+
+		public static string MqQueue
+		{
+			get => Get("flagcarrier-tag-scanned");
+			set => Set(value);
 		}
 
 		public static string MqUsername
 		{
-			get => Get() ?? "guest";
+			get => Get("guest");
 			set => Set(value);
 		}
 
 		public static string MqPassword
 		{
-			get => Get() ?? "";
+			get => Get("");
 			set => Set(value);
 		}
 	}

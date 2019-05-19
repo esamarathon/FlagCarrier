@@ -31,6 +31,8 @@ namespace FlagCarrierMini
 				});
 
 			exitEvent.WaitOne();
-        }
+
+			fcm.Dispose();
+		}
 	}
 }

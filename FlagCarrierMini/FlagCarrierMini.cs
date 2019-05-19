@@ -8,31 +8,14 @@ using NdefLibrary.Ndef;
 
 namespace FlagCarrierMini
 {
-	class FlagCarrierMini
+	class FlagCarrierMini : IDisposable
 	{
-		private NfcHandler nfcHandler;
-		private string acrReader = null;
+		private readonly NfcHandler nfcHandler;
+		private readonly string acrReader = null;
+		private MqHandler mqHandler;
+		private byte[] curUid = null;
 
-		private Options options = new Options();
-		public Options Options
-		{
-			get
-			{
-				return options;
-			}
-			set
-			{
-				options = value;
-			}
-		}
-
-		public byte[] PubKey
-		{
-			set
-			{
-				NdefHandler.SetKeys(value);
-			}
-		}
+		public Options Options { get; set; } = new Options();
 
 		public FlagCarrierMini()
 		{
@@ -43,9 +26,20 @@ namespace FlagCarrierMini
 			nfcHandler.ErrorMessage += NfcHandler_ErrorMessage;
 			nfcHandler.ReceiveNdefMessage += NfcHandler_ReceiveNdefMessage;
 			nfcHandler.CardHandlingDone += NfcHandler_CardHandlingDone;
-			nfcHandler.NewTagUid += NdefHandler.SetExtraSignData;
+			nfcHandler.NewTagUid += NfcHandler_NewTagUid;
 
 			acrReader = nfcHandler.GetACRReader();
+
+			mqHandler = new MqHandler();
+		}
+
+		public void Dispose()
+		{
+			if (mqHandler != null)
+			{
+				mqHandler.Dispose();
+				mqHandler = null;
+			}
 		}
 
 		private bool signalSuccess, signalFailure;
@@ -64,17 +58,20 @@ namespace FlagCarrierMini
 
 		private void NfcHandler_CardHandlingDone(string obj)
 		{
-			try
+			if (acrReader != null)
 			{
-				// This cannot be done in the middle of handling a card, hence this construct.
-				if (signalFailure && acrReader != null)
-					nfcHandler.SignalFailure(acrReader);
-				else if (signalSuccess && acrReader != null)
-					nfcHandler.SignalSuccess(acrReader);
-			}
-			catch (PCSC.Exceptions.PCSCException e)
-			{
-				Console.WriteLine("Failed signaling: " + e.Message);
+				try
+				{
+					// This cannot be done in the middle of handling a card, hence this construct.
+					if (signalFailure)
+						nfcHandler.SignalFailure(acrReader);
+					else if (signalSuccess)
+						nfcHandler.SignalSuccess(acrReader);
+				}
+				catch (PCSC.Exceptions.PCSCException e)
+				{
+					Console.WriteLine("Failed signaling: " + e.Message);
+				}
 			}
 
 			signalSuccess = signalFailure = false;
@@ -82,13 +79,37 @@ namespace FlagCarrierMini
 
 		public void Start()
 		{
-			HandleSettings();
+			HandleOptions();
 
 			nfcHandler.StartMonitoring();
 			Console.WriteLine("Monitoring all readers");
+
+			ConnectMq();
+
+			Console.WriteLine("Ready");
 		}
 
-		private void HandleSettings()
+		private void ConnectMq()
+		{
+			mqHandler.Close();
+
+			try
+			{
+				mqHandler.Connect(
+					AppSettings.MqHost,
+					AppSettings.MqUsername,
+					AppSettings.MqPassword,
+					AppSettings.MqPort);
+				mqHandler.Subscribe(AppSettings.MqQueue);
+				Console.WriteLine("Connected to MQ Server");
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine("Failed connecting to MQ Server: " + e.ToString());
+			}
+		}
+
+		private void HandleOptions()
 		{
 			if (Options.PubKey != null && Options.PubKey.Trim() != "")
 			{
@@ -108,22 +129,30 @@ namespace FlagCarrierMini
 		{
 			Dictionary<string, string> vals = NdefHandler.ParseNdefMessage(msg);
 
-			string disp_name = "an unknown display name";
+			string disp_name = null;
 			if (vals.ContainsKey("display_name"))
 				disp_name = vals["display_name"];
+
+			string user_id = null;
+			if (vals.ContainsKey("user_id"))
+				user_id = vals["user_id"];
+
+			bool? sigValid = null;
 
 			if (vals.ContainsKey("sig_valid"))
 			{
 				if (vals["sig_valid"] != "True")
 				{
 					SignalFailure();
+					sigValid = false;
 					Console.WriteLine("Invalid signature trying to parse tag for " + disp_name);
-
-					return;
 				}
-
-				SignalSuccess();
-				Console.WriteLine("Successfully detected valid tag owned by " + disp_name);
+				else
+				{
+					SignalSuccess();
+					sigValid = true;
+					Console.WriteLine("Successfully detected valid tag owned by " + disp_name);
+				}
 			}
 			else
 			{
@@ -131,7 +160,29 @@ namespace FlagCarrierMini
 				Console.WriteLine("Successfully detected unverified tag owned by " + disp_name);
 			}
 
-			//TODO: Actually do stuff.
+			if (NdefHandler.HasPubKey() && sigValid != true && !AppSettings.ReportAllScans)
+				return;
+
+			if (!mqHandler.IsConnected)
+			{
+				Console.WriteLine("Not connected to MQ, not sending event.");
+				return;
+			}
+
+			TagScannedEvent tse = new TagScannedEvent();
+
+			tse.FlagCarrier.ID = AppSettings.ID;
+			tse.FlagCarrier.Time = DateTime.UtcNow;
+			tse.FlagCarrier.UID = curUid;
+			tse.FlagCarrier.ValidSignature = sigValid;
+			tse.FlagCarrier.PubKey = AppSettings.PubKey;
+
+			tse.User.DisplayName = disp_name;
+			tse.User.ID = user_id;
+
+			tse.RawData = vals;
+
+			mqHandler.Publish(tse);
 		}
 
 		private void NfcHandler_ErrorMessage(string msg)
@@ -141,14 +192,23 @@ namespace FlagCarrierMini
 
 		private void NfcHandler_StatusMessage(string msg)
 		{
-			if (options.Verbose)
+			if (Options.Verbose)
 				Console.WriteLine(msg);
 		}
 
 		private void NfcHandler_CardAdded(string readerName)
 		{
-			Console.WriteLine("Card added!");
+			if (Options.Verbose)
+				Console.WriteLine("Card added!");
+
 			NdefHandler.ClearExtraSignData();
+			curUid = null;
+		}
+
+		private void NfcHandler_NewTagUid(byte[] uid)
+		{
+			NdefHandler.SetExtraSignData(uid);
+			curUid = uid;
 		}
 	}
 }
