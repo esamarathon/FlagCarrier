@@ -15,8 +15,6 @@ namespace FlagCarrierMini
 		private MqHandler mqHandler;
 		private byte[] curUid = null;
 
-		public Options Options { get; set; } = new Options();
-
 		public FlagCarrierMini()
 		{
 			nfcHandler = new NfcHandler();
@@ -111,14 +109,8 @@ namespace FlagCarrierMini
 
 		private void HandleOptions()
 		{
-			if (Options.PubKey != null && Options.PubKey.Trim() != "")
-			{
-				Console.WriteLine("Updated public key from commandline.");
-				AppSettings.PubKey = Options.PubKeyBin;
-			}
-
 			byte[] pubKey = AppSettings.PubKey;
-			if (pubKey != null)
+			if (pubKey != null && pubKey.Length > 0)
 			{
 				Console.WriteLine("Applied public key!");
 				NdefHandler.SetKeys(pubKey);
@@ -192,13 +184,13 @@ namespace FlagCarrierMini
 
 		private void NfcHandler_StatusMessage(string msg)
 		{
-			if (Options.Verbose)
+			if (AppSettings.Verbose)
 				Console.WriteLine(msg);
 		}
 
 		private void NfcHandler_CardAdded(string readerName)
 		{
-			if (Options.Verbose)
+			if (AppSettings.Verbose)
 				Console.WriteLine("Card added!");
 
 			NdefHandler.ClearExtraSignData();

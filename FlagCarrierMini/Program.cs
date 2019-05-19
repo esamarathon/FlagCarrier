@@ -1,38 +1,38 @@
 using System;
 using System.Threading;
 
-using CommandLine;
-
 namespace FlagCarrierMini
 {
     class Program
     {
-		public static ManualResetEvent exitEvent = new ManualResetEvent(false);
+		private static readonly ManualResetEvent exitEvent = new ManualResetEvent(false);
+		private static readonly FlagCarrierMini flagCarrier = new FlagCarrierMini();
 
-        static void Main(string[] args)
+		static void Main(string[] args)
         {
-			Console.CancelKeyPress += (sender, eArgs) =>
-			{
-				eArgs.Cancel = true;
-				exitEvent.Set();
-			};
+			Console.CancelKeyPress += Console_CancelKeyPress;
+			AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
 
-			FlagCarrierMini fcm = new FlagCarrierMini();
+			if (!AppSettings.FromArgs(args))
+				return;
 
-			Parser.Default.ParseArguments<Options>(args)
-				.WithNotParsed(options =>
-				{
-					exitEvent.Set();
-				})
-				.WithParsed(options =>
-				{
-					fcm.Options = options;
-					fcm.Start();
-				});
+			flagCarrier.Start();
 
 			exitEvent.WaitOne();
 
-			fcm.Dispose();
+			flagCarrier.Dispose();
+		}
+
+		private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs args)
+		{
+			args.Cancel = true;
+			exitEvent.Set();
+		}
+
+		private static void CurrentDomain_ProcessExit(object sender, EventArgs args)
+		{
+			flagCarrier.Dispose();
+			exitEvent.Set();
 		}
 	}
 }

@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
 using System.Runtime.CompilerServices;
 using System.Reflection;
@@ -13,6 +15,104 @@ namespace FlagCarrierMini
 		{
 			foreach (PropertyInfo prop in typeof(AppSettings).GetProperties(BindingFlags.Static | BindingFlags.Public))
 				prop.SetValue(null, prop.GetValue(null));
+		}
+
+		internal static bool FromArgs(IEnumerable<string> args)
+		{
+			IEnumerator<string> en = args.GetEnumerator();
+			Dictionary<string, string> values = new Dictionary<string, string>();
+
+			while (en.MoveNext())
+			{
+				switch (en.Current)
+				{
+					case "-v":
+						verbose = true;
+						continue;
+					case "--help":
+						PrintHelp();
+						return false;
+					default:
+						break;
+				}
+
+				if (!en.Current.StartsWith("--"))
+				{
+					Console.WriteLine("Invalid option " + en.Current);
+					return false;
+				}
+				string currentSetting = en.Current.Substring(2);
+
+				if (currentSetting.Contains("="))
+				{
+					string[] kv = currentSetting.Split("=", 2);
+					values.Add(kv[0], kv[1]);
+				}
+				else
+				{
+					if (!en.MoveNext())
+					{
+						Console.WriteLine("Missing value for argument " + currentSetting);
+						return false;
+					}
+
+					values.Add(currentSetting, en.Current);
+				}
+			}
+
+			return FromDict(values);
+		}
+
+		public static bool FromDict(Dictionary<string, string> values)
+		{
+			foreach (var kv in values)
+			{
+				PropertyInfo prop = typeof(AppSettings).GetProperty(kv.Key, BindingFlags.Static | BindingFlags.Public | BindingFlags.IgnoreCase);
+				if (prop == null)
+				{
+					Console.WriteLine("Unknown Option " + kv.Key);
+					return false;
+				}
+
+				// Backup original value in case of format errors
+				string oval = Get(null, prop.Name);
+
+				try
+				{
+					Set(kv.Value, prop.Name);
+
+					// Load and set via propety to normalize and verify format
+					object nval = prop.GetValue(null);
+					prop.SetValue(null, nval);
+				}
+				catch (Exception e)
+				{
+					// Restore original value on error
+					Set(oval, prop.Name);
+
+					Console.WriteLine("Failed setting option " + kv.Key + ": " + e.Message);
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		public static void PrintHelp()
+		{
+			string lPref = "   ";
+			int rOffset = 35;
+			string so(string s) => (lPref + s + " ").PadRight(rOffset, ' ');
+
+			Console.WriteLine("Available options:");
+			Console.WriteLine(so("--help") + "Print this help text.");
+			Console.WriteLine(so("-v") + "Enable Verbose Output");
+			Console.WriteLine();
+			Console.WriteLine("Available settings:");
+			foreach (PropertyInfo prop in typeof(AppSettings).GetProperties(BindingFlags.Public | BindingFlags.Static))
+				Console.WriteLine(so("--" + prop.Name.ToLower() + "=" + Get(null, prop.Name) + " [" + prop.PropertyType.Name + "]"));
+			Console.WriteLine();
+			Console.WriteLine("All settings will be persisted to the application configuration automatically.");
 		}
 
 		private static string Get(string defaultValue = null, [CallerMemberName] string name = null)
@@ -64,6 +164,24 @@ namespace FlagCarrierMini
 		{
 			get => bool.Parse(Get("False"));
 			set => Set(value.ToString());
+		}
+
+		private static bool? verbose = null;
+		public static bool Verbose
+		{
+			get
+			{
+				if (verbose != null)
+					return verbose.Value;
+				verbose = bool.Parse(Get("False"));
+				return verbose.Value;
+			}
+
+			set
+			{
+				verbose = value;
+				Set(value.ToString());
+			}
 		}
 
 		public static string MqHost
