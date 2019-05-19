@@ -77,14 +77,17 @@ namespace FlagCarrierMini
 
 		public void Start()
 		{
-			HandleOptions();
-
 			nfcHandler.StartMonitoring();
 			Console.WriteLine("Monitoring all readers");
 
-			ConnectMq();
+			HandleNewSettings();
 
 			Console.WriteLine("Ready");
+		}
+
+		private void HandleNewSettings()
+		{
+			ConnectMq();
 		}
 
 		private void ConnectMq()
@@ -107,54 +110,69 @@ namespace FlagCarrierMini
 			}
 		}
 
-		private void HandleOptions()
+		private bool? GetSigValid(Dictionary<string, string> vals)
 		{
-			byte[] pubKey = AppSettings.PubKey;
-			if (pubKey != null && pubKey.Length > 0)
-			{
-				Console.WriteLine("Applied public key!");
-				NdefHandler.SetKeys(pubKey);
-			}
-		}
-
-		private void NfcHandler_ReceiveNdefMessage(NdefMessage msg)
-		{
-			Dictionary<string, string> vals = NdefHandler.ParseNdefMessage(msg);
-
-			string disp_name = null;
-			if (vals.ContainsKey("display_name"))
-				disp_name = vals["display_name"];
-
-			string user_id = null;
-			if (vals.ContainsKey("user_id"))
-				user_id = vals["user_id"];
-
 			bool? sigValid = null;
 
 			if (vals.ContainsKey("sig_valid"))
 			{
 				if (vals["sig_valid"] != "True")
 				{
-					SignalFailure();
 					sigValid = false;
-					Console.WriteLine("Invalid signature trying to parse tag for " + disp_name);
+					Console.WriteLine("Invalid tag signature!");
 				}
 				else
 				{
-					SignalSuccess();
 					sigValid = true;
-					Console.WriteLine("Successfully detected valid tag owned by " + disp_name);
+					Console.WriteLine("Detected valid tag signature.");
 				}
 			}
 			else
 			{
-				SignalSuccess();
-				Console.WriteLine("Successfully detected unverified tag owned by " + disp_name);
+				Console.WriteLine("Tag not verified.");
 			}
 
-			if (NdefHandler.HasPubKey() && sigValid != true && !AppSettings.ReportAllScans)
-				return;
+			return sigValid;
+		}
 
+		private bool TryHandleSettings(Dictionary<string, string> vals, bool? sigValid)
+		{
+			if (vals.ContainsKey("display_name") && vals["display_name"] == "set" && vals.ContainsKey("set"))
+			{
+				if (NdefHandler.HasPubKey() && sigValid != true)
+				{
+					Console.WriteLine("Rejecting settings due to invalid signature!");
+					SignalFailure();
+					return true;
+				}
+
+				string[] keys = vals["set"].Split(',');
+
+				Dictionary<string, string> settings = new Dictionary<string, string>();
+
+				foreach (string key in keys)
+					settings.Add(key, vals[key]);
+
+				if (AppSettings.FromDict(settings))
+				{
+					HandleNewSettings();
+
+					Console.WriteLine("Applied settings from tag.");
+					SignalSuccess();
+				}
+				else
+				{
+					SignalFailure();
+				}
+
+				return true;
+			}
+
+			return false;
+		}
+
+		private void HandleScannedTag(Dictionary<string, string> vals, bool? sigValid)
+		{
 			if (!mqHandler.IsConnected)
 			{
 				Console.WriteLine("Not connected to MQ, not sending event.");
@@ -169,12 +187,39 @@ namespace FlagCarrierMini
 			tse.FlagCarrier.ValidSignature = sigValid;
 			tse.FlagCarrier.PubKey = AppSettings.PubKey;
 
-			tse.User.DisplayName = disp_name;
-			tse.User.ID = user_id;
+			if (vals.ContainsKey("display_name"))
+				tse.User.DisplayName = vals["display_name"];
+			else
+				tse.User.DisplayName = "*unset*";
+
+			if (vals.ContainsKey("user_id"))
+				tse.User.ID = vals["user_id"];
 
 			tse.RawData = vals;
 
 			mqHandler.Publish(tse);
+		}
+
+		private void NfcHandler_ReceiveNdefMessage(NdefMessage msg)
+		{
+			NdefHandler.SetKeys(AppSettings.PubKey);
+
+			Dictionary<string, string> vals = NdefHandler.ParseNdefMessage(msg);
+
+			bool? sigValid = GetSigValid(vals);
+
+			if (TryHandleSettings(vals, sigValid))
+				return;
+
+			if (sigValid == false)
+				SignalFailure();
+			else
+				SignalSuccess();
+
+			if (NdefHandler.HasPubKey() && sigValid != true && !AppSettings.ReportAllScans)
+				return;
+
+			HandleScannedTag(vals, sigValid);
 		}
 
 		private void NfcHandler_ErrorMessage(string msg)
