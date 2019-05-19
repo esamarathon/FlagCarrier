@@ -370,11 +370,8 @@ namespace FlagCarrierBase
 					return;
 				}
 
-				if (res.ResponseData == null || res.ResponseData.Length <= 0)
-				{
-					ErrorMessage?.Invoke("No data in ReadBinary response.");
-					return;
-				}
+				if (res.ResponseData == null || res.ResponseData.Length == 0)
+					break;
 
 				Array.Resize(ref ndefData, ndefData.Length + res.ResponseData.Length);
 				res.ResponseData.CopyTo(ndefData, offset);
