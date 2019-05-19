@@ -355,6 +355,8 @@ namespace FlagCarrierBase
 				return;
 			}
 
+			StatusMessage?.Invoke("Sent challenge token: " + BitConverter.ToString(challengeToken));
+
 			byte[] ndefData = new byte[0];
 			const int len = 255;
 			int offset = 0;
