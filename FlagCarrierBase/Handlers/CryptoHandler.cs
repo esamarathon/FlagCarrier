@@ -33,7 +33,7 @@ namespace FlagCarrierBase
 
 	public static class CryptoHandler
 	{
-		private static SecureRandom random = new SecureRandom();
+		private static readonly SecureRandom random = new SecureRandom();
 
 		public static KeyPair GenKeyPair()
 		{

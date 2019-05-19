@@ -265,7 +265,7 @@ namespace Iso7816
 	public class SelectCommand : ApduCommand
 	{
 		public SelectCommand(byte[] aid, byte? le)
-			: base((byte)Iso7816.Cla.CompliantCmd0x, (byte)Iso7816.Ins.SelectFile, 0x04, 0x00, aid, le)
+			: base((byte)Cla.CompliantCmd0x, (byte)Ins.SelectFile, 0x04, 0x00, aid, le)
 		{
 		}
 
@@ -274,9 +274,46 @@ namespace Iso7816
 			set { CommandData = value; }
 			get { return CommandData; }
 		}
+
 		public override string ToString()
 		{
 			return "SelectCommand AID=" + BitConverter.ToString(CommandData).Replace("-", "");
+		}
+	}
+
+	public class UpdateBinaryCommand : ApduCommand
+	{
+		public UpdateBinaryCommand(byte[] data, int address = 0)
+			: base((byte)Cla.CompliantCmd0x, (byte)Ins.UpdateBinary, 0x00, 0x00, data, null)
+		{
+			if (address < 0 || address >= 1024)
+				throw new InvalidOperationException("Address must not be larger than 1023");
+
+			P1 = (byte)(address >> 8);
+			P2 = (byte)(address & 0xFF);
+		}
+
+		public override string ToString()
+		{
+			return "UpdateBinaryCommand Address=" + ((P1 << 8) | P2) + " Data=" + BitConverter.ToString(CommandData).Replace("-", "");
+		}
+	}
+
+	public class ReadBinaryCommand : ApduCommand
+	{
+		public ReadBinaryCommand(byte length = 0, int offset = 0)
+			: base((byte)Cla.CompliantCmd0x, (byte)Ins.ReadBinary, 0x00, 0x00, null, length)
+		{
+			if (offset < 0 || offset >= 0x8000)
+				throw new InvalidOperationException("Offset must not be larger than 32767");
+
+			P1 = (byte)(offset >> 8);
+			P2 = (byte)(offset & 0xFF);
+		}
+
+		public override string ToString()
+		{
+			return "ReadBinaryCommand Offset=" + ((P1 << 8) | P2) + " Length=" + Le;
 		}
 	}
 }

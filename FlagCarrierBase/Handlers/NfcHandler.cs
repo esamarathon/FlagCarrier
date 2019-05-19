@@ -10,6 +10,7 @@ using PCSC.Exceptions;
 
 using PcscSdk;
 using PcscSdk.Common;
+using Org.BouncyCastle.Security;
 
 namespace FlagCarrierBase
 {
@@ -320,19 +321,73 @@ namespace FlagCarrierBase
 		#region Host Emulation Client
 
 		public static readonly byte[] FLAGCARRIER_HCE_AID = new byte[] { 0xf0, 0x5a, 0x25, 0x58, 0x83, 0x6e, 0x09, 0x66, 0xae, 0xd5, 0x27, 0xce };
+		private static readonly SecureRandom random = new SecureRandom();
 
 		private void HandleHCEClient(ICardReader reader)
 		{
 			StatusMessage?.Invoke("Attemtping to talk to Android HCE device.");
 
-			var select_cmd = new Iso7816.SelectCommand(FLAGCARRIER_HCE_AID, 0);
-			var res = reader.Transceive(select_cmd);
+			var selectCmd = new Iso7816.SelectCommand(FLAGCARRIER_HCE_AID, 0);
+			var res = reader.Transceive(selectCmd);
 
 			if (res.SW == 0x6a82)
 			{
-				StatusMessage?.Invoke("Device has no idea who we are.");
+				ErrorMessage?.Invoke("Device has no idea who we are.");
 				return;
 			}
+			else if(!res.Succeeded)
+			{
+				ErrorMessage?.Invoke("Failed communicating with device: " + res.ToString());
+				return;
+			}
+
+			StatusMessage?.Invoke("Connected to FlagCarrier HCE device!");
+
+			byte[] challengeToken = new byte[32];
+			random.NextBytes(challengeToken, 0, challengeToken.Length);
+
+			var updateCmd = new Iso7816.UpdateBinaryCommand(challengeToken);
+			res = reader.Transceive(updateCmd);
+
+			if (!res.Succeeded)
+			{
+				ErrorMessage?.Invoke("Failed sending challenge token: " + res.ToString());
+				return;
+			}
+
+			byte[] ndefData = new byte[0];
+			const int len = 255;
+			int offset = 0;
+
+			do
+			{
+				var readCmd = new Iso7816.ReadBinaryCommand(len, offset);
+				res = reader.Transceive(readCmd);
+
+				if (!res.Succeeded)
+				{
+					ErrorMessage?.Invoke("Failed reading data at " + offset + ": " + res.ToString());
+					return;
+				}
+
+				if (res.ResponseData == null || res.ResponseData.Length <= 0)
+				{
+					ErrorMessage?.Invoke("No data in ReadBinary response.");
+					return;
+				}
+
+				Array.Resize(ref ndefData, ndefData.Length + res.ResponseData.Length);
+				res.ResponseData.CopyTo(ndefData, offset);
+				offset += res.ResponseData.Length;
+
+			} while (res.ResponseData.Length == len);
+
+			StatusMessage?.Invoke("Read " + ndefData.Length + " bytes of ndef data from device.");
+
+			NdefMessage msg = NdefMessage.FromByteArray(ndefData);
+
+			NewTagUid?.Invoke(challengeToken);
+			ReceiveNdefMessage?.Invoke(msg);
 		}
 
 		#endregion
