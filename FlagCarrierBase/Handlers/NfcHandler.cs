@@ -349,16 +349,22 @@ namespace FlagCarrierBase
 			var updateCmd = new Iso7816.UpdateBinaryCommand(challengeToken);
 			res = reader.Transceive(updateCmd);
 
+			if (res.SW == 0x6A82)
+			{
+				ErrorMessage?.Invoke("HCE Device does not have any data for us.");
+				return;
+			}
+
 			if (!res.Succeeded)
 			{
 				ErrorMessage?.Invoke("Failed sending challenge token: " + res.ToString());
 				return;
 			}
 
-			StatusMessage?.Invoke("Sent challenge token: " + BitConverter.ToString(challengeToken));
+			StatusMessage?.Invoke("Sent challenge token.");
 
 			byte[] ndefData = new byte[0];
-			const int len = 255;
+			const int len = 250;
 			int offset = 0;
 
 			do
