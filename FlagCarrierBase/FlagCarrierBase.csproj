@@ -9,7 +9,6 @@
   <ItemGroup>
     <PackageReference Include="NdefLibrary" Version="4.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-    <PackageReference Include="PCSC" Version="4.0.3" />
     <PackageReference Include="Portable.BouncyCastle" Version="1.8.5" />
   </ItemGroup>
 

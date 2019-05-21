@@ -151,6 +151,10 @@
       <Project>{2d2c480d-06c8-40a4-8d1c-e099314c556f}</Project>
       <Name>FlagCarrierBase</Name>
     </ProjectReference>
+    <ProjectReference Include="..\FlagCarrierDesktopBase\FlagCarrierDesktopBase.csproj">
+      <Project>{ce7008f9-77c3-45de-938c-542f5f091543}</Project>
+      <Name>FlagCarrierDesktopBase</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

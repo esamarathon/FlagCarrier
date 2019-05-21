@@ -1,12 +1,16 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2035
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.452
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlagCarrierWin", "FlagCarrierWin\FlagCarrierWin.csproj", "{72A2029D-B144-48DE-A1A5-4A66BFA18674}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlagCarrierBase", "FlagCarrierBase\FlagCarrierBase.csproj", "{2D2C480D-06C8-40A4-8D1C-E099314C556F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlagCarrierBase", "FlagCarrierBase\FlagCarrierBase.csproj", "{2D2C480D-06C8-40A4-8D1C-E099314C556F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlagCarrierMini", "FlagCarrierMini\FlagCarrierMini.csproj", "{515036FC-0514-4F56-A3B2-CDAF8CB5E46F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlagCarrierMini", "FlagCarrierMini\FlagCarrierMini.csproj", "{515036FC-0514-4F56-A3B2-CDAF8CB5E46F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlagCarrierAndroid", "FlagCarrierAndroid\FlagCarrierAndroid.csproj", "{C8D211CE-FD82-4F92-99DB-99EACBEC7498}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlagCarrierDesktopBase", "FlagCarrierDesktopBase\FlagCarrierDesktopBase.csproj", "{CE7008F9-77C3-45DE-938C-542F5F091543}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,6 +30,16 @@ Global
 		{515036FC-0514-4F56-A3B2-CDAF8CB5E46F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{515036FC-0514-4F56-A3B2-CDAF8CB5E46F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{515036FC-0514-4F56-A3B2-CDAF8CB5E46F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8D211CE-FD82-4F92-99DB-99EACBEC7498}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8D211CE-FD82-4F92-99DB-99EACBEC7498}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8D211CE-FD82-4F92-99DB-99EACBEC7498}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{C8D211CE-FD82-4F92-99DB-99EACBEC7498}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8D211CE-FD82-4F92-99DB-99EACBEC7498}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8D211CE-FD82-4F92-99DB-99EACBEC7498}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{CE7008F9-77C3-45DE-938C-542F5F091543}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE7008F9-77C3-45DE-938C-542F5F091543}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE7008F9-77C3-45DE-938C-542F5F091543}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE7008F9-77C3-45DE-938C-542F5F091543}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FlagCarrierBase\FlagCarrierBase.csproj" />
+    <ProjectReference Include="..\FlagCarrierDesktopBase\FlagCarrierDesktopBase.csproj" />
   </ItemGroup>
 
 </Project>
