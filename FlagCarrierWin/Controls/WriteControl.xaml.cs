@@ -42,7 +42,7 @@ namespace FlagCarrierWin
 			twitterHandleBox.Text = "";
 
 			extraDataBox.Clear();
-			extraDataBox.AppendText("set=" + String.Join(",", settings.Keys) + Environment.NewLine);
+			extraDataBox.AppendText("set=" + string.Join(",", settings.Keys) + Environment.NewLine);
 			foreach(var entry in settings)
 				extraDataBox.AppendText(entry.Key + "=" + entry.Value + Environment.NewLine);
 		}

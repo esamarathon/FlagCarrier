@@ -66,13 +66,13 @@ namespace FlagCarrierWin
 		{
 			Dictionary<string, string> data = new Dictionary<string, string>
 			{
-				{ "pos_avail", positionsBox.Text },
-				{ "group_id", groupIdBox.Text },
-				{ "target_url", targetUrlBox.Text }
+				{ "posAvail", positionsBox.Text },
+				{ "groupId", groupIdBox.Text },
+				{ "targetUrl", targetUrlBox.Text }
 			};
 
 			if (pubKeyBox.Text.Trim().Length != 0)
-				data.Add("pub_key", pubKeyBox.Text);
+				data.Add("pubKey", pubKeyBox.Text);
 
 			WriteToTagRequest?.Invoke(data);
 		}
