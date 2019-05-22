@@ -5,17 +5,17 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
-
+using System.Threading.Tasks;
 using Xamarin.Essentials;
 
-namespace FlagCarrierAndroid
+namespace FlagCarrierAndroid.Helpers
 {
-    class AppSettings : INotifyPropertyChanged
+    public class AppSettings : INotifyPropertyChanged
     {
         const string TAG = "AppSettings";
 
         private static readonly AppSettings inst = new AppSettings();
-        public AppSettings Global { get => inst;  }
+        public static AppSettings Global { get => inst;  }
 
         private AppSettings()
         {
@@ -127,38 +127,38 @@ namespace FlagCarrierAndroid
         }
 
         const string PrivKeyKey = "priv_key";
-        public byte[] PrivKey
+
+        public async Task<byte[]> GetPrivKey()
         {
-            get
+            try
             {
-                try
-                {
-                    string v = SecureStorage.GetAsync(PrivKeyKey).Result;
-                    return Convert.FromBase64String(v);
-                }
-                catch (Exception)
-                {
-                    Log.Error(TAG, "Failed reading from secure storage!");
-                    return null;
-                }
+                string v = await SecureStorage.GetAsync(PrivKeyKey);
+                return Convert.FromBase64String(v);
             }
-            set
+            catch (Exception)
             {
-                string v = "";
-                if (value != null && value.Length > 0)
-                    v = Convert.ToBase64String(value);
-
-                try
-                {
-                    SecureStorage.SetAsync(PrivKeyKey, v).Wait();
-                } catch(Exception)
-                {
-                    Log.Error(TAG, "Failed writing to secure storage!");
-                    return;
-                }
-
-                Notify();
+                Log.Error(TAG, "Failed reading from secure storage!");
+                return null;
             }
+        }
+
+        public async void SetPrivKey(byte[] privKey)
+        {
+            string v = "";
+            if (privKey != null && privKey.Length > 0)
+                v = Convert.ToBase64String(privKey);
+
+            try
+            {
+                await SecureStorage.SetAsync(PrivKeyKey, v);
+            }
+            catch (Exception)
+            {
+                Log.Error(TAG, "Failed writing to secure storage!");
+                return;
+            }
+
+            Notify();
         }
     }
 }

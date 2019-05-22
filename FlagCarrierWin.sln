@@ -8,9 +8,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlagCarrierBase", "FlagCarr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlagCarrierMini", "FlagCarrierMini\FlagCarrierMini.csproj", "{515036FC-0514-4F56-A3B2-CDAF8CB5E46F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlagCarrierAndroid", "FlagCarrierAndroid\FlagCarrierAndroid.csproj", "{C8D211CE-FD82-4F92-99DB-99EACBEC7498}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlagCarrierDesktopBase", "FlagCarrierDesktopBase\FlagCarrierDesktopBase.csproj", "{CE7008F9-77C3-45DE-938C-542F5F091543}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlagCarrierDesktopBase", "FlagCarrierDesktopBase\FlagCarrierDesktopBase.csproj", "{CE7008F9-77C3-45DE-938C-542F5F091543}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlagCarrierAndroid", "FlagCarrierAndroid\FlagCarrierAndroid.csproj", "{146C7A6D-F741-40EB-9D51-B8627EF1FF01}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,16 +30,16 @@ Global
 		{515036FC-0514-4F56-A3B2-CDAF8CB5E46F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{515036FC-0514-4F56-A3B2-CDAF8CB5E46F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{515036FC-0514-4F56-A3B2-CDAF8CB5E46F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C8D211CE-FD82-4F92-99DB-99EACBEC7498}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C8D211CE-FD82-4F92-99DB-99EACBEC7498}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C8D211CE-FD82-4F92-99DB-99EACBEC7498}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{C8D211CE-FD82-4F92-99DB-99EACBEC7498}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C8D211CE-FD82-4F92-99DB-99EACBEC7498}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C8D211CE-FD82-4F92-99DB-99EACBEC7498}.Release|Any CPU.Deploy.0 = Release|Any CPU
 		{CE7008F9-77C3-45DE-938C-542F5F091543}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CE7008F9-77C3-45DE-938C-542F5F091543}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE7008F9-77C3-45DE-938C-542F5F091543}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CE7008F9-77C3-45DE-938C-542F5F091543}.Release|Any CPU.Build.0 = Release|Any CPU
+		{146C7A6D-F741-40EB-9D51-B8627EF1FF01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{146C7A6D-F741-40EB-9D51-B8627EF1FF01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{146C7A6D-F741-40EB-9D51-B8627EF1FF01}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{146C7A6D-F741-40EB-9D51-B8627EF1FF01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{146C7A6D-F741-40EB-9D51-B8627EF1FF01}.Release|Any CPU.Build.0 = Release|Any CPU
+		{146C7A6D-F741-40EB-9D51-B8627EF1FF01}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
