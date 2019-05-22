@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_scan_tag"
+            android:title="Scan Tag" />
+        <item
+            android:id="@+id/nav_manual_login"
+            android:title="Manual Login" />
+        <item
+            android:id="@+id/nav_write_tag"
+            android:title="Write Tag" />
+        <item
+            android:id="@+id/nav_beam_mini"
+            android:title="Beam To Mini" />
+        <item
+            android:id="@+id/nav_settings"
+            android:title="Settings" />
+    </group>
+
+</menu>
