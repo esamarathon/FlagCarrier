@@ -65,6 +65,7 @@
     <PackageReference Include="Xamarin.Essentials" Version="1.1.0" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Fragments\ManualLoginFragment.cs" />
     <Compile Include="Fragments\ScanTagFragment.cs" />
     <Compile Include="Fragments\WriteTagFragment.cs" />
     <Compile Include="Helpers\AppSettings.cs" />

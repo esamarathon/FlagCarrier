@@ -21,12 +21,17 @@ namespace FlagCarrierAndroid.Activities
     [IntentFilter(new[] { "android.nfc.action.NDEF_DISCOVERED" }, Categories = new[] { "android.intent.category.DEFAULT" }, DataMimeType = FLAGCARRIER_MIMETYPE)]
     public class MainActivity : AppCompatActivity, NavigationView.IOnNavigationItemSelectedListener
     {
+        public static MainActivity Instance { get; private set; } = null;
+
         public const string FLAGCARRIER_MIMETYPE = "application/vnd.de.oromit.flagcarrier";
 
         private DrawerLayout drawer = null;
+        private NavigationView navigationView = null;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
+            Instance = this;
+
             base.OnCreate(savedInstanceState);
             CrossCurrentActivity.Current.Init(this, savedInstanceState);
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
@@ -41,13 +46,10 @@ namespace FlagCarrierAndroid.Activities
             drawer.AddDrawerListener(toggle);
             toggle.SyncState();
 
-            NavigationView navigationView = FindViewById<NavigationView>(Resource.Id.nav_view);
+            navigationView = FindViewById<NavigationView>(Resource.Id.nav_view);
             navigationView.SetNavigationItemSelectedListener(this);
-            navigationView.SetCheckedItem(Resource.Id.nav_scan_tag);
 
-            SupportFragmentManager.BeginTransaction()
-                .Replace(Resource.Id.content, new ScanTagFragment())
-                .Commit();
+            SwitchToPage(Resource.Id.nav_scan_tag);
         }
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
         {
@@ -58,28 +60,38 @@ namespace FlagCarrierAndroid.Activities
 
         public bool OnNavigationItemSelected(IMenuItem item)
         {
+            return SwitchToPage(item.ItemId);
+        }
+
+        public bool SwitchToPage(int navId)
+        {
             SupportFragment fragment;
 
-            switch (item.ItemId)
+            switch (navId)
             {
                 case Resource.Id.nav_scan_tag:
                     fragment = new ScanTagFragment();
                     break;
+                case Resource.Id.nav_manual_login:
+                    fragment = new ManualLoginFragment();
+                    break;
                 case Resource.Id.nav_write_tag:
                     fragment = new WriteTagFragment();
                     break;
-                case Resource.Id.nav_manual_login:
                 case Resource.Id.nav_beam_mini:
                 case Resource.Id.nav_settings:
                 default:
                     return false;
             }
 
+            navigationView.SetCheckedItem(navId);
+
             SupportFragmentManager.BeginTransaction()
                 .Replace(Resource.Id.content, fragment)
                 .Commit();
 
-            drawer.CloseDrawer(GravityCompat.Start);
+            if (drawer.IsDrawerOpen(GravityCompat.Start))
+                drawer.CloseDrawer(GravityCompat.Start);
 
             return true;
         }
@@ -89,6 +101,10 @@ namespace FlagCarrierAndroid.Activities
             if (drawer.IsDrawerOpen(GravityCompat.Start))
             {
                 drawer.CloseDrawer(GravityCompat.Start);
+            }
+            else if (navigationView.CheckedItem != null && navigationView.CheckedItem.ItemId != Resource.Id.nav_scan_tag)
+            {
+                SwitchToPage(Resource.Id.nav_scan_tag);
             }
             else
             {
