@@ -25,7 +25,16 @@ namespace FlagCarrierAndroid.Fragments
             view.FindViewById(Resource.Id.extraDataLabel).Visibility = ViewStates.Invisible;
             view.FindViewById(Resource.Id.extraDataText).Visibility = ViewStates.Invisible;
 
+            Button submitButton = view.FindViewById<Button>(Resource.Id.writeTagButton);
+            submitButton.SetText(Resource.String.manual_login_submit);
+            submitButton.Click += SubmitButton_Click;
+
             return view;
+        }
+
+        private void SubmitButton_Click(object sender, EventArgs e)
+        {
+            
         }
     }
 }

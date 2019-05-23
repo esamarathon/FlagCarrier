@@ -1,4 +1,6 @@
-﻿using Android.Util;
+﻿using Android.App;
+using Android.Preferences;
+using Android.Util;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -6,16 +8,14 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using Xamarin.Essentials;
+using System.Security.Cryptography;
+using Javax.Crypto;
 
 namespace FlagCarrierAndroid.Helpers
 {
     public class AppSettings : INotifyPropertyChanged
     {
-        const string TAG = "AppSettings";
-
-        private static readonly AppSettings inst = new AppSettings();
-        public static AppSettings Global { get => inst;  }
+        public static AppSettings Global { get; } = new AppSettings();
 
         private AppSettings()
         {
@@ -23,142 +23,260 @@ namespace FlagCarrierAndroid.Helpers
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private void Notify([CallerMemberName] string propertyName = null)
+        #region Helper Functions
+
+        private readonly AndroidKeyStore keyStore = new AndroidKeyStore();
+
+        private void Notify(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        private string HashKey(string key)
+        {
+            using (var sha = SHA1.Create())
+                return Convert.ToBase64String(sha.ComputeHash(Encoding.UTF8.GetBytes(key)));
+        }
+
+        private void SetEncrypted(string key, byte[] data, [CallerMemberName] string propertyName = null)
+        {
+            bool changed = false;
+
+            key = HashKey(key);
+
+            lock (this)
+            {
+                string encryptedValue = data != null ? Convert.ToBase64String(keyStore.Encrypt(data)) : null;
+
+                using (var prefs = PreferenceManager.GetDefaultSharedPreferences(Application.Context))
+                using (var editor = prefs.Edit())
+                {
+                    if (encryptedValue == null)
+                    {
+                        if (prefs.Contains(key))
+                        {
+                            editor.Remove(key);
+                            changed = true;
+                        }
+                    }
+                    else
+                    {
+                        if (prefs.GetString(key, null) != encryptedValue)
+                        {
+                            editor.PutString(key, encryptedValue);
+                            changed = true;
+                        }
+                    }
+
+                    editor.Apply();
+                }
+            }
+
+            if (changed)
+                Notify(propertyName);
+        }
+
+        private byte[] GetEncrypted(string key)
+        {
+            key = HashKey(key);
+
+            lock (this)
+            {
+                string encVal;
+
+                using (var prefs = PreferenceManager.GetDefaultSharedPreferences(Application.Context))
+                {
+                    encVal = prefs.GetString(key, null);
+
+                    if (encVal == null)
+                        return null;
+                }
+
+                try
+                {
+                    byte[] encData = Convert.FromBase64String(encVal);
+                    return keyStore.Decrypt(encData);
+                }
+                catch (FormatException)
+                {
+                    return null;
+                }
+                catch (AEADBadTagException)
+                {
+                    return null;
+                }
+            }
+        }
+
+        private void Set<T>(string key, T value, [CallerMemberName] string propertyName = null)
+        {
+            bool changed = false;
+
+            lock (this)
+            {
+                using (var prefs = PreferenceManager.GetDefaultSharedPreferences(Application.Context))
+                using (var editor = prefs.Edit())
+                {
+                    if (value == null)
+                    {
+                        if (prefs.Contains(key))
+                        {
+                            editor.Remove(key);
+                            changed = true;
+                        }
+                    }
+                    else
+                    {
+                        switch (value)
+                        {
+                            case string s:
+                                if (!prefs.Contains(key) || prefs.GetString(key, null) != s)
+                                {
+                                    editor.PutString(key, s);
+                                    changed = true;
+                                }
+                                break;
+                            case string[] sr:
+                                if (!prefs.Contains(key) || !sr.SequenceEqual(prefs.GetStringSet(key, null)))
+                                {
+                                    editor.PutStringSet(key, sr);
+                                    changed = true;
+                                }
+                                break;
+                            case bool b:
+                                if (!prefs.Contains(key) || prefs.GetBoolean(key, false) != b)
+                                {
+                                    editor.PutBoolean(key, b);
+                                    changed = true;
+                                }
+                                break;
+                            case byte[] br:
+                                string brs = Convert.ToBase64String(br);
+                                if (!prefs.Contains(key) || prefs.GetString(key, null) != brs)
+                                {
+                                    editor.PutString(key, brs);
+                                    changed = true;
+                                }
+                                break;
+                            default:
+                                throw new NotImplementedException();
+                        }
+                    }
+
+                    editor.Apply();
+                }
+            }
+
+            if (changed)
+                Notify(propertyName);
+        }
+
+        private T Get<T>(string key, T defaultValue)
+        {
+            object res = null;
+
+            lock (this)
+            {
+                using (var prefs = PreferenceManager.GetDefaultSharedPreferences(Application.Context))
+                {
+                    if (defaultValue == null)
+                    {
+                        if (typeof(T) == typeof(string))
+                        {
+                            res = prefs.GetString(key, null);
+                        }
+                        else if (typeof(T) == typeof(byte[]))
+                        {
+                            string brs = prefs.GetString(key, null);
+                            if (brs != null)
+                                res = Convert.FromBase64String(brs);
+                        }
+                        else if (typeof(T) == typeof(string[]))
+                        {
+                            var sr = prefs.GetStringSet(key, null);
+                            if (sr != null)
+                                res = sr.ToArray();
+                        }
+
+                        return (T)res;
+                    }
+
+                    switch (defaultValue)
+                    {
+                        case string s:
+                            res = prefs.GetString(key, s);
+                            break;
+                        case string[] sr:
+                            res = prefs.GetStringSet(key, sr).ToArray();
+                            break;
+                        case bool b:
+                            res = prefs.GetBoolean(key, b);
+                            break;
+                        case byte[] br:
+                            string brs = prefs.GetString(key, null);
+                            if (brs != null)
+                                res = Convert.FromBase64String(brs);
+                            else
+                                res = br;
+                            break;
+                        default:
+                            throw new NotImplementedException();
+                    }
+                }
+            }
+
+            return (T)res;
+        }
+
+        #endregion
+
         const string TargetUrlKey = "target_url";
         public string TargetUrl
         {
-            get => Preferences.Get(TargetUrlKey, "");
-            set
-            {
-                if (value == TargetUrl)
-                    return;
-
-                Preferences.Set(TargetUrlKey, value);
-                Notify();
-            }
+            get => Get(TargetUrlKey, "");
+            set => Set(TargetUrlKey, value);
         }
 
         const string PositionsKey = "pos_avail";
         public string[] Positions
         {
-            get => Preferences.Get(PositionsKey, "").Split(',');
-            set
-            {
-                string v = "";
-                if (value != null)
-                    v = string.Join(',', value);
-
-                if (v == Preferences.Get(PositionsKey, ""))
-                    return;
-
-                Preferences.Set(PositionsKey, v);
-                Notify();
-            }
+            get => Get(PositionsKey, new[] { "left", "mid", "right" });
+            set => Set(PositionsKey, value);
         }
 
         const string KioskModeKey = "kiosk_mode";
         public bool KioskMode
         {
-            get => Preferences.Get(KioskModeKey, false);
-            set
-            {
-                if (value == KioskMode)
-                    return;
-
-                Preferences.Set(KioskModeKey, value);
-                Notify();
-            }
+            get => Get(KioskModeKey, false);
+            set => Set(KioskModeKey, value);
         }
 
         const string DeviceIdKey = "device_id";
         public string DeviceId
         {
-            get => Preferences.Get(DeviceIdKey, "");
-            set
-            {
-                if (value == DeviceId)
-                    return;
-
-                Preferences.Set(DeviceIdKey, value);
-                Notify();
-            }
+            get => Get(DeviceIdKey, "SomeAndroidDevice");
+            set => Set(DeviceIdKey, value);
         }
 
         const string GroupIdKey = "group_id";
         public string GroupId
         {
-            get => Preferences.Get(GroupIdKey, "");
-            set
-            {
-                if (value == GroupId)
-                    return;
-
-                Preferences.Set(GroupIdKey, value);
-                Notify();
-            }
+            get => Get(GroupIdKey, "");
+            set => Set(GroupIdKey, value);
         }
 
         const string PubKeyKey = "pub_key";
         public byte[] PubKey
         {
-            get
-            {
-                try
-                {
-                    return Convert.FromBase64String(Preferences.Get(PubKeyKey, ""));
-                } catch (Exception)
-                {
-                    return null;
-                }
-            }
-            set
-            {
-                string v = "";
-                if (value != null && value.Length > 0)
-                    v = Convert.ToBase64String(value);
-
-                Preferences.Set(PubKeyKey, v);
-                Notify();
-            }
+            get => Get<byte[]>(PubKeyKey, null);
+            set => Set(PubKeyKey, value);
         }
 
         const string PrivKeyKey = "priv_key";
-
-        public async Task<byte[]> GetPrivKey()
+        public byte[] PrivKey
         {
-            try
-            {
-                string v = await SecureStorage.GetAsync(PrivKeyKey);
-                return Convert.FromBase64String(v);
-            }
-            catch (Exception)
-            {
-                Log.Error(TAG, "Failed reading from secure storage!");
-                return null;
-            }
-        }
-
-        public async void SetPrivKey(byte[] privKey)
-        {
-            string v = "";
-            if (privKey != null && privKey.Length > 0)
-                v = Convert.ToBase64String(privKey);
-
-            try
-            {
-                await SecureStorage.SetAsync(PrivKeyKey, v);
-            }
-            catch (Exception)
-            {
-                Log.Error(TAG, "Failed writing to secure storage!");
-                return;
-            }
-
-            Notify();
+            get => GetEncrypted(PrivKeyKey);
+            set => SetEncrypted(PrivKeyKey, value);
         }
     }
 }

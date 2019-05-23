@@ -56,18 +56,21 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Plugin.CurrentActivity" Version="2.1.0.4" />
+    <PackageReference Include="System.Security.Cryptography.Algorithms">
+      <Version>4.3.1</Version>
+    </PackageReference>
     <PackageReference Include="Xamarin.Android.Support.Constraint.Layout" Version="1.1.2" />
     <PackageReference Include="Xamarin.Android.Support.Design" Version="28.0.0.1" />
     <PackageReference Include="Xamarin.Android.Support.v7.AppCompat" Version="28.0.0.1" />
     <PackageReference Include="Xamarin.Android.Support.v4" Version="28.0.0.1" />
     <PackageReference Include="Xamarin.Android.Support.Core.Utils" Version="28.0.0.1" />
     <PackageReference Include="Xamarin.Android.Support.CustomTabs" Version="28.0.0.1" />
-    <PackageReference Include="Xamarin.Essentials" Version="1.1.0" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Fragments\ManualLoginFragment.cs" />
     <Compile Include="Fragments\ScanTagFragment.cs" />
     <Compile Include="Fragments\WriteTagFragment.cs" />
+    <Compile Include="Helpers\AndroidKeyStore.cs" />
     <Compile Include="Helpers\AppSettings.cs" />
     <Compile Include="Helpers\NdefConverter.cs" />
     <Compile Include="Activities\MainActivity.cs" />

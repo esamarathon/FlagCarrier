@@ -21,7 +21,15 @@ namespace FlagCarrierAndroid.Fragments
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
             View view = inflater.Inflate(Resource.Layout.fragment_write_tag, container, false);
+
+            Button submitButton = view.FindViewById<Button>(Resource.Id.writeTagButton);
+            submitButton.Click += SubmitButton_Click;
+
             return view;
+        }
+
+        private void SubmitButton_Click(object sender, EventArgs e)
+        {
         }
     }
 }
