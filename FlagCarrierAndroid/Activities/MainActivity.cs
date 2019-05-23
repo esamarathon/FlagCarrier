@@ -65,8 +65,10 @@ namespace FlagCarrierAndroid.Activities
                 case Resource.Id.nav_scan_tag:
                     fragment = new ScanTagFragment();
                     break;
-                case Resource.Id.nav_manual_login:
                 case Resource.Id.nav_write_tag:
+                    fragment = new WriteTagFragment();
+                    break;
+                case Resource.Id.nav_manual_login:
                 case Resource.Id.nav_beam_mini:
                 case Resource.Id.nav_settings:
                 default:

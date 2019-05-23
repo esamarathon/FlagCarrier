@@ -48,7 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Additions\AboutAdditions.txt" />
-    <LibraryProjectZip Include="Jars\libphonenumber-android-8.10.1.aar" />
+    <LibraryProjectZip Include="Jars\libphonenumber-android-8.10.12-1.aar" />
   </ItemGroup>
   <ItemGroup>
     <TransformFile Include="Transforms\Metadata.xml" />

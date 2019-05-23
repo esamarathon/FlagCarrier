@@ -38,6 +38,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0"
+            app:ccp_contentColor="@android:color/darker_gray"
+            app:ccpDialog_textColor="@android:color/darker_gray"
             app:ccp_countryPreference="de,fr,se,nl,us,gb"
             app:ccp_defaultNameCode="DE"
             app:ccp_showFullName="true"

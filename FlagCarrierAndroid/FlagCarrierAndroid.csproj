@@ -66,6 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Fragments\ScanTagFragment.cs" />
+    <Compile Include="Fragments\WriteTagFragment.cs" />
     <Compile Include="Helpers\AppSettings.cs" />
     <Compile Include="Helpers\NdefConverter.cs" />
     <Compile Include="Activities\MainActivity.cs" />
@@ -88,6 +89,14 @@
     <ProjectReference Include="..\Bindings\CountryCodePicker\CountryCodePicker.csproj">
       <Project>{822d177b-2375-44a5-b96c-8b564f7e80fc}</Project>
       <Name>CountryCodePicker</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Bindings\FastScroll\FastScroll.csproj">
+      <Project>{4ccf19d1-968b-426d-ba4f-03ae15f3ec35}</Project>
+      <Name>FastScroll</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Bindings\LibPhoneNumber\LibPhoneNumber.csproj">
+      <Project>{fd733e96-20b4-4de4-8c81-1bc25828c196}</Project>
+      <Name>LibPhoneNumber</Name>
     </ProjectReference>
     <ProjectReference Include="..\FlagCarrierBase\FlagCarrierBase.csproj">
       <Project>{2d2c480d-06c8-40a4-8d1c-e099314c556f}</Project>
