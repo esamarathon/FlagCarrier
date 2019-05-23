@@ -48,7 +48,7 @@ namespace FlagCarrierAndroid.Activities
             navigationView = FindViewById<NavigationView>(Resource.Id.nav_view);
             navigationView.SetNavigationItemSelectedListener(this);
 
-            SwitchToPage(Resource.Id.nav_scan_tag);
+            SwitchToPage(Resource.Id.nav_scan_tag, false);
         }
 
         public bool OnNavigationItemSelected(IMenuItem item)
@@ -56,7 +56,7 @@ namespace FlagCarrierAndroid.Activities
             return SwitchToPage(item.ItemId);
         }
 
-        public bool SwitchToPage(int navId)
+        public bool SwitchToPage(int navId, bool animate = true)
         {
             SupportFragment fragment;
 
@@ -79,9 +79,18 @@ namespace FlagCarrierAndroid.Activities
 
             navigationView.SetCheckedItem(navId);
 
-            SupportFragmentManager.BeginTransaction()
-                .Replace(Resource.Id.content, fragment)
-                .Commit();
+            var tx = SupportFragmentManager.BeginTransaction();
+
+            if (animate)
+            {
+                if (navId != Resource.Id.nav_scan_tag)
+                    tx.SetCustomAnimations(Resource.Animation.slide_in_right, Resource.Animation.slide_out_left);
+                else
+                    tx.SetCustomAnimations(Resource.Animation.slide_in_left, Resource.Animation.slide_out_right);
+            }
+
+            tx.Replace(Resource.Id.content, fragment);
+            tx.Commit(); ;
 
             if (drawer.IsDrawerOpen(GravityCompat.Start))
                 drawer.CloseDrawer(GravityCompat.Start);
