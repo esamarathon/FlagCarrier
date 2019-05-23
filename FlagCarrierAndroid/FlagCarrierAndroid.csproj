@@ -85,6 +85,10 @@
     <Folder Include="Services\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Bindings\CountryCodePicker\CountryCodePicker.csproj">
+      <Project>{822d177b-2375-44a5-b96c-8b564f7e80fc}</Project>
+      <Name>CountryCodePicker</Name>
+    </ProjectReference>
     <ProjectReference Include="..\FlagCarrierBase\FlagCarrierBase.csproj">
       <Project>{2d2c480d-06c8-40a4-8d1c-e099314c556f}</Project>
       <Name>FlagCarrierBase</Name>
@@ -160,6 +164,11 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\fragment_scan_tag.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\fragment_write_tag.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>
