@@ -16,6 +16,7 @@
   <string name="priv_key_setting_name">Private Key</string>
   <string name="priv_key_gen_btn">Generate Keypair</string>
   <string name="pos_avail_setting_name">Available Positions</string>
+  <string name="kiosk_mode_setting_name">Kiosk Mode</string>
 
   <string name="initial_greeting">Scan Tag!</string>
 

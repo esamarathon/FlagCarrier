@@ -69,5 +69,13 @@ namespace FlagCarrierBase
 
 			return Ed25519.Verify(sig, 0, publicKey, 0, msg, 0, msg.Length);
 		}
+
+		public static bool IsKeyValid(byte[] key)
+		{
+			if (key == null)
+				return false;
+
+			return key.Length == Ed25519.SecretKeySize || key.Length == Ed25519.PublicKeySize || key.Length == Ed25519.SecretKeySize + Ed25519.PublicKeySize;
+		}
 	}
 }

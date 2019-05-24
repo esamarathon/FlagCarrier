@@ -69,6 +69,7 @@
   <ItemGroup>
     <Compile Include="Fragments\ManualLoginFragment.cs" />
     <Compile Include="Fragments\ScanTagFragment.cs" />
+    <Compile Include="Fragments\SettingsFragment.cs" />
     <Compile Include="Fragments\WriteTagFragment.cs" />
     <Compile Include="Helpers\AndroidKeyStore.cs" />
     <Compile Include="Helpers\AppSettings.cs" />
@@ -196,6 +197,11 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\anim\slide_out_left.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\fragment_settings.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
 </Project>

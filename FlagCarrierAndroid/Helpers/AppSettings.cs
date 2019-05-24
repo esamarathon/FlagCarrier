@@ -233,14 +233,14 @@ namespace FlagCarrierAndroid.Helpers
         const string TargetUrlKey = "target_url";
         public string TargetUrl
         {
-            get => Get(TargetUrlKey, "");
+            get => Get(TargetUrlKey, "https://oromit.de/hosts.php");
             set => Set(TargetUrlKey, value);
         }
 
         const string PositionsKey = "pos_avail";
-        public string[] Positions
+        public string Positions
         {
-            get => Get(PositionsKey, new[] { "left", "mid", "right" });
+            get => Get(PositionsKey, "left,mid,right");
             set => Set(PositionsKey, value);
         }
 

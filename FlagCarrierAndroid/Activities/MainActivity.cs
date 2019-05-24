@@ -72,7 +72,10 @@ namespace FlagCarrierAndroid.Activities
                     fragment = new WriteTagFragment();
                     break;
                 case Resource.Id.nav_beam_mini:
+                    return false;
                 case Resource.Id.nav_settings:
+                    fragment = new SettingsFragment();
+                    break;
                 default:
                     return false;
             }
