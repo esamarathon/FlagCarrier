@@ -18,6 +18,8 @@ namespace FlagCarrierWin
 		Dictionary<string, string> dataToWrite;
 		NfcHandler nfcHandler;
 
+		NdefHandler NdefHandler { get; set; } = new NdefHandler();
+
 		public MainWindow()
 		{
 			InitializeComponent();
@@ -25,6 +27,9 @@ namespace FlagCarrierWin
 			RoutedCommand jumpToSettings = new RoutedCommand();
 			jumpToSettings.InputGestures.Add(new KeyGesture(Key.O, ModifierKeys.Control | ModifierKeys.Shift));
 			CommandBindings.Add(new CommandBinding(jumpToSettings, JumpToSettings));
+
+			loginControl.NdefHandler = NdefHandler;
+			settingsControl.NdefHandler = NdefHandler;
 
 			nfcHandler = new NfcHandler();
 			nfcHandler.CardAdded += NfcHandler_CardAdded;

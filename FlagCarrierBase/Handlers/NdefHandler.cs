@@ -26,50 +26,50 @@ namespace FlagCarrierBase
 		}
 	}
 
-	public static class NdefHandler
+	public class NdefHandler
 	{
 		public const string FLAGCARRIER_MIME_TYPE = "application/vnd.de.oromit.flagcarrier";
 		public const string FLAGCARRIER_APP_REC = "de.oromit.flagcarrier";
 
-		static private byte[] privateKey = null;
-		static private byte[] publicKey = null;
-		static private byte[] extraSignData = null;
+		private byte[] privateKey = null;
+		private byte[] publicKey = null;
+		private byte[] extraSignData = null;
 
-		public static void ClearKeys()
+		public void ClearKeys()
 		{
 			privateKey = null;
 			publicKey = null;
 		}
 
-		public static void SetKeys(byte[] publicKey, byte[] privateKey=null)
+		public void SetKeys(byte[] publicKey, byte[] privateKey=null)
 		{
-			NdefHandler.privateKey = privateKey;
-			NdefHandler.publicKey = publicKey;
+			this.privateKey = privateKey;
+			this.publicKey = publicKey;
 		}
 
-		public static void ClearExtraSignData()
+		public void ClearExtraSignData()
 		{
 			extraSignData = null;
 		}
 
-		public static bool HasPubKey()
+		public bool HasPubKey()
 		{
 			return publicKey != null && publicKey.Length != 0;
 		}
 
-		public static bool HasPrivKey()
+		public bool HasPrivKey()
 		{
 			return privateKey != null && privateKey.Length != 0;
 		}
 
-		public static void SetExtraSignData(byte[] extraSignData)
+		public void SetExtraSignData(byte[] extraSignData)
 		{
-			NdefHandler.extraSignData = extraSignData;
+			this.extraSignData = extraSignData;
 		}
 
 		#region TagReading
 
-		public static Dictionary<string, string> ParseNdefMessage(byte[] raw)
+		public Dictionary<string, string> ParseNdefMessage(byte[] raw)
 		{
 			NdefMessage ndefMessage;
 			try
@@ -84,7 +84,7 @@ namespace FlagCarrierBase
 			return ParseNdefMessage(ndefMessage);
 		}
 
-		public static Dictionary<string, string> ParseNdefMessage(NdefMessage msg)
+		public Dictionary<string, string> ParseNdefMessage(NdefMessage msg)
 		{
 			foreach(NdefRecord rec in msg)
 			{
@@ -97,7 +97,7 @@ namespace FlagCarrierBase
 			throw new NdefHandlerException("Unsupported Tag");
 		}
 
-		private static Dictionary<string, string> ParsePayload(byte[] payload)
+		private Dictionary<string, string> ParsePayload(byte[] payload)
 		{
 			var res = ZlibStream.UncompressBuffer(payload);
 			return ParseInflatedPayload(res);
@@ -116,7 +116,7 @@ namespace FlagCarrierBase
 			return Encoding.UTF8.GetString(reader.ReadBytes(keyLength));
 		}
 
-		private static Dictionary<string, string> ParseInflatedPayload(byte[] payload)
+		private Dictionary<string, string> ParseInflatedPayload(byte[] payload)
 		{
 			Dictionary<string, string> res = new Dictionary<string, string>();
 
@@ -159,7 +159,7 @@ namespace FlagCarrierBase
 			return res;
 		}
 
-		private static bool IsOurRecord(NdefRecord rec)
+		private bool IsOurRecord(NdefRecord rec)
 		{
 			if(rec.TypeNameFormat != NdefRecord.TypeNameFormatType.Mime)
 				return false;
@@ -174,12 +174,12 @@ namespace FlagCarrierBase
 
 		#region TagWriting
 
-		public static byte[] GenerateRawNdefMessage(Dictionary<string, string> values)
+		public byte[] GenerateRawNdefMessage(Dictionary<string, string> values)
 		{
 			return GenerateNdefMessage(values).ToByteArray();
 		}
 
-		public static NdefMessage GenerateNdefMessage(Dictionary<string, string> values)
+		public NdefMessage GenerateNdefMessage(Dictionary<string, string> values)
 		{
 			NdefMessage res = new NdefMessage
 			{
@@ -189,7 +189,7 @@ namespace FlagCarrierBase
 			return res;
 		}
 
-		private static NdefRecord GenerateAppRecord()
+		private NdefRecord GenerateAppRecord()
 		{
 			NdefAndroidAppRecord rec = new NdefAndroidAppRecord
 			{
@@ -198,7 +198,7 @@ namespace FlagCarrierBase
 			return rec;
 		}
 
-		private static NdefRecord GenerateMimeRecord(Dictionary<string, string> values)
+		private NdefRecord GenerateMimeRecord(Dictionary<string, string> values)
 		{
 			NdefRecord rec = new NdefRecord(NdefRecord.TypeNameFormatType.Mime, Encoding.ASCII.GetBytes(FLAGCARRIER_MIME_TYPE))
 			{
@@ -207,7 +207,7 @@ namespace FlagCarrierBase
 			return rec;
 		}
 
-		private static byte[] GenerateCompressedPayload(Dictionary<string, string> values)
+		private byte[] GenerateCompressedPayload(Dictionary<string, string> values)
 		{
 			byte[] rawData = GeneratePayload(values);
 
@@ -221,7 +221,7 @@ namespace FlagCarrierBase
 			}
 		}
 
-		private static byte[] GeneratePayload(Dictionary<string, string> values)
+		private byte[] GeneratePayload(Dictionary<string, string> values)
 		{
 			byte[] rawData = null;
 

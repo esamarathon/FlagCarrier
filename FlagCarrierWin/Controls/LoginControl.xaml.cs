@@ -13,10 +13,12 @@ namespace FlagCarrierWin
     /// </summary>
     public partial class LoginControl : UserControl
     {
-		HttpHandler httpHandler;
+		readonly HttpHandler httpHandler;
 		Dictionary<string, string> loginData;
 
-        public LoginControl()
+		public NdefHandler NdefHandler { get; set; } = new NdefHandler();
+
+		public LoginControl()
         {
             InitializeComponent();
 

@@ -15,6 +15,8 @@ namespace FlagCarrierMini
 		private MqHandler mqHandler;
 		private byte[] curUid = null;
 
+		private NdefHandler NdefHandler { get; } = new NdefHandler();
+
 		public FlagCarrierMini()
 		{
 			nfcHandler = new NfcHandler();

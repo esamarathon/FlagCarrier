@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using FlagCarrierBase;
+
 namespace FlagCarrierWin
 {
     /// <summary>
@@ -23,9 +25,11 @@ namespace FlagCarrierWin
 		public event Action<Dictionary<string, string>> WriteToTagRequest;
 		public event Action UpdatedSettings;
 
-        public SettingsControl()
-        {
-            InitializeComponent();
+		public NdefHandler NdefHandler { get; set; } = new NdefHandler();
+
+		public SettingsControl()
+		{
+			InitializeComponent();
 
 			ResetSettings();
 			ApplyKeyPair();
@@ -115,7 +119,7 @@ namespace FlagCarrierWin
 				if (Properties.Settings.Default.privateKey.Trim().Length == 0)
 					privKey = null;
 
-				FlagCarrierBase.NdefHandler.SetKeys(pubKey, privKey);
+				NdefHandler.SetKeys(pubKey, privKey);
 			}
 			catch (FormatException)
 			{
