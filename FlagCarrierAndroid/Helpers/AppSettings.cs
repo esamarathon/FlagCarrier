@@ -230,49 +230,49 @@ namespace FlagCarrierAndroid.Helpers
 
         #endregion
 
-        const string TargetUrlKey = "target_url";
+        public const string TargetUrlKey = "target_url";
         public string TargetUrl
         {
             get => Get(TargetUrlKey, "https://oromit.de/hosts.php");
             set => Set(TargetUrlKey, value);
         }
 
-        const string PositionsKey = "pos_avail";
+        public const string PositionsKey = "pos_avail";
         public string Positions
         {
             get => Get(PositionsKey, "left,mid,right");
             set => Set(PositionsKey, value);
         }
 
-        const string KioskModeKey = "kiosk_mode";
+        public const string KioskModeKey = "kiosk_mode";
         public bool KioskMode
         {
             get => Get(KioskModeKey, false);
             set => Set(KioskModeKey, value);
         }
 
-        const string DeviceIdKey = "device_id";
+        public const string DeviceIdKey = "device_id";
         public string DeviceId
         {
             get => Get(DeviceIdKey, "SomeAndroidDevice");
             set => Set(DeviceIdKey, value);
         }
 
-        const string GroupIdKey = "group_id";
+        public const string GroupIdKey = "group_id";
         public string GroupId
         {
             get => Get(GroupIdKey, "");
             set => Set(GroupIdKey, value);
         }
 
-        const string PubKeyKey = "pub_key";
+        public const string PubKeyKey = "pub_key";
         public byte[] PubKey
         {
             get => Get<byte[]>(PubKeyKey, null);
             set => Set(PubKeyKey, value);
         }
 
-        const string PrivKeyKey = "priv_key";
+        public const string PrivKeyKey = "priv_key";
         public byte[] PrivKey
         {
             get => GetEncrypted(PrivKeyKey);

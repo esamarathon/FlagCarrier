@@ -29,15 +29,22 @@ namespace FlagCarrierBase
 
 		public async Task<string> DoRequestAsync(string url, string deviceId, string groupId, string action, Dictionary<String, String> tagData = null, Dictionary<String, String> extraData = null)
 		{
-			string json = DataToJson(deviceId, groupId, action, tagData, extraData);
-			StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
+			try
+			{
+				string json = DataToJson(deviceId, groupId, action, tagData, extraData);
+				StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
 
-			HttpResponseMessage response = await client.PostAsync(url, content);
+				HttpResponseMessage response = await client.PostAsync(url, content);
 
-			if (response.StatusCode != HttpStatusCode.OK)
-				throw new HttpHandlerException("HTTP Request failed: " + response.StatusCode.ToString());
+				if (response.StatusCode != HttpStatusCode.OK)
+					throw new HttpHandlerException("HTTP Request failed: " + response.StatusCode.ToString());
 
-			return await response.Content.ReadAsStringAsync();
+				return await response.Content.ReadAsStringAsync();
+			}
+			catch (Exception e)
+			{
+				throw new HttpHandlerException("HTTP Request failed: " + e.Message);
+			}
 		}
 
 		private string DataToJson(string deviceId, string groupId, string action, Dictionary<String, String> tagData = null, Dictionary<String, String> extraData = null)
