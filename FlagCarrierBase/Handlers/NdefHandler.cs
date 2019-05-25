@@ -30,6 +30,8 @@ namespace FlagCarrierBase
 	{
 		public const string FLAGCARRIER_MIME_TYPE = "application/vnd.de.oromit.flagcarrier";
 		public const string FLAGCARRIER_APP_REC = "de.oromit.flagcarrier";
+		public const string SIG_KEY = "sig";
+		public const string SIG_VALID_KEY = "sig_valid";
 
 		private byte[] privateKey = null;
 		private byte[] publicKey = null;
@@ -129,10 +131,10 @@ namespace FlagCarrierBase
 					string key = ReadUTF(reader);
 					string val = ReadUTF(reader);
 
-					if (key == "sig_valid")
+					if (key == SIG_VALID_KEY)
 						continue;
 
-					if (initPos == 0 && key == "sig" && publicKey != null && publicKey.Length != 0)
+					if (initPos == 0 && key == SIG_KEY && publicKey != null && publicKey.Length != 0)
 					{
 						long prePos = reader.BaseStream.Position;
 						byte[] msg = reader.ReadBytes((int)(reader.BaseStream.Length - reader.BaseStream.Position));
@@ -146,7 +148,7 @@ namespace FlagCarrierBase
 							extraSignData.CopyTo(msg, preLen);
 						}
 
-						res.Add("sig_valid", CryptoHandler.VerifyDetached(sig, msg, publicKey).ToString());
+						res.Add(SIG_VALID_KEY, CryptoHandler.VerifyDetached(sig, msg, publicKey).ToString());
 					}
 
 					res.Add(key, val);
@@ -261,7 +263,7 @@ namespace FlagCarrierBase
 			{
 				using (BinaryWriter writer = new BinaryWriter(mem))
 				{
-					WriteUTF(writer, "sig");
+					WriteUTF(writer, SIG_KEY);
 					WriteUTF(writer, sigStr);
 					writer.Write(rawData);
 				}
