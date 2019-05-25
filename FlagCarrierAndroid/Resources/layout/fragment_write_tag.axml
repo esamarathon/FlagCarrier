@@ -1,113 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:text="@string/wt_disp_name" />
+    <ScrollView
+        android:layout_height="0dp"
+        android:layout_width="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/writeTagButton"
+        android:fillViewport="true">
 
-    <EditText
-        android:id="@+id/displayNameText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:ems="10"
-        android:hint="@string/wt_disp_name"
-        android:inputType="textPersonName"
-        android:maxLength="254" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:text="@string/wt_country" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:text="@string/wt_disp_name" />
 
-    <com.hbb20.CountryCodePicker
-        android:id="@+id/countryCodePicker"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0"
-        app:ccp_contentColor="@android:color/darker_gray"
-        app:ccpDialog_textColor="@android:color/darker_gray"
-        app:ccp_countryPreference="de,fr,se,nl,us,gb"
-        app:ccp_defaultNameCode="DE"
-        app:ccp_showFullName="true"
-        app:ccp_showNameCode="true"
-        app:ccp_showPhoneCode="false" />
+            <EditText
+                android:id="@+id/displayNameText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:ems="10"
+                android:hint="@string/wt_disp_name"
+                android:inputType="textPersonName"
+                android:maxLength="254" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:text="@string/wt_speedruncom" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:text="@string/wt_country" />
 
-    <EditText
-        android:id="@+id/speedrunNameText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:ems="10"
-        android:hint="@string/wt_speedruncom"
-        android:inputType="textPersonName"
-        android:maxLength="254" />
+            <com.hbb20.CountryCodePicker
+                android:id="@+id/countryCodePicker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                app:ccp_contentColor="@android:color/darker_gray"
+                app:ccpDialog_textColor="@android:color/darker_gray"
+                app:ccp_countryPreference="de,fr,se,nl,us,gb"
+                app:ccp_defaultNameCode="DE"
+                app:ccp_showFullName="true"
+                app:ccp_showNameCode="true"
+                app:ccp_showPhoneCode="false" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:text="@string/wt_twitch" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:text="@string/wt_speedruncom" />
 
-    <EditText
-        android:id="@+id/twitchNameText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:ems="10"
-        android:hint="@string/wt_twitch"
-        android:inputType="textPersonName"
-        android:maxLength="254" />
+            <EditText
+                android:id="@+id/speedrunNameText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:ems="10"
+                android:hint="@string/wt_speedruncom"
+                android:inputType="textPersonName"
+                android:maxLength="254" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:text="@string/wt_twitter" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:text="@string/wt_twitch" />
 
-    <EditText
-        android:id="@+id/twitterHandleText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:ems="10"
-        android:hint="@string/wt_twitter"
-        android:inputType="textPersonName"
-        android:maxLength="254" />
+            <EditText
+                android:id="@+id/twitchNameText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:ems="10"
+                android:hint="@string/wt_twitch"
+                android:inputType="textPersonName"
+                android:maxLength="254" />
 
-    <TextView
-        android:id="@+id/extraDataLabel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:text="@string/wt_extra_data" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:text="@string/wt_twitter" />
 
-    <EditText
-        android:id="@+id/extraDataText"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:hint="@string/wt_extra_data"
-        android:inputType="textMultiLine" />
+            <EditText
+                android:id="@+id/twitterHandleText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:ems="10"
+                android:hint="@string/wt_twitter"
+                android:inputType="textPersonName"
+                android:maxLength="254" />
+
+            <TextView
+                android:id="@+id/extraDataLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:text="@string/wt_extra_data" />
+
+            <EditText
+                android:id="@+id/extraDataText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:hint="@string/wt_extra_data"
+                android:inputType="textMultiLine" />
+        </LinearLayout>
+    </ScrollView>
 
     <Button
         android:id="@+id/writeTagButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         android:text="@string/wt_write_tag_button" />
-</LinearLayout>
+
+</android.support.constraint.ConstraintLayout>
