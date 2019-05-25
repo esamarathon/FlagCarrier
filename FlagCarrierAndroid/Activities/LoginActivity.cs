@@ -17,6 +17,7 @@ using FlagCarrierAndroid.Helpers;
 
 using SupportToolbar = Android.Support.V7.Widget.Toolbar;
 using System.Threading.Tasks;
+using Android.Runtime;
 
 namespace FlagCarrierAndroid.Activities
 {
@@ -124,8 +125,12 @@ namespace FlagCarrierAndroid.Activities
 
         private void ParseManualLoginIntent(Intent intent)
         {
-            // TODO: Test this
-            tagData = (Dictionary<string, string>)intent.GetSerializableExtra(ManualLoginIntentData);
+            JavaDictionary<string, string> data = new JavaDictionary<string, string>(
+                intent.GetSerializableExtra(ManualLoginIntentData).Handle,
+                JniHandleOwnership.DoNotRegister);
+
+            tagData = new Dictionary<string, string>(data);
+
             UpdateTextView();
         }
 
