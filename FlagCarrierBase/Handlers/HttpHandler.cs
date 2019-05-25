@@ -27,7 +27,7 @@ namespace FlagCarrierBase
 	{
 		private readonly HttpClient client = new HttpClient();
 
-		public async Task<string> DoRequestAsync(string url, string deviceId, string groupId, string action, Dictionary<String, String> tagData = null, Dictionary<String, String> extraData = null)
+		public async Task<string> DoRequestAsync(string url, string deviceId, string groupId, string action, Dictionary<string, string> tagData = null, Dictionary<string, string> extraData = null)
 		{
 			try
 			{
@@ -47,7 +47,7 @@ namespace FlagCarrierBase
 			}
 		}
 
-		private string DataToJson(string deviceId, string groupId, string action, Dictionary<String, String> tagData = null, Dictionary<String, String> extraData = null)
+		private string DataToJson(string deviceId, string groupId, string action, Dictionary<string, string> tagData = null, Dictionary<string, string> extraData = null)
 		{
 			Dictionary<string, object> data = new Dictionary<string, object>
 			{
