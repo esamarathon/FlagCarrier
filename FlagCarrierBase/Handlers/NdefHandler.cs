@@ -28,8 +28,8 @@ namespace FlagCarrierBase
 
 	public static class NdefHandler
 	{
-		static readonly string EXPECTED_MIME_TYPE = "application/vnd.de.oromit.flagcarrier";
-		static readonly string EXPECTED_APP_REC = "de.oromit.flagcarrier";
+		public const string FLAGCARRIER_MIME_TYPE = "application/vnd.de.oromit.flagcarrier";
+		public const string FLAGCARRIER_APP_REC = "de.oromit.flagcarrier";
 
 		static private byte[] privateKey = null;
 		static private byte[] publicKey = null;
@@ -164,7 +164,7 @@ namespace FlagCarrierBase
 			if(rec.TypeNameFormat != NdefRecord.TypeNameFormatType.Mime)
 				return false;
 
-			if (Encoding.ASCII.GetString(rec.Type) != EXPECTED_MIME_TYPE)
+			if (Encoding.ASCII.GetString(rec.Type) != FLAGCARRIER_MIME_TYPE)
 				return false;
 
 			return true;
@@ -193,14 +193,14 @@ namespace FlagCarrierBase
 		{
 			NdefAndroidAppRecord rec = new NdefAndroidAppRecord
 			{
-				PackageName = EXPECTED_APP_REC
+				PackageName = FLAGCARRIER_APP_REC
 			};
 			return rec;
 		}
 
 		private static NdefRecord GenerateMimeRecord(Dictionary<string, string> values)
 		{
-			NdefRecord rec = new NdefRecord(NdefRecord.TypeNameFormatType.Mime, Encoding.ASCII.GetBytes(EXPECTED_MIME_TYPE))
+			NdefRecord rec = new NdefRecord(NdefRecord.TypeNameFormatType.Mime, Encoding.ASCII.GetBytes(FLAGCARRIER_MIME_TYPE))
 			{
 				Payload = GenerateCompressedPayload(values)
 			};

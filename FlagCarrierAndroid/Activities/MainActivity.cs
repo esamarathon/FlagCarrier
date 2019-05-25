@@ -18,7 +18,6 @@ using SupportFragment = Android.Support.V4.App.Fragment;
 namespace FlagCarrierAndroid.Activities
 {
     [Activity(Label = "@string/app_name", Theme = "@style/AppTheme.NoActionBar", MainLauncher = true)]
-    [IntentFilter(new[] { "android.nfc.action.NDEF_DISCOVERED" }, Categories = new[] { "android.intent.category.DEFAULT" }, DataMimeType = FLAGCARRIER_MIMETYPE)]
     public class MainActivity : AppCompatActivity, NavigationView.IOnNavigationItemSelectedListener
     {
         public static MainActivity Instance { get; private set; } = null;

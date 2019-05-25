@@ -26,6 +26,7 @@
   <string name="manual_login_submit">Login</string>
   <string name="manual_login_title">Manual Login</string>
 
+  <string name="login_title">Login</string>
   <string name="login_action">Login</string>
   <string name="clear_action">Clear</string>
   <string name="manual_action">Manual Login</string>
