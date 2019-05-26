@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 using Android.Content;
 using Android.OS;
+using Android.Text;
 using Android.Support.V4.App;
 using Android.Views;
 using Android.Widget;
 using Com.Hbb20;
 
+using FlagCarrierBase.Helpers;
 using FlagCarrierAndroid.Activities;
 using FlagCarrierAndroid.Helpers;
 
@@ -22,12 +25,21 @@ namespace FlagCarrierAndroid.Fragments
             HasOptionsMenu = true;
         }
 
-        EditText displayNameText = null;
-        CountryCodePicker ccp = null;
-        EditText speedrunNameText = null;
-        EditText twitchNameText = null;
-        EditText twitterHandleText = null;
-        EditText extraDataText = null;
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        {
+            inflater.Inflate(Resource.Menu.menu_write, menu);
+
+            base.OnCreateOptionsMenu(menu, inflater);
+        }
+
+        private EditText displayNameText = null;
+        private CountryCodePicker ccp = null;
+        private EditText speedrunNameText = null;
+        private EditText twitchNameText = null;
+        private EditText twitterHandleText = null;
+        private EditText extraDataText = null;
+
+        private string lookupName = null;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -40,17 +52,21 @@ namespace FlagCarrierAndroid.Fragments
             twitterHandleText = view.FindViewById<EditText>(Resource.Id.twitterHandleText);
             extraDataText = view.FindViewById<EditText>(Resource.Id.extraDataText);
 
+            displayNameText.TextChanged += AnyControl_TextChanged;
+            speedrunNameText.TextChanged += AnyControl_TextChanged;
+            twitchNameText.TextChanged += AnyControl_TextChanged;
+            twitterHandleText.TextChanged += AnyControl_TextChanged;
+
             Button submitButton = view.FindViewById<Button>(Resource.Id.writeTagButton);
             submitButton.Click += SubmitButton_Click;
 
             return view;
         }
 
-        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        private void AnyControl_TextChanged(object sender, TextChangedEventArgs e)
         {
-            inflater.Inflate(Resource.Menu.menu_write, menu);
-
-            base.OnCreateOptionsMenu(menu, inflater);
+            EditText txt = (EditText)sender;
+            lookupName = txt.Text;
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
@@ -60,9 +76,27 @@ namespace FlagCarrierAndroid.Fragments
                 case Resource.Id.fillSetOption:
                     FillWithSettings();
                     return true;
+                case Resource.Id.fromSrComOption:
+                    _ = FillFromSpeedrunCom();
+                    return true;
                 default:
                     return base.OnOptionsItemSelected(item);
             }
+        }
+
+        private async Task FillFromSpeedrunCom()
+        {
+            var data = await SpeedrunComHelper.GetUserInfo(lookupName);
+
+            if (data == null)
+                return;
+
+            displayNameText.Text = data.DisplayName;
+            ccp.SetCountryForNameCode(data.CountryCode.Split('/')[0]);
+            speedrunNameText.Text = data.SrComName;
+            twitchNameText.Text = data.TwitchName;
+            twitterHandleText.Text = data.TwitterHandle;
+            extraDataText.Text = "";
         }
 
         private void SubmitButton_Click(object sender, EventArgs e)

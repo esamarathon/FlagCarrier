@@ -45,6 +45,8 @@
 
   <string name="fill_set_write">Settings Template</string>
 
+  <string name="from_sr_com">From speedrun.com</string>
+  
   <string name="btm_device_id">Device ID</string>
   <string name="btm_group_id">Group ID</string>
   <string name="btm_report_all_scans">Report All Scans</string>

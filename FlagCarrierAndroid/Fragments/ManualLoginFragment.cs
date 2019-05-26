@@ -1,16 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
+
+using Android.Runtime;
 using Android.Content;
 using Android.OS;
+using Android.Text;
 using Android.Support.V4.App;
 using Android.Views;
 using Android.Widget;
 using Com.Hbb20;
 
+using FlagCarrierBase.Helpers;
 using FlagCarrierAndroid.Helpers;
 using FlagCarrierAndroid.Activities;
-using Android.Runtime;
 
 namespace FlagCarrierAndroid.Fragments
 {
@@ -19,13 +23,23 @@ namespace FlagCarrierAndroid.Fragments
         public override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+            HasOptionsMenu = true;
         }
 
-        EditText displayNameText = null;
-        CountryCodePicker ccp = null;
-        EditText speedrunNameText = null;
-        EditText twitchNameText = null;
-        EditText twitterHandleText = null;
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        {
+            inflater.Inflate(Resource.Menu.menu_from_srcom, menu);
+
+            base.OnCreateOptionsMenu(menu, inflater);
+        }
+
+        private EditText displayNameText = null;
+        private CountryCodePicker ccp = null;
+        private EditText speedrunNameText = null;
+        private EditText twitchNameText = null;
+        private EditText twitterHandleText = null;
+
+        private string lookupName = null;
 
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
@@ -40,11 +54,48 @@ namespace FlagCarrierAndroid.Fragments
             twitchNameText = view.FindViewById<EditText>(Resource.Id.twitchNameText);
             twitterHandleText = view.FindViewById<EditText>(Resource.Id.twitterHandleText);
 
+            displayNameText.TextChanged += AnyControl_TextChanged;
+            speedrunNameText.TextChanged += AnyControl_TextChanged;
+            twitchNameText.TextChanged += AnyControl_TextChanged;
+            twitterHandleText.TextChanged += AnyControl_TextChanged;
+
             Button submitButton = view.FindViewById<Button>(Resource.Id.writeTagButton);
             submitButton.SetText(Resource.String.manual_login_submit);
             submitButton.Click += SubmitButton_Click;
 
             return view;
+        }
+
+        private void AnyControl_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            EditText txt = (EditText)sender;
+            lookupName = txt.Text;
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            switch (item.ItemId)
+            {
+                case Resource.Id.fromSrComOptionSingle:
+                    _ = FillFromSpeedrunCom();
+                    return true;
+                default:
+                    return base.OnOptionsItemSelected(item);
+            }
+        }
+
+        private async Task FillFromSpeedrunCom()
+        {
+            var data = await SpeedrunComHelper.GetUserInfo(lookupName);
+
+            if (data == null)
+                return;
+
+            displayNameText.Text = data.DisplayName;
+            ccp.SetCountryForNameCode(data.CountryCode.Split('/')[0]);
+            speedrunNameText.Text = data.SrComName;
+            twitchNameText.Text = data.TwitchName;
+            twitterHandleText.Text = data.TwitterHandle;
         }
 
         private void SubmitButton_Click(object sender, EventArgs e)
