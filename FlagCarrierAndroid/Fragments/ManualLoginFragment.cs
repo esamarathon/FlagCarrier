@@ -14,7 +14,7 @@ using Android.Runtime;
 
 namespace FlagCarrierAndroid.Fragments
 {
-    public class ManualLoginFragment : Fragment
+    public class ManualLoginFragment : BaseFragment
     {
         public override void OnCreate(Bundle savedInstanceState)
         {

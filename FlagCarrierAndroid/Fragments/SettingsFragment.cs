@@ -13,7 +13,7 @@ using FlagCarrierBase;
 
 namespace FlagCarrierAndroid.Fragments
 {
-    public class SettingsFragment : Fragment
+    public class SettingsFragment : BaseFragment
     {
         public override void OnCreate(Bundle savedInstanceState)
         {

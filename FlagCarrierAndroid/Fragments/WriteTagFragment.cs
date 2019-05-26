@@ -14,7 +14,7 @@ using FlagCarrierAndroid.Helpers;
 
 namespace FlagCarrierAndroid.Fragments
 {
-    public class WriteTagFragment : Fragment
+    public class WriteTagFragment : BaseFragment
     {
         public override void OnCreate(Bundle savedInstanceState)
         {

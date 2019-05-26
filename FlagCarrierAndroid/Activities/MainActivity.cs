@@ -13,8 +13,6 @@ using Plugin.CurrentActivity;
 
 using FlagCarrierAndroid.Fragments;
 
-using SupportFragment = Android.Support.V4.App.Fragment;
-
 namespace FlagCarrierAndroid.Activities
 {
     [Activity(Label = "@string/app_name", Theme = "@style/AppTheme.NoActionBar", MainLauncher = true)]
@@ -26,6 +24,8 @@ namespace FlagCarrierAndroid.Activities
 
         private DrawerLayout drawer = null;
         private NavigationView navigationView = null;
+
+        private BaseFragment currentFragment = null;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -57,23 +57,21 @@ namespace FlagCarrierAndroid.Activities
 
         public bool SwitchToPage(int navId, bool animate = true)
         {
-            SupportFragment fragment;
-
             switch (navId)
             {
                 case Resource.Id.nav_scan_tag:
-                    fragment = new ScanTagFragment();
+                    currentFragment = new ScanTagFragment();
                     break;
                 case Resource.Id.nav_manual_login:
-                    fragment = new ManualLoginFragment();
+                    currentFragment = new ManualLoginFragment();
                     break;
                 case Resource.Id.nav_write_tag:
-                    fragment = new WriteTagFragment();
+                    currentFragment = new WriteTagFragment();
                     break;
                 case Resource.Id.nav_beam_mini:
                     return false;
                 case Resource.Id.nav_settings:
-                    fragment = new SettingsFragment();
+                    currentFragment = new SettingsFragment();
                     break;
                 default:
                     return false;
@@ -91,8 +89,8 @@ namespace FlagCarrierAndroid.Activities
                     tx.SetCustomAnimations(Resource.Animation.slide_in_left, Resource.Animation.slide_out_right);
             }
 
-            tx.Replace(Resource.Id.content, fragment);
-            tx.Commit(); ;
+            tx.Replace(Resource.Id.content, currentFragment);
+            tx.Commit();
 
             if (drawer.IsDrawerOpen(GravityCompat.Start))
                 drawer.CloseDrawer(GravityCompat.Start);

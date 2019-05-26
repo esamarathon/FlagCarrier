@@ -16,7 +16,7 @@ using FlagCarrierAndroid.Helpers;
 
 namespace FlagCarrierAndroid.Fragments
 {
-    public class ScanTagFragment : Fragment
+    public class ScanTagFragment : BaseFragment
     {
         private readonly HttpHandler httpHandler = new HttpHandler();
 
