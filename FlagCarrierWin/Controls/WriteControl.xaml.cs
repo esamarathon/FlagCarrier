@@ -8,6 +8,7 @@ using System.Web;
 using System.Linq;
 
 using FlagCarrierBase;
+using FlagCarrierBase.Helpers;
 using NdefLibrary.Ndef;
 using Newtonsoft.Json.Linq;
 
@@ -18,7 +19,6 @@ namespace FlagCarrierWin
     /// </summary>
     public partial class WriteControl : UserControl
     {
-		private readonly HttpClient httpClient = new HttpClient();
 		private TextBox lastChangedTextBox = null;
 
 		public event Action<Dictionary<string, string>> ManualLoginRequest;
@@ -82,85 +82,20 @@ namespace FlagCarrierWin
 			if (lookup_name == "")
 				return;
 
-			HttpResponseMessage response = await httpClient.GetAsync("https://www.speedrun.com/api/v1/users?lookup=" + HttpUtility.UrlEncode(lookup_name));
-
-			if (response.StatusCode != HttpStatusCode.OK)
-			{
-				ErrorMessage?.Invoke("sr.com request failed: " + response.StatusCode.ToString());
-				return;
-			}
-
-			string data = await response.Content.ReadAsStringAsync();
-
 			try
 			{
-				var srdata = JObject.Parse(data);
-				var userdata = srdata["data"];
+				var srData = await SpeedrunComHelper.GetUserInfo(lookup_name);
 
-				if (userdata.Count() <= 0)
-				{
-					ErrorMessage?.Invoke("Not found on speedrun.com: " + lookup_name);
-					return;
-				}
-
-				if (userdata.Count() != 1)
-				{
-					ErrorMessage?.Invoke("Multiple results for \"" + lookup_name + "\", using first one.");
-				}
-
-				userdata = userdata[0];
-
-				try
-				{
-					displayNameBox.Text = (string)userdata["names"]["international"];
-				}
-				catch (Exception)
-				{
-					displayNameBox.Text = "";
-				}
-
-				try
-				{
-					countryCodeBox.Code = (string)userdata["location"]["country"]["code"];
-				}
-				catch (Exception)
-				{
-					countryCodeBox.Code = "de";
-				}
-
-				try
-				{
-					string srname = (string)userdata["weblink"];
-					srcomNameBox.Text = srname.Split('/').Last();
-				}
-				catch (Exception)
-				{
-					srcomNameBox.Text = "";
-				}
-
-				try
-				{
-					string twitch = (string)userdata["twitch"]["uri"];
-					twitchNameBox.Text = twitch.Split('/').Last();
-				}
-				catch (Exception)
-				{
-					twitchNameBox.Text = "";
-				}
-
-				try
-				{
-					string twitter = (string)userdata["twitter"]["uri"];
-					twitterHandleBox.Text = twitter.Split('/').Last();
-				}
-				catch (Exception)
-				{
-					twitterHandleBox.Text = "";
-				}
+				displayNameBox.Text = srData.DisplayName;
+				countryCodeBox.Code = srData.CountryCode;
+				srcomNameBox.Text = srData.SrComName;
+				twitchNameBox.Text = srData.TwitchName;
+				twitterHandleBox.Text = srData.TwitterHandle;
 			}
 			catch(Exception ex)
 			{
-				ErrorMessage?.Invoke("Failed parsing sr.com data:\n" + ex.Message);
+				ErrorMessage?.Invoke(ex.Message);
+				return;
 			}
 		}
 
@@ -191,7 +126,7 @@ namespace FlagCarrierWin
 			if (txt != "")
 				vals.Add(Definitions.TWITTER_HANDLE, txt);
 
-			foreach (String line in extraDataBox.Text.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries))
+			foreach (string line in extraDataBox.Text.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries))
 			{
 				string[] kv = line.Split(new[] { '=' }, 2, StringSplitOptions.None);
 
