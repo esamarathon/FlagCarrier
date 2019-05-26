@@ -70,6 +70,7 @@
     <Compile Include="Activities\LoginActivity.cs" />
     <Compile Include="Activities\WriteTagActivity.cs" />
     <Compile Include="Fragments\BaseFragment.cs" />
+    <Compile Include="Fragments\BeamToMiniFragment.cs" />
     <Compile Include="Fragments\ManualLoginFragment.cs" />
     <Compile Include="Fragments\ScanTagFragment.cs" />
     <Compile Include="Fragments\SettingsFragment.cs" />
@@ -213,6 +214,11 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\activity_write_tag.axml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\layout\fragment_beam_to_mini.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>

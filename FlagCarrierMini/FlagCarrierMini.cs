@@ -153,7 +153,15 @@ namespace FlagCarrierMini
 				Dictionary<string, string> settings = new Dictionary<string, string>();
 
 				foreach (string key in keys)
+				{
+					if (!vals.ContainsKey(key))
+					{
+						Console.WriteLine("Invalid settings data, missing value for " + key);
+						return true;
+					}
+
 					settings.Add(key, vals[key]);
+				}
 
 				if (AppSettings.FromDict(settings))
 				{
@@ -183,7 +191,8 @@ namespace FlagCarrierMini
 
 			TagScannedEvent tse = new TagScannedEvent();
 
-			tse.FlagCarrier.ID = AppSettings.ID;
+			tse.FlagCarrier.ID = AppSettings.DeviceId;
+			tse.FlagCarrier.Group = AppSettings.GroupId;
 			tse.FlagCarrier.Time = DateTime.UtcNow;
 			tse.FlagCarrier.UID = curUid;
 			tse.FlagCarrier.ValidSignature = sigValid;

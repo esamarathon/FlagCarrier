@@ -5,6 +5,8 @@ using System.Configuration;
 using System.Runtime.CompilerServices;
 using System.Reflection;
 
+using FlagCarrierBase.Constants;
+
 namespace FlagCarrierMini
 {
 	class AppSettings
@@ -63,11 +65,26 @@ namespace FlagCarrierMini
 			return FromDict(values);
 		}
 
+		private static PropertyInfo FindPropByKey(string key)
+		{
+			foreach (PropertyInfo prop in typeof(AppSettings).GetProperties(BindingFlags.Public | BindingFlags.Static))
+			{
+				FieldInfo keyField = typeof(AppSettings).GetField(prop.Name + "Key", BindingFlags.Public | BindingFlags.Static);
+				if (keyField == null || keyField.IsInitOnly || !keyField.IsLiteral)
+					continue;
+
+				if (keyField.GetRawConstantValue().ToString() == key)
+					return prop;
+			}
+
+			return null;
+		}
+
 		public static bool FromDict(Dictionary<string, string> values)
 		{
 			foreach (var kv in values)
 			{
-				PropertyInfo prop = typeof(AppSettings).GetProperty(kv.Key, BindingFlags.Static | BindingFlags.Public | BindingFlags.IgnoreCase);
+				PropertyInfo prop = FindPropByKey(kv.Key);
 				if (prop == null)
 				{
 					Console.WriteLine("Unknown Option " + kv.Key);
@@ -75,11 +92,11 @@ namespace FlagCarrierMini
 				}
 
 				// Backup original value in case of format errors
-				string oval = Get(null, prop.Name);
+				string oval = Get(kv.Key, null);
 
 				try
 				{
-					Set(kv.Value, prop.Name);
+					Set(kv.Key, kv.Value);
 
 					// Load and set via propety to normalize and verify format
 					object nval = prop.GetValue(null);
@@ -88,7 +105,7 @@ namespace FlagCarrierMini
 				catch (Exception e)
 				{
 					// Restore original value on error
-					Set(oval, prop.Name);
+					Set(kv.Key, oval);
 
 					Console.WriteLine("Failed setting option " + kv.Key + ": " + e.Message);
 					return false;
@@ -110,12 +127,18 @@ namespace FlagCarrierMini
 			Console.WriteLine();
 			Console.WriteLine("Available settings:");
 			foreach (PropertyInfo prop in typeof(AppSettings).GetProperties(BindingFlags.Public | BindingFlags.Static))
-				Console.WriteLine(so("--" + prop.Name.ToLower() + "=" + Get(null, prop.Name) + " [" + prop.PropertyType.Name + "]"));
+			{
+				FieldInfo keyField = typeof(AppSettings).GetField(prop.Name + "Key", BindingFlags.Public | BindingFlags.Static);
+				if (keyField == null || keyField.IsInitOnly || !keyField.IsLiteral)
+					continue;
+
+				Console.WriteLine(so("--" + keyField.GetRawConstantValue().ToString() + "=" + Get(keyField.GetRawConstantValue().ToString(), null) + " [" + prop.PropertyType.Name + "]"));
+			}
 			Console.WriteLine();
 			Console.WriteLine("All settings will be persisted to the application configuration automatically.");
 		}
 
-		private static string Get(string defaultValue = null, [CallerMemberName] string name = null)
+		private static string Get(string name, string defaultValue = null)
 		{
 			var cfg = config.AppSettings.Settings[name];
 			if (cfg != null)
@@ -124,7 +147,7 @@ namespace FlagCarrierMini
 				return defaultValue;
 		}
 
-		private static void Set(string value, [CallerMemberName] string name = null)
+		private static void Set(string name, string value)
 		{
 			if (config.AppSettings.Settings[name] != null)
 				config.AppSettings.Settings.Remove(name);
@@ -136,17 +159,26 @@ namespace FlagCarrierMini
 			config.Save(ConfigurationSaveMode.Modified);
 		}
 
-		public static string ID
+		public const string DeviceIdKey = SettingsKeys.DeviceIdKey;
+		public static string DeviceId
 		{
-			get => Get("unset");
-			set => Set(value);
+			get => Get(DeviceIdKey, "unset");
+			set => Set(DeviceIdKey, value);
 		}
 
+		public const string GroupIdKey = SettingsKeys.GroupIdKey;
+		public static string GroupId
+		{
+			get => Get(GroupIdKey, "unset");
+			set => Set(GroupIdKey, value);
+		}
+
+		public const string PubKeyKey = SettingsKeys.PubKeyKey;
 		public static byte[] PubKey
 		{
 			get
 			{
-				string v = Get();
+				string v = Get(PubKeyKey);
 				if (v != null)
 					return Convert.FromBase64String(v);
 				return null;
@@ -154,18 +186,20 @@ namespace FlagCarrierMini
 			set
 			{
 				if (value != null)
-					Set(Convert.ToBase64String(value));
+					Set(PubKeyKey, Convert.ToBase64String(value));
 				else
-					Set(null);
+					Set(PubKeyKey, null);
 			}
 		}
 
+		public const string ReportAllScansKey = SettingsKeys.ReportAllScansKey;
 		public static bool ReportAllScans
 		{
-			get => bool.Parse(Get("False"));
-			set => Set(value.ToString());
+			get => bool.Parse(Get(ReportAllScansKey, "False"));
+			set => Set(ReportAllScansKey, value.ToString());
 		}
 
+		public const string VerboseKey = SettingsKeys.VerboseKey;
 		private static bool? verbose = null;
 		public static bool Verbose
 		{
@@ -173,51 +207,57 @@ namespace FlagCarrierMini
 			{
 				if (verbose != null)
 					return verbose.Value;
-				verbose = bool.Parse(Get("False"));
+				verbose = bool.Parse(Get(VerboseKey, "False"));
 				return verbose.Value;
 			}
 
 			set
 			{
 				verbose = value;
-				Set(value.ToString());
+				Set(VerboseKey, value.ToString());
 			}
 		}
 
+		public const string MqHostKey = SettingsKeys.MqHostKey;
 		public static string MqHost
 		{
-			get => Get("");
-			set => Set(value);
+			get => Get(MqHostKey, "");
+			set => Set(MqHostKey, value);
 		}
 
+		public const string MqPortKey = SettingsKeys.MqPortKey;
 		public static ushort MqPort
 		{
-			get => ushort.Parse(Get("0"));
-			set => Set(value.ToString());
+			get => ushort.Parse(Get(MqPortKey, "0"));
+			set => Set(MqPortKey, value.ToString());
 		}
 
+		public const string MqTlsKey = SettingsKeys.MqTlsKey;
 		public static bool MqTls
 		{
-			get => bool.Parse(Get("True"));
-			set => Set(value.ToString());
+			get => bool.Parse(Get(MqTlsKey, "True"));
+			set => Set(MqTlsKey, value.ToString());
 		}
 
+		public const string MqQueueKey = SettingsKeys.MqQueueKey;
 		public static string MqQueue
 		{
-			get => Get("flagcarrier-tag-scanned");
-			set => Set(value);
+			get => Get(MqQueueKey, "flagcarrier-tag-scanned");
+			set => Set(MqQueueKey, value);
 		}
 
+		public const string MqUsernameKey = SettingsKeys.MqUsernameKey;
 		public static string MqUsername
 		{
-			get => Get("guest");
-			set => Set(value);
+			get => Get(MqUsernameKey, "guest");
+			set => Set(MqUsernameKey, value);
 		}
 
+		public const string MqPasswordKey = SettingsKeys.MqPasswordKey;
 		public static string MqPassword
 		{
-			get => Get("");
-			set => Set(value);
+			get => Get(MqPasswordKey, "");
+			set => Set(MqPasswordKey, value);
 		}
 	}
 }

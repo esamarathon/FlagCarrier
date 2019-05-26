@@ -12,6 +12,9 @@ namespace FlagCarrierMini
 			[JsonProperty("id")]
 			public string ID { get; set; }
 
+			[JsonProperty("group")]
+			public string Group { get; set; }
+
 			[JsonProperty("time")]
 			[JsonConverter(typeof(MicrosecondEpochConverter))]
 			public DateTime Time { get; set; }
