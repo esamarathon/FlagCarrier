@@ -69,6 +69,7 @@
   <ItemGroup>
     <Compile Include="Activities\LoginActivity.cs" />
     <Compile Include="Activities\WriteTagActivity.cs" />
+    <Compile Include="Fragments\BaseFragment.cs" />
     <Compile Include="Fragments\ManualLoginFragment.cs" />
     <Compile Include="Fragments\ScanTagFragment.cs" />
     <Compile Include="Fragments\SettingsFragment.cs" />
@@ -164,7 +165,7 @@
     </AndroidResource>
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\menu\menu_main.xml">
+    <AndroidResource Include="Resources\menu\menu_write.xml">
       <Generator>MSBuild:UpdateGeneratedFiles</Generator>
       <SubType>Designer</SubType>
     </AndroidResource>

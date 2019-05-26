@@ -19,6 +19,7 @@ namespace FlagCarrierAndroid.Fragments
         public override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+            HasOptionsMenu = true;
         }
 
         EditText displayNameText = null;
@@ -43,6 +44,25 @@ namespace FlagCarrierAndroid.Fragments
             submitButton.Click += SubmitButton_Click;
 
             return view;
+        }
+
+        public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
+        {
+            inflater.Inflate(Resource.Menu.menu_write, menu);
+
+            base.OnCreateOptionsMenu(menu, inflater);
+        }
+
+        public override bool OnOptionsItemSelected(IMenuItem item)
+        {
+            switch (item.ItemId)
+            {
+                case Resource.Id.fillSetOption:
+                    FillWithSettings();
+                    return true;
+                default:
+                    return base.OnOptionsItemSelected(item);
+            }
         }
 
         private void SubmitButton_Click(object sender, EventArgs e)
@@ -104,6 +124,32 @@ namespace FlagCarrierAndroid.Fragments
             intent.SetAction(WriteTagActivity.WriteTagIntentAction);
             intent.PutExtra(WriteTagActivity.WriteTagIntentData, new Java.Util.HashMap(data));
             StartActivity(intent);
+        }
+
+        private void FillWithSettings()
+        {
+            displayNameText.Text = "set";
+            speedrunNameText.Text = "";
+            twitchNameText.Text = "";
+            twitterHandleText.Text = "";
+
+            StringBuilder extra = new StringBuilder();
+
+            List<string> keys = AppSettings.GetAllKeys();
+
+            keys.Remove(AppSettings.DeviceIdKey);
+            keys.Remove(AppSettings.PrivKeyKey);
+
+            extra.Append("set=");
+            extra.Append(string.Join(',', keys));
+
+            foreach (string key in keys)
+            {
+                extra.Append("\n");
+                extra.Append(key).Append('=').Append(AppSettings.Global.GetByKey(key));
+            }
+
+            extraDataText.Text = extra.ToString();
         }
     }
 }

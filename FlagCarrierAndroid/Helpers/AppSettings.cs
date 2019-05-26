@@ -23,7 +23,7 @@ namespace FlagCarrierAndroid.Helpers
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        #region Helper Functions
+        #region Internal Helper Functions
 
         private readonly AndroidKeyStore keyStore = new AndroidKeyStore();
 
@@ -226,6 +226,77 @@ namespace FlagCarrierAndroid.Helpers
             }
 
             return (T)res;
+        }
+
+        #endregion
+
+        #region External Helper Functions
+
+        public void SetByKey(string key, string value)
+        {
+            switch (key)
+            {
+                case TargetUrlKey:
+                    TargetUrl = value;
+                    break;
+                case PositionsKey:
+                    Positions = value;
+                    break;
+                case KioskModeKey:
+                    KioskMode = Convert.ToBoolean(value);
+                    break;
+                case DeviceIdKey:
+                    DeviceId = value;
+                    break;
+                case GroupIdKey:
+                    GroupId = value;
+                    break;
+                case PubKeyKey:
+                    PubKey = Convert.FromBase64String(value);
+                    break;
+                case PrivKeyKey:
+                    PrivKey = Convert.FromBase64String(value);
+                    break;
+                default:
+                    throw new ArgumentException("Unknown settings key " + key);
+            }
+        }
+
+        public string GetByKey(string key)
+        {
+            switch (key)
+            {
+                case TargetUrlKey:
+                    return TargetUrl;
+                case PositionsKey:
+                    return Positions;
+                case KioskModeKey:
+                    return KioskMode.ToString();
+                case DeviceIdKey:
+                    return DeviceId;
+                case GroupIdKey:
+                    return GroupId;
+                case PubKeyKey:
+                    return Convert.ToBase64String(PubKey);
+                case PrivKeyKey:
+                    return Convert.ToBase64String(PrivKey);
+                default:
+                    throw new ArgumentException("Unknown settings key " + key);
+            }
+        }
+
+        public static List<string> GetAllKeys()
+        {
+            return new List<string>()
+            {
+                TargetUrlKey,
+                PositionsKey,
+                KioskModeKey,
+                DeviceIdKey,
+                GroupIdKey,
+                PubKeyKey,
+                PrivKeyKey
+            };
         }
 
         #endregion
