@@ -52,7 +52,7 @@ namespace FlagCarrierAndroid.Fragments
             mqUserText = view.FindViewById<EditText>(Resource.Id.mqUserText);
             mqPassText = view.FindViewById<EditText>(Resource.Id.mqPassText);
 
-            pubKeyText.Text = Convert.ToBase64String(AppSettings.Global.PubKey);
+            pubKeyText.Text = Convert.ToBase64String(AppSettings.Global.PubKey ?? new byte[0]);
 
             mqHostText.Text = AppSettings.Global.MqHost;
             mqPortText.Text = AppSettings.Global.MqPort.ToString();
