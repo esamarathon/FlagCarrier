@@ -8,6 +8,7 @@ using Android.Support.V4.App;
 using Android.Support.V7.App;
 using Android.Views;
 using Android.Widget;
+using Android.Nfc;
 
 using FlagCarrierBase;
 using FlagCarrierAndroid.Activities;
@@ -30,6 +31,18 @@ namespace FlagCarrierAndroid.Fragments
 
             Button clearButton = view.FindViewById<Button>(Resource.Id.clearButton);
             clearButton.Click += ClearButton_Click;
+
+            var nfcAdapter = NfcAdapter.GetDefaultAdapter(MainActivity.Instance);
+            var mainTextView = view.FindViewById<TextView>(Resource.Id.mainTextView);
+
+            if (nfcAdapter == null)
+            {
+                mainTextView.Text = "No NFC Adapter found!";
+            }
+            else if (!nfcAdapter.IsEnabled)
+            {
+                mainTextView.Text = "NFC Adapter is disabled!";
+            }
 
             return view;
         }
