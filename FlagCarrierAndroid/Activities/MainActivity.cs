@@ -69,7 +69,8 @@ namespace FlagCarrierAndroid.Activities
                     currentFragment = new WriteTagFragment();
                     break;
                 case Resource.Id.nav_beam_mini:
-                    return false;
+                    currentFragment = new BeamToMiniFragment();
+                    break;
                 case Resource.Id.nav_settings:
                     currentFragment = new SettingsFragment();
                     break;

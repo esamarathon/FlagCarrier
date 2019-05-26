@@ -33,6 +33,8 @@ namespace FlagCarrierBase
 		public const string SIG_KEY = "sig";
 		public const string SIG_VALID_KEY = "sig_valid";
 
+		public bool KeepEmptyFields { get; set; } = false;
+
 		private byte[] privateKey = null;
 		private byte[] publicKey = null;
 		private byte[] extraSignData = null;
@@ -233,9 +235,9 @@ namespace FlagCarrierBase
 				{
 					foreach (var entry in values)
 					{
-						String key = entry.Key.Trim();
-						String val = entry.Value.Trim();
-						if (String.IsNullOrEmpty(val))
+						string key = entry.Key.Trim();
+						string val = entry.Value.Trim();
+						if (!KeepEmptyFields && val == "")
 							continue;
 						WriteUTF(writer, key);
 						WriteUTF(writer, val);

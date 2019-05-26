@@ -45,6 +45,19 @@
 
   <string name="fill_set_write">Settings Template</string>
 
+  <string name="btm_device_id">Device ID</string>
+  <string name="btm_group_id">Group ID</string>
+  <string name="btm_report_all_scans">Report All Scans</string>
+  <string name="btm_verbose">Verbose Logging</string>
+  <string name="btm_pub_key">Public Key</string>
+  <string name="btm_mq_host">RabbitMQ Host</string>
+  <string name="btm_mq_port">RabbitMQ Port</string>
+  <string name="btm_mq_tls">RabbitMQ TLS</string>
+  <string name="btm_mq_queue">RabbitMQ Queue</string>
+  <string name="btm_mq_user">RabbitMQ Username</string>
+  <string name="btm_mq_pass">RabbitMQ Password</string>
+  <string name="btm_beam_button">Beam</string>
+
   <string name="hceservicedesc">FlagCarrier HCE Service</string>
   <string name="hceaiddescription">FlagCarrier HCE AID</string>
 </resources>

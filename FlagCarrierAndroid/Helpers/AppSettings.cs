@@ -78,6 +78,11 @@ namespace FlagCarrierAndroid.Helpers
                 Notify(propertyName);
         }
 
+        private void SetEncrypted(string key, string data, [CallerMemberName] string propertyName = null)
+        {
+            SetEncrypted(key, Encoding.UTF8.GetBytes(data), propertyName);
+        }
+
         private byte[] GetEncrypted(string key)
         {
             key = HashKey(key);
@@ -108,6 +113,15 @@ namespace FlagCarrierAndroid.Helpers
                     return null;
                 }
             }
+        }
+
+        private string GetEncryptedStr(string key)
+        {
+            var res = GetEncrypted(key);
+            if (res == null)
+                return null;
+
+            return Encoding.UTF8.GetString(res);
         }
 
         private void Set<T>(string key, T value, [CallerMemberName] string propertyName = null)
@@ -157,6 +171,20 @@ namespace FlagCarrierAndroid.Helpers
                                 if (!prefs.Contains(key) || prefs.GetString(key, null) != brs)
                                 {
                                     editor.PutString(key, brs);
+                                    changed = true;
+                                }
+                                break;
+                            case ushort us:
+                                if (!prefs.Contains(key) || prefs.GetInt(key, 0) != us)
+                                {
+                                    editor.PutInt(key, us);
+                                    changed = true;
+                                }
+                                break;
+                            case int i:
+                                if (!prefs.Contains(key) || prefs.GetInt(key, 0) != i)
+                                {
+                                    editor.PutInt(key, i);
                                     changed = true;
                                 }
                                 break;
@@ -220,6 +248,12 @@ namespace FlagCarrierAndroid.Helpers
                                 res = Convert.FromBase64String(brs);
                             else
                                 res = br;
+                            break;
+                        case int i:
+                            res = prefs.GetInt(key, i);
+                            break;
+                        case ushort us:
+                            res = (ushort)prefs.GetInt(key, us);
                             break;
                         default:
                             throw new NotImplementedException();
@@ -350,6 +384,48 @@ namespace FlagCarrierAndroid.Helpers
         {
             get => GetEncrypted(PrivKeyKey);
             set => SetEncrypted(PrivKeyKey, value);
+        }
+
+        public const string MqHostKey = SettingsKeys.MqHostKey;
+        public string MqHost
+        {
+            get => Get(MqHostKey, "");
+            set => Set(MqHostKey, value);
+        }
+
+        public const string MqPortKey = SettingsKeys.MqPortKey;
+        public ushort MqPort
+        {
+            get => Get(MqPortKey, (ushort)0);
+            set => Set(MqPortKey, value);
+        }
+
+        public const string MqTlsKey = SettingsKeys.MqTlsKey;
+        public bool MqTls
+        {
+            get => Get(MqTlsKey, true);
+            set => Set(MqTlsKey, value);
+        }
+
+        public const string MqQueueKey = SettingsKeys.MqQueueKey;
+        public string MqQueue
+        {
+            get => Get(MqQueueKey, "flagcarrier-tag-scanned");
+            set => Set(MqQueueKey, value);
+        }
+
+        public const string MqUsernameKey = SettingsKeys.MqUsernameKey;
+        public string MqUsername
+        {
+            get => Get(MqUsernameKey, "");
+            set => Set(MqUsernameKey, value);
+        }
+
+        public const string MqPasswordKey = SettingsKeys.MqPasswordKey;
+        public string MqPassword
+        {
+            get => GetEncryptedStr(MqPasswordKey);
+            set => SetEncrypted(MqPasswordKey, value);
         }
     }
 }
