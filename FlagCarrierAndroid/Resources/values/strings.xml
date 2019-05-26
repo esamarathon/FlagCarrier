@@ -21,7 +21,7 @@
   <string name="initial_greeting">Scan Tag!</string>
 
   <string name="write_tag">Write Tag</string>
-  <string name="write_tag_title">Write Tag</string>
+  <string name="write_tag_title">Scan tag to write data</string>
 
   <string name="manual_login_submit">Login</string>
   <string name="manual_login_title">Manual Login</string>

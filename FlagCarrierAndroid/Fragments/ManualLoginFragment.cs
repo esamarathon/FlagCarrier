@@ -54,7 +54,7 @@ namespace FlagCarrierAndroid.Fragments
             string dspName = displayNameText.Text.Trim();
             if (dspName == "")
             {
-                PopUpHelper.Snackbar("A display name is required.");
+                PopUpHelper.Toast("A display name is required.");
                 return;
             }
 
