@@ -258,28 +258,29 @@ namespace FlagCarrierAndroid.Activities
             StringBuilder bldr = new StringBuilder();
             StringBuilder other = new StringBuilder();
 
-            Dictionary<string, string> knownIdx = new Dictionary<string, string>
+            List<string> entryOrder = new List<string>
             {
-                ["display_name"] = "Display Name: ",
-                ["country_code"] = "Country Code: ",
-                ["speedruncom_name"] = "speedrun.com Name: ",
-                ["twitch_name"] = "Twitch Name: ",
-                ["twitter_handle"] = "Twitter Handle: "
+                "display_name",
+                "country_code",
+                "speedruncom_name",
+                "twitch_name",
+                "twitter_handle"
             };
+
+            AppendKnownKeys(bldr, entryOrder);
+            AppendSignatureStatus(bldr);
+
+            entryOrder.Add(NdefHandler.SIG_KEY);
+            entryOrder.Add(NdefHandler.SIG_VALID_KEY);
 
             foreach (var entry in tagData)
             {
-                if (knownIdx.ContainsKey(entry.Key))
-                {
-                    bldr.Append(knownIdx[entry.Key]);
-                    bldr.AppendLine(entry.Value);
-                }
-                else
-                {
-                    other.Append(entry.Key);
-                    other.Append('=');
-                    other.AppendLine(entry.Value);
-                }
+                if (entryOrder.Contains(entry.Key))
+                    continue;
+
+                other.Append(entry.Key);
+                other.Append('=');
+                other.AppendLine(entry.Value);
             }
 
             if (other.Length > 0)
@@ -290,6 +291,68 @@ namespace FlagCarrierAndroid.Activities
             }
 
             FindViewById<TextView>(Resource.Id.loginTextView).Text = bldr.ToString();
+        }
+
+        private void AppendKnownKeys(StringBuilder bldr, List<string> entryOrder)
+        {
+            foreach (var knownKey in entryOrder)
+            {
+                if (tagData.TryGetValue(knownKey, out string value))
+                {
+                    switch (knownKey)
+                    {
+                        case "display_name":
+                            bldr.Append("Display Name");
+                            break;
+                        case "country_code":
+                            bldr.Append("Country Code");
+                            break;
+                        case "speedruncom_name":
+                            bldr.Append("speedrun.com Name");
+                            break;
+                        case "twitch_name":
+                            bldr.Append("Twitch Name");
+                            break;
+                        case "twitter_handle":
+                            bldr.Append("Twitter Handle");
+                            break;
+                        default:
+                            bldr.Append(knownKey);
+                            break;
+                    }
+                    bldr.Append(": ").AppendLine(value);
+                }
+            }
+
+            bldr.AppendLine();
+        }
+
+        private void AppendSignatureStatus(StringBuilder bldr)
+        {
+            if (tagData.ContainsKey(NdefHandler.SIG_KEY))
+            {
+                if (tagData.TryGetValue(NdefHandler.SIG_VALID_KEY, out string sig_valid))
+                {
+                    if (sig_valid == bool.TrueString)
+                    {
+                        bldr.AppendLine("Signature Valid");
+                    }
+                    else
+                    {
+                        bldr.AppendLine("Signature INVALID");
+                    }
+                }
+                else
+                {
+                    bldr.AppendLine("Signature Unverified");
+                }
+            }
+            else
+            {
+                bldr.AppendLine("No Signature");
+            }
+
+            bldr.AppendLine();
         }
 
         private void BackToMain()
