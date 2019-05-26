@@ -207,39 +207,8 @@ namespace FlagCarrierAndroid.Activities
 
                 try
                 {
-                    switch (setting)
-                    {
-                        case AppSettings.TargetUrlKey:
-                            AppSettings.Global.TargetUrl = val;
-                            res.Append(setting).Append('=').AppendLine(val);
-                            break;
-                        case AppSettings.PositionsKey:
-                            AppSettings.Global.Positions = val;
-                            res.Append(setting).Append('=').AppendLine(val);
-                            break;
-                        case AppSettings.KioskModeKey:
-                            AppSettings.Global.KioskMode = bool.Parse(val);
-                            res.Append(setting).Append('=').AppendLine(bool.Parse(val).ToString());
-                            break;
-                        case AppSettings.DeviceIdKey:
-                            AppSettings.Global.DeviceId = val;
-                            res.Append(setting).Append('=').AppendLine(val);
-                            break;
-                        case AppSettings.GroupIdKey:
-                            AppSettings.Global.GroupId = val;
-                            res.Append(setting).Append('=').AppendLine(val);
-                            break;
-                        case AppSettings.PubKeyKey:
-                            AppSettings.Global.PubKey = Convert.FromBase64String(val);
-                            res.Append(setting).Append('=').AppendLine(val);
-                            break;
-                        case AppSettings.PrivKeyKey:
-                            AppSettings.Global.PrivKey = Convert.FromBase64String(val);
-                            res.Append(setting).Append('=').AppendLine(val);
-                            break;
-                        default:
-                            throw new Exception("Unknown setting");
-                    }
+                    AppSettings.Global.SetByKey(setting, val);
+                    res.Append(setting).Append('=').AppendLine(val);
                 }
                 catch (Exception e)
                 {
