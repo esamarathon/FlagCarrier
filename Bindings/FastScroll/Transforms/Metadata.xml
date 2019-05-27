@@ -1,3 +1,3 @@
-﻿<metadata>
+<metadata>
   <attr path="/api/package[@name='com.futuremind.recyclerviewfastscroll.viewprovider']/class[@name='VisibilityAnimationManager.Builder']/method[@name='build' and count(parameter)=0]" name="managedReturn">Java.Lang.Object</attr>
 </metadata>

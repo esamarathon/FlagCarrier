@@ -1,4 +1,4 @@
-﻿using Android.App;
+using Android.App;
 using Android.Widget;
 using Plugin.CurrentActivity;
 

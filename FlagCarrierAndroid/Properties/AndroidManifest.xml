@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="203" android:versionName="2.3" package="de.oromit.flagcarrier" android:installLocation="auto">
 	<uses-sdk android:minSdkVersion="19" android:targetSdkVersion="28" />
 	<uses-permission android:name="android.permission.NFC" />

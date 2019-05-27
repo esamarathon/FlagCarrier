@@ -1,4 +1,4 @@
-﻿using Android.App;
+using Android.App;
 using Android.Preferences;
 using Android.Util;
 using System;

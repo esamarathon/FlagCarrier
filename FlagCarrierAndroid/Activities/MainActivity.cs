@@ -1,4 +1,4 @@
-﻿using Android.Content.PM;
+using Android.Content.PM;
 using Android.Runtime;
 using Android.Views;
 using Android.OS;
