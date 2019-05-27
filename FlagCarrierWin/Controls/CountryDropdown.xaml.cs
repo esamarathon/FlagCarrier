@@ -17,93 +17,93 @@ using System.IO;
 
 namespace FlagCarrierWin.Controls
 {
-	public class CountryDropdownItem
-	{
-		public string Text { get; set; }
-		public string Code { get; set; }
+    public class CountryDropdownItem
+    {
+        public string Text { get; set; }
+        public string Code { get; set; }
 
-		public override string ToString()
-		{
-			return Text;
-		}
-	}
+        public override string ToString()
+        {
+            return Text;
+        }
+    }
 
-	/// <summary>
-	/// Interaction logic for CountryDropdown.xaml
-	/// </summary>
-	public partial class CountryDropdown : UserControl
-	{
-		Dictionary<string, CountryDropdownItem> codeToItem = new Dictionary<string, CountryDropdownItem>();
+    /// <summary>
+    /// Interaction logic for CountryDropdown.xaml
+    /// </summary>
+    public partial class CountryDropdown : UserControl
+    {
+        Dictionary<string, CountryDropdownItem> codeToItem = new Dictionary<string, CountryDropdownItem>();
 
-		public string Code
-		{
-			get
-			{
-				CountryDropdownItem item = (CountryDropdownItem)countryBox.SelectedItem;
-				if (item == null)
-					return "";
-				return item.Code;
-			}
-			set
-			{
-				string uv = value.ToUpper();
-				if (codeToItem.ContainsKey(uv))
-					countryBox.SelectedItem = codeToItem[uv];
-				else
-					throw new Exception("Requested code does not exist in our list");
-			}
-		}
+        public string Code
+        {
+            get
+            {
+                CountryDropdownItem item = (CountryDropdownItem)countryBox.SelectedItem;
+                if (item == null)
+                    return "";
+                return item.Code;
+            }
+            set
+            {
+                string uv = value.ToUpper();
+                if (codeToItem.ContainsKey(uv))
+                    countryBox.SelectedItem = codeToItem[uv];
+                else
+                    throw new Exception("Requested code does not exist in our list");
+            }
+        }
 
-		public CountryDropdown()
-		{
-			InitializeComponent();
+        public CountryDropdown()
+        {
+            InitializeComponent();
 
-			XmlDocument doc = new XmlDocument();
+            XmlDocument doc = new XmlDocument();
 
-			using (Stream stream = GetType().Assembly.GetManifestResourceStream("FlagCarrierWin.Resources.countries.xml"))
-				doc.Load(stream);
+            using (Stream stream = GetType().Assembly.GetManifestResourceStream("FlagCarrierWin.Resources.countries.xml"))
+                doc.Load(stream);
 
-			foreach(XmlNode xn in doc.SelectNodes("/countries/country"))
-			{
-				string cca2 = xn.Attributes["cca2"].Value;
-				string names = xn.Attributes["name"].Value;
+            foreach(XmlNode xn in doc.SelectNodes("/countries/country"))
+            {
+                string cca2 = xn.Attributes["cca2"].Value;
+                string names = xn.Attributes["name"].Value;
 
-				CountryDropdownItem item = new CountryDropdownItem
-				{
-					Text = cca2 + " [" + cca2 + "]",
-					Code = cca2
-				};
-				countryBox.Items.Add(item);
+                CountryDropdownItem item = new CountryDropdownItem
+                {
+                    Text = cca2 + " [" + cca2 + "]",
+                    Code = cca2
+                };
+                countryBox.Items.Add(item);
 
-				foreach (string name in names.Split(','))
-				{
-					item = new CountryDropdownItem
-					{
-						Text = name + " [" + cca2 + "]",
-						Code = cca2
-					};
-					countryBox.Items.Add(item);
+                foreach (string name in names.Split(','))
+                {
+                    item = new CountryDropdownItem
+                    {
+                        Text = name + " [" + cca2 + "]",
+                        Code = cca2
+                    };
+                    countryBox.Items.Add(item);
 
-					if (!codeToItem.ContainsKey(cca2))
-						codeToItem.Add(cca2, item);
-				}
-			}
+                    if (!codeToItem.ContainsKey(cca2))
+                        codeToItem.Add(cca2, item);
+                }
+            }
 
-			Code = "DE";
-		}
+            Code = "DE";
+        }
 
-		private void CountryBox_TextChanged(object sender, TextChangedEventArgs e)
-		{
-			string t = countryBox.Text.ToUpper();
-			if (codeToItem.ContainsKey(t))
-				countryBox.SelectedItem = codeToItem[t];
-		}
+        private void CountryBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string t = countryBox.Text.ToUpper();
+            if (codeToItem.ContainsKey(t))
+                countryBox.SelectedItem = codeToItem[t];
+        }
 
-		private void CountryBox_LostFocus(object sender, RoutedEventArgs e)
-		{
-			CountryDropdownItem item = (CountryDropdownItem)countryBox.SelectedItem;
-			if (item == null)
-				Code = "DE";
-		}
-	}
+        private void CountryBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            CountryDropdownItem item = (CountryDropdownItem)countryBox.SelectedItem;
+            if (item == null)
+                Code = "DE";
+        }
+    }
 }

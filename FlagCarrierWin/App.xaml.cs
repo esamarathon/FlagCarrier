@@ -8,7 +8,7 @@ using System.Windows;
 
 namespace FlagCarrierWin
 {
-	public partial class App : Application
-	{
-	}
+    public partial class App : Application
+    {
+    }
 }
