@@ -118,6 +118,9 @@ namespace FlagCarrierBase.Helpers
             }
             catch (Exception ex)
             {
+                if (ex is SpeedrunComHelperException)
+                    throw;
+
                 throw new SpeedrunComHelperException("Failed parsing sr.com data:\n" + ex.Message, ex);
             }
         }

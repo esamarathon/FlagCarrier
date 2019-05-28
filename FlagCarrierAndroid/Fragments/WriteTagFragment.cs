@@ -97,13 +97,26 @@ namespace FlagCarrierAndroid.Fragments
 
         private async Task FillFromSpeedrunCom()
         {
-            var data = await SpeedrunComHelper.GetUserInfo(lookupName);
+            SpeedrunComHelperData data = null;
+
+            try
+            {
+                data = await SpeedrunComHelper.GetUserInfo(lookupName);
+            }
+            catch (SpeedrunComHelperException e)
+            {
+                ShowToast(e.Message);
+            }
+            catch (Exception e)
+            {
+                ShowToast("Failed getting sr.com data: " + e.Message);
+            }
 
             if (data == null)
                 return;
 
             displayNameText.Text = data.DisplayName;
-            ccp.SetCountryForNameCode(data.CountryCode.Split('/')[0]);
+            ccp.SetCountryForNameCode(data.CountryCode.Split('/', 2)[0]);
             speedrunNameText.Text = data.SrComName;
             twitchNameText.Text = data.TwitchName;
             twitterHandleText.Text = data.TwitterHandle;

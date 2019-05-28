@@ -86,7 +86,20 @@ namespace FlagCarrierAndroid.Fragments
 
         private async Task FillFromSpeedrunCom()
         {
-            var data = await SpeedrunComHelper.GetUserInfo(lookupName);
+            SpeedrunComHelperData data = null;
+
+            try
+            {
+                data = await SpeedrunComHelper.GetUserInfo(lookupName);
+            }
+            catch (SpeedrunComHelperException e)
+            {
+                ShowToast(e.Message);
+            }
+            catch (Exception e)
+            {
+                ShowToast("Failed getting sr.com data: " + e.Message);
+            }
 
             if (data == null)
                 return;
