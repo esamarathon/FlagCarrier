@@ -94,14 +94,14 @@ namespace FlagCarrierAndroid.Fragments
                     pubKey = Convert.FromBase64String(pubKeyInput.Text);
                     if (!CryptoHandler.IsKeyValid(pubKey))
                     {
-                        PopUpHelper.Toast("Invalid Public Key");
+                        ShowToast("Invalid Public Key");
                         return;
                     }
                 }
             }
             catch (FormatException)
             {
-                PopUpHelper.Toast("Invalid Public Key Format");
+                ShowToast("Invalid Public Key Format");
                 return;
             }
 
@@ -112,14 +112,14 @@ namespace FlagCarrierAndroid.Fragments
                     privKey = Convert.FromBase64String(privKeyInput.Text);
                     if (!CryptoHandler.IsKeyValid(privKey))
                     {
-                        PopUpHelper.Toast("Invalid Private Key");
+                        ShowToast("Invalid Private Key");
                         return;
                     }
                 }
             }
             catch (FormatException)
             {
-                PopUpHelper.Toast("Invalid Private Key Format");
+                ShowToast("Invalid Private Key Format");
                 return;
             }
 
@@ -133,7 +133,7 @@ namespace FlagCarrierAndroid.Fragments
             if (privKeyChanged)
                 AppSettings.Global.PrivKey = privKey;
 
-            PopUpHelper.Toast("Settings Saved");
+            ShowToast("Settings Saved");
         }
     }
 }

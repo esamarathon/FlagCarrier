@@ -150,7 +150,7 @@ namespace FlagCarrierAndroid.Fragments
 
             HCEService.Publish(settingsDict);
 
-            PopUpHelper.Toast("Scan phone with Flag Carrier Mini device now to beam settings!");
+            ShowToast("Scan phone with Flag Carrier Mini device now to beam settings!");
         }
     }
 }

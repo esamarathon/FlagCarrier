@@ -14,6 +14,7 @@ using Com.Hbb20;
 using FlagCarrierBase.Helpers;
 using FlagCarrierAndroid.Activities;
 using FlagCarrierAndroid.Helpers;
+using FlagCarrierAndroid.Services;
 
 namespace FlagCarrierAndroid.Fragments
 {
@@ -63,6 +64,13 @@ namespace FlagCarrierAndroid.Fragments
             return view;
         }
 
+        public override void OnDestroy()
+        {
+            HCEService.Publish(null);
+
+            base.OnDestroy();
+        }
+
         private void AnyControl_TextChanged(object sender, TextChangedEventArgs e)
         {
             EditText txt = (EditText)sender;
@@ -78,6 +86,9 @@ namespace FlagCarrierAndroid.Fragments
                     return true;
                 case Resource.Id.fromSrComOption:
                     _ = FillFromSpeedrunCom();
+                    return true;
+                case Resource.Id.beamWriteData:
+                    Beam();
                     return true;
                 default:
                     return base.OnOptionsItemSelected(item);
@@ -99,15 +110,15 @@ namespace FlagCarrierAndroid.Fragments
             extraDataText.Text = "";
         }
 
-        private void SubmitButton_Click(object sender, EventArgs e)
+        private Dictionary<string, string> GetData()
         {
             var data = new Dictionary<string, string>();
 
             string dspName = displayNameText.Text.Trim();
             if (dspName == "")
             {
-                PopUpHelper.Toast("A display name is required.");
-                return;
+                ShowToast("A display name is required.");
+                return null;
             }
 
             data["display_name"] = dspName;
@@ -126,7 +137,7 @@ namespace FlagCarrierAndroid.Fragments
                 data["twitter_handle"] = tmp;
 
             string extra = extraDataText.Text.Trim();
-            foreach(string lineRaw in extra.Split('\n'))
+            foreach (string lineRaw in extra.Split('\n'))
             {
                 string line = lineRaw.Trim();
                 if (line == "")
@@ -135,29 +146,49 @@ namespace FlagCarrierAndroid.Fragments
                 string[] parts = line.Split('=', 2);
                 if (parts.Length != 2)
                 {
-                    PopUpHelper.Toast("Invalid extra data");
-                    return;
+                    ShowToast("Invalid extra data");
+                    return null;
                 }
 
                 if (parts[0].Length > 32)
                 {
-                    PopUpHelper.Toast("Extra data key length > 32");
-                    return;
+                    ShowToast("Extra data key length > 32");
+                    return null;
                 }
 
                 if (parts[1].Length > 255)
                 {
-                    PopUpHelper.Toast("Extra data value length > 255");
-                    return;
+                    ShowToast("Extra data value length > 255");
+                    return null;
                 }
 
                 data[parts[0]] = parts[1];
             }
 
-            Intent intent = new Intent(MainActivity.Instance, Java.Lang.Class.FromType(typeof(WriteTagActivity)));
+            return data;
+        }
+
+        private void SubmitButton_Click(object sender, EventArgs e)
+        {
+            var data = GetData();
+            if (data == null)
+                return;
+
+            Intent intent = new Intent(Activity, Java.Lang.Class.FromType(typeof(WriteTagActivity)));
             intent.SetAction(WriteTagActivity.WriteTagIntentAction);
             intent.PutExtra(WriteTagActivity.WriteTagIntentData, new Java.Util.HashMap(data));
             StartActivity(intent);
+        }
+
+        private void Beam()
+        {
+            var data = GetData();
+            if (data == null)
+                return;
+
+            HCEService.Publish(data);
+
+            ShowToast("Ready to beam data to device.");
         }
 
         private void FillWithSettings()

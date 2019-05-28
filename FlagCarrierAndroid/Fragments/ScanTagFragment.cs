@@ -68,11 +68,11 @@ namespace FlagCarrierAndroid.Fragments
                                                               AppSettings.Global.GroupId,
                                                               action);
 
-                PopUpHelper.Snackbar(res);
+                ShowSnackbar(res);
             }
             catch (HttpHandlerException e)
             {
-                PopUpHelper.Snackbar(e.Message);
+                ShowSnackbar(e.Message);
             }
         }
     }

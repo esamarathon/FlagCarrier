@@ -23,7 +23,7 @@ namespace FlagCarrierAndroid.Activities
 {
     [Activity(Label = "@string/login_title", Theme = "@style/AppTheme.NoActionBar")]
     [IntentFilter(new[] { NfcAdapter.ActionNdefDiscovered }, Categories = new[] { Intent.CategoryDefault }, DataMimeType = NdefHandler.FLAGCARRIER_MIME_TYPE)]
-    public class LoginActivity : AppCompatActivity
+    public class LoginActivity : BaseActivity
     {
         public const string ManualLoginIntentAction = "de.oromit.flagcarrier.manual_login_intent";
         public const string ManualLoginIntentData = "MANUAL_TAG_LOGIN_DATA";
@@ -95,12 +95,12 @@ namespace FlagCarrierAndroid.Activities
                                                               AppSettings.Global.GroupId,
                                                               action, tagData, extraData);
 
-                PopUpHelper.Toast(res);
+                ShowToast(res);
                 Finish();
             }
             catch (HttpHandlerException e)
             {
-                PopUpHelper.Snackbar(e.Message);
+                ShowSnackbar(e.Message);
             }
         }
 
@@ -118,7 +118,7 @@ namespace FlagCarrierAndroid.Activities
             }
             else
             {
-                PopUpHelper.Toast("Give me a tag!");
+                ShowToast("Give me a tag!");
                 BackToMain();
             }
         }
@@ -139,7 +139,7 @@ namespace FlagCarrierAndroid.Activities
             var rawMessages = intent.GetParcelableArrayExtra(NfcAdapter.ExtraNdefMessages);
             if (rawMessages == null || rawMessages.Length != 1)
             {
-                PopUpHelper.Toast("Can't handle this tag.");
+                ShowToast("Can't handle this tag.");
                 BackToMain();
                 return;
             }
@@ -159,7 +159,7 @@ namespace FlagCarrierAndroid.Activities
                     bool sigValid = Convert.ToBoolean(tagData[NdefHandler.SIG_VALID_KEY]);
                     if (!sigValid)
                     {
-                        PopUpHelper.Toast("Invalid Tag Signature!");
+                        ShowToast("Invalid Tag Signature!");
                         BackToMain();
                         return;
                     }
@@ -170,7 +170,7 @@ namespace FlagCarrierAndroid.Activities
             }
             catch (NdefHandlerException e)
             {
-                PopUpHelper.Toast(e.Message);
+                ShowToast(e.Message);
                 BackToMain();
             }
             finally
@@ -198,7 +198,7 @@ namespace FlagCarrierAndroid.Activities
             {
                 if (!tagData.ContainsKey(setting))
                 {
-                    PopUpHelper.Toast("Malformed settings: " + setting + " missing on tag.");
+                    ShowToast("Malformed settings: " + setting + " missing on tag.");
                     BackToMain();
                     return;
                 }
@@ -212,13 +212,13 @@ namespace FlagCarrierAndroid.Activities
                 }
                 catch (Exception e)
                 {
-                    PopUpHelper.Toast("Failed applying setting " + setting + " from tag:" + e.Message);
+                    ShowToast("Failed applying setting " + setting + " from tag:" + e.Message);
                     BackToMain();
                     return;
                 }
             }
 
-            PopUpHelper.Toast(res.ToString());
+            ShowToast(res.ToString());
             BackToMain();
         }
 

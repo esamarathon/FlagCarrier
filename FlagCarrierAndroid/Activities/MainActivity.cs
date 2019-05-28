@@ -9,14 +9,12 @@ using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
 
-using Plugin.CurrentActivity;
-
 using FlagCarrierAndroid.Fragments;
 
 namespace FlagCarrierAndroid.Activities
 {
     [Activity(Label = "@string/app_name", Theme = "@style/AppTheme.NoActionBar", MainLauncher = true)]
-    public class MainActivity : AppCompatActivity, NavigationView.IOnNavigationItemSelectedListener
+    public class MainActivity : BaseActivity, NavigationView.IOnNavigationItemSelectedListener
     {
         public static MainActivity Instance { get; private set; } = null;
 
@@ -32,7 +30,6 @@ namespace FlagCarrierAndroid.Activities
             Instance = this;
 
             base.OnCreate(savedInstanceState);
-            CrossCurrentActivity.Current.Init(this, savedInstanceState);
 
             SetContentView(Resource.Layout.activity_main);
 

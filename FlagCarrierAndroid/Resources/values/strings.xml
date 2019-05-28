@@ -60,6 +60,8 @@
   <string name="btm_mq_pass">RabbitMQ Password</string>
   <string name="btm_beam_button">Beam</string>
 
+  <string name="beam_menu_text">Beam</string>
+
   <string name="hceservicedesc">FlagCarrier HCE Service</string>
   <string name="hceaiddescription">FlagCarrier HCE AID</string>
 </resources>

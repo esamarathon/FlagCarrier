@@ -21,7 +21,7 @@ using SupportToolbar = Android.Support.V7.Widget.Toolbar;
 namespace FlagCarrierAndroid.Activities
 {
     [Activity(Label = "@string/write_tag_title", Theme = "@style/AppTheme.NoActionBar")]
-    public class WriteTagActivity : AppCompatActivity
+    public class WriteTagActivity : BaseActivity
     {
         public const string WriteTagIntentAction = "de.oromit.flagcarrier.write_tag_intent";
         public const string WriteTagIntentData = "WRITE_TAG_WRITE_DATA";
@@ -73,14 +73,14 @@ namespace FlagCarrierAndroid.Activities
 
             if (nfcAdapter == null)
             {
-                PopUpHelper.Toast("No NFC Adapter found.");
+                ShowToast("No NFC Adapter found.");
                 Finish();
                 return;
             }
 
             if (!nfcAdapter.IsEnabled)
             {
-                PopUpHelper.Toast("NFC Adapter is disabled.");
+                ShowToast("NFC Adapter is disabled.");
                 Finish();
                 return;
             }
@@ -106,7 +106,7 @@ namespace FlagCarrierAndroid.Activities
             }
             else
             {
-                PopUpHelper.Toast("Unknown WriteTag Intent: " + intent.Action);
+                ShowToast("Unknown WriteTag Intent: " + intent.Action);
                 Finish();
             }
         }
@@ -121,7 +121,7 @@ namespace FlagCarrierAndroid.Activities
 
             if (writeData.Count == 0)
             {
-                PopUpHelper.Toast("Got empty data to write to tag!");
+                ShowToast("Got empty data to write to tag!");
                 Finish();
                 return;
             }
@@ -162,7 +162,7 @@ namespace FlagCarrierAndroid.Activities
 
                 if (written == true)
                 {
-                    PopUpHelper.Toast("Written " + ndefMsg.ByteArrayLength + " bytes of NDEF data.");
+                    ShowToast("Written " + ndefMsg.ByteArrayLength + " bytes of NDEF data.");
                     Finish();
                 }
             }
@@ -185,13 +185,13 @@ namespace FlagCarrierAndroid.Activities
 
                 if (!ndef.IsWritable)
                 {
-                    PopUpHelper.Toast("Tag is not writable.");
+                    ShowToast("Tag is not writable.");
                     return null;
                 }
 
                 if (msg.ByteArrayLength > ndef.MaxSize)
                 {
-                    PopUpHelper.Toast("Tag is too small: " + msg.ByteArrayLength + "/" + ndef.MaxSize);
+                    ShowToast("Tag is too small: " + msg.ByteArrayLength + "/" + ndef.MaxSize);
                     return null;
                 }
 
@@ -199,7 +199,7 @@ namespace FlagCarrierAndroid.Activities
             }
             catch (Exception e)
             {
-                PopUpHelper.Toast("Failed writing to tag: " + e.Message);
+                ShowToast("Failed writing to tag: " + e.Message);
                 return null;
             }
             finally
@@ -210,7 +210,7 @@ namespace FlagCarrierAndroid.Activities
                 }
                 catch (Exception)
                 {
-                    PopUpHelper.Toast("Tag connection failed to close.");
+                    ShowToast("Tag connection failed to close.");
                 }
             }
 
@@ -222,7 +222,7 @@ namespace FlagCarrierAndroid.Activities
             NdefFormatable ndef = NdefFormatable.Get(tag);
             if (ndef == null)
             {
-                PopUpHelper.Toast("Tag is not NDEF formatable.");
+                ShowToast("Tag is not NDEF formatable.");
                 return false;
             }
 
@@ -233,7 +233,7 @@ namespace FlagCarrierAndroid.Activities
             }
             catch (Exception e)
             {
-                PopUpHelper.Toast("Failed formating tag: " + e.Message);
+                ShowToast("Failed formating tag: " + e.Message);
                 return null;
             }
             finally
@@ -244,7 +244,7 @@ namespace FlagCarrierAndroid.Activities
                 }
                 catch (Exception)
                 {
-                    PopUpHelper.Toast("Tag connection failed to close.");
+                    ShowToast("Tag connection failed to close.");
                 }
             }
 

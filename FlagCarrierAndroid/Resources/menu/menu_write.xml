@@ -5,6 +5,9 @@
   <item android:id="@+id/fromSrComOption"
         android:title="@string/from_sr_com"
         app:showAsAction="never" />
+  <item android:id="@+id/beamWriteData"
+        android:title="@string/beam_menu_text"
+        app:showAsAction="never" />
   <item android:id="@+id/fillSetOption"
         android:title="@string/fill_set_write"
         app:showAsAction="never" />
