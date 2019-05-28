@@ -33,6 +33,7 @@ namespace FlagCarrierAndroid.Services
         private const byte SELECT_INS = 0xA4;
         private const byte UPDATEBINARY_INS = 0xD6;
         private const byte READBINARY_INS = 0xB0;
+        private const byte ERASEBINARY_INS = 0x0E;
 
         private static readonly byte[] FLAGCARRIER_AID
                 = new byte[] { 0xf0, 0x5a, 0x25, 0x58, 0x83, 0x6e, 0x09, 0x66, 0xae, 0xd5, 0x27, 0xce };
@@ -47,11 +48,11 @@ namespace FlagCarrierAndroid.Services
         private readonly NdefHandler ndefHandler = new NdefHandler();
 
         private byte[] ndefData = null;
-        private int highestReadEnd = 0;
+        private bool confirmed = false;
 
         public override byte[] ProcessCommandApdu(byte[] apdu, Bundle extras)
         {
-            if (apdu == null || apdu.Length < 5)
+            if (apdu == null || apdu.Length < 4)
                 return STATUS_FAILED;
 
             if (apdu[0] != DEFAULT_CLA)
@@ -65,6 +66,8 @@ namespace FlagCarrierAndroid.Services
                     return ProcessUpdate(apdu);
                 case READBINARY_INS:
                     return ProcessRead(apdu);
+                case ERASEBINARY_INS:
+                    return ProcessErase(apdu);
                 default:
                     return INS_NOT_SUPPORTED;
             }
@@ -82,7 +85,7 @@ namespace FlagCarrierAndroid.Services
                 if (apdu[i + 5] != FLAGCARRIER_AID[i])
                     return FILE_NOT_FOUND;
 
-            highestReadEnd = 0;
+            confirmed = false;
 
             return STATUS_SUCCESS;
         }
@@ -100,7 +103,7 @@ namespace FlagCarrierAndroid.Services
             if (apdu.Length < length + 5)
                 return STATUS_FAILED;
 
-            if (dataToPublish == null)
+            if (dataToPublish == null || confirmed)
                 return FILE_NOT_FOUND;
 
             byte[] challenge = new byte[length];
@@ -138,7 +141,7 @@ namespace FlagCarrierAndroid.Services
             if (length < 0 || length > 253)
                 length = 253;
 
-            if (ndefData == null)
+            if (ndefData == null || confirmed)
                 return FILE_NOT_FOUND;
 
             if (offset >= ndefData.Length)
@@ -150,9 +153,6 @@ namespace FlagCarrierAndroid.Services
 
             length = end - offset;
 
-            if (end > highestReadEnd)
-                highestReadEnd = end;
-
             byte[] res = new byte[length + STATUS_SUCCESS.Length];
             Buffer.BlockCopy(ndefData, offset, res, 0, length);
             Buffer.BlockCopy(STATUS_SUCCESS, 0, res, length, STATUS_SUCCESS.Length);
@@ -160,15 +160,24 @@ namespace FlagCarrierAndroid.Services
             return res;
         }
 
+        private byte[] ProcessErase(byte[] apdu)
+        {
+            if (apdu.Length != 4)
+                return STATUS_FAILED;
+
+            if (ndefData == null || confirmed)
+                return FILE_NOT_FOUND;
+
+            ShowToast("Transferred " + ndefData.Length + " bytes via Flag Carrier HCE Service.");
+            confirmed = true;
+
+            return STATUS_SUCCESS;
+        }
+
         public override void OnDeactivated([GeneratedEnum] DeactivationReason reason)
         {
-            if (dataToPublish != null)
-            {
-                if (ndefData == null || highestReadEnd < ndefData.Length)
-                    ShowToast("Sending Flag Carrier HCE data was interrupted.");
-                else
-                    ShowToast("Transferred " + ndefData.Length + " bytes via Flag Carrier HCE Service.");
-            }
+            if (dataToPublish != null && !confirmed)
+                ShowToast("Sending Flag Carrier HCE data was interrupted.");
 
             ndefData = null;
         }

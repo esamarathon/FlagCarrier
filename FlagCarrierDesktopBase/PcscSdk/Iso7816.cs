@@ -316,4 +316,27 @@ namespace Iso7816
             return "ReadBinaryCommand Offset=" + ((P1 << 8) | P2) + " Length=" + Le;
         }
     }
+
+    public class EraseBinaryCommand : ApduCommand
+    {
+        public EraseBinaryCommand(int offset = 0, int end = -1)
+            : base((byte)Cla.CompliantCmd0x, (byte)Ins.EraseBinary, 0x00, 0x00, null, null)
+        {
+            if (offset < 0 || offset >= 0x8000)
+                throw new InvalidOperationException("Offset must not be larger than 32767");
+            if (end >= 0x8000)
+                throw new InvalidOperationException("End must not be larger than 32767");
+
+            P1 = (byte)(offset >> 8);
+            P2 = (byte)(offset & 0xFF);
+
+            if (end >= 0)
+                CommandData = new byte[] { (byte)(end >> 8), (byte)(end & 0xFF) };
+        }
+
+        public override string ToString()
+        {
+            return "ReadBinaryCommand Offset=" + ((P1 << 8) | P2) + " Length=" + Le;
+        }
+    }
 }

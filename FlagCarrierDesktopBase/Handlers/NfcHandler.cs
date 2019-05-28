@@ -393,6 +393,12 @@ namespace FlagCarrierBase
 
             NewTagUid?.Invoke(challengeToken);
             ReceiveNdefMessage?.Invoke(msg);
+
+            var eraseCmd = new Iso7816.EraseBinaryCommand();
+            res = reader.Transceive(eraseCmd);
+
+            if (!res.Succeeded)
+                ErrorMessage?.Invoke("Failed confirming transaction to device.");
         }
 
         #endregion
