@@ -18,7 +18,7 @@ using FlagCarrierAndroid.Activities;
 
 namespace FlagCarrierAndroid.Fragments
 {
-    public class ManualLoginFragment : BaseFragment
+    public class ManualLoginFragment : UserDataBaseFragment
     {
         public override void OnCreate(Bundle savedInstanceState)
         {
@@ -33,43 +33,16 @@ namespace FlagCarrierAndroid.Fragments
             base.OnCreateOptionsMenu(menu, inflater);
         }
 
-        private EditText displayNameText = null;
-        private CountryCodePicker ccp = null;
-        private EditText speedrunNameText = null;
-        private EditText twitchNameText = null;
-        private EditText twitterHandleText = null;
-
-        private string lookupName = null;
-
         public override View OnCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
         {
-            View view = inflater.Inflate(Resource.Layout.fragment_write_tag, container, false);
+            View view = base.OnCreateView(inflater, container, savedInstanceState);
 
             view.FindViewById(Resource.Id.extraDataLabel).Visibility = ViewStates.Invisible;
             view.FindViewById(Resource.Id.extraDataText).Visibility = ViewStates.Invisible;
 
-            displayNameText = view.FindViewById<EditText>(Resource.Id.displayNameText);
-            ccp = view.FindViewById<CountryCodePicker>(Resource.Id.countryCodePicker);
-            speedrunNameText = view.FindViewById<EditText>(Resource.Id.speedrunNameText);
-            twitchNameText = view.FindViewById<EditText>(Resource.Id.twitchNameText);
-            twitterHandleText = view.FindViewById<EditText>(Resource.Id.twitterHandleText);
-
-            displayNameText.TextChanged += AnyControl_TextChanged;
-            speedrunNameText.TextChanged += AnyControl_TextChanged;
-            twitchNameText.TextChanged += AnyControl_TextChanged;
-            twitterHandleText.TextChanged += AnyControl_TextChanged;
-
-            Button submitButton = view.FindViewById<Button>(Resource.Id.writeTagButton);
-            submitButton.SetText(Resource.String.manual_login_submit);
-            submitButton.Click += SubmitButton_Click;
+            view.FindViewById<Button>(Resource.Id.writeTagButton).SetText(Resource.String.manual_login_submit);
 
             return view;
-        }
-
-        private void AnyControl_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            EditText txt = (EditText)sender;
-            lookupName = txt.Text;
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
@@ -84,61 +57,9 @@ namespace FlagCarrierAndroid.Fragments
             }
         }
 
-        private async Task FillFromSpeedrunCom()
+        protected override void OnSubmit()
         {
-            SpeedrunComHelperData data = null;
-
-            try
-            {
-                data = await SpeedrunComHelper.GetUserInfo(lookupName);
-            }
-            catch (SpeedrunComHelperException e)
-            {
-                ShowToast(e.Message);
-            }
-            catch (Exception e)
-            {
-                ShowToast("Failed getting sr.com data: " + e.Message);
-            }
-
-            if (data == null)
-                return;
-
-            ccp.SetCountryForNameCode(data.CountryCode);
-            if (!ccp.SelectedCountryNameCode.Equals(data.CountryCode, StringComparison.OrdinalIgnoreCase))
-                ccp.SetCountryForNameCode(data.CountryCode.Split('/', 2)[0]);
-
-            displayNameText.Text = data.DisplayName;
-            speedrunNameText.Text = data.SrComName;
-            twitchNameText.Text = data.TwitchName;
-            twitterHandleText.Text = data.TwitterHandle;
-        }
-
-        private void SubmitButton_Click(object sender, EventArgs e)
-        {
-            var data = new Dictionary<string, string>();
-
-            string dspName = displayNameText.Text.Trim();
-            if (dspName == "")
-            {
-                ShowToast("A display name is required.");
-                return;
-            }
-
-            data["display_name"] = dspName;
-            data["country_code"] = ccp.SelectedCountryNameCode;
-
-            string tmp = speedrunNameText.Text.Trim();
-            if (tmp != "")
-                data["speedruncom_name"] = tmp;
-
-            tmp = twitchNameText.Text.Trim();
-            if (tmp != "")
-                data["twitch_name"] = tmp;
-
-            tmp = twitterHandleText.Text.Trim();
-            if (tmp != "")
-                data["twitter_handle"] = tmp;
+            var data = GetData();
 
             Intent intent = new Intent(MainActivity.Instance, Java.Lang.Class.FromType(typeof(LoginActivity)));
             intent.SetAction(LoginActivity.ManualLoginIntentAction);

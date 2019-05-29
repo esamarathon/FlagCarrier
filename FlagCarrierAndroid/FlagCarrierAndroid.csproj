@@ -83,6 +83,7 @@
     <Compile Include="Fragments\ManualLoginFragment.cs" />
     <Compile Include="Fragments\ScanTagFragment.cs" />
     <Compile Include="Fragments\SettingsFragment.cs" />
+    <Compile Include="Fragments\UserDataBaseFragment.cs" />
     <Compile Include="Fragments\WriteTagFragment.cs" />
     <Compile Include="Helpers\AndroidKeyStore.cs" />
     <Compile Include="Helpers\AppSettings.cs" />
