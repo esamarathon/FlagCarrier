@@ -104,8 +104,11 @@ namespace FlagCarrierAndroid.Fragments
             if (data == null)
                 return;
 
+            ccp.SetCountryForNameCode(data.CountryCode);
+            if (!ccp.SelectedCountryNameCode.Equals(data.CountryCode, StringComparison.OrdinalIgnoreCase))
+                ccp.SetCountryForNameCode(data.CountryCode.Split('/', 2)[0]);
+
             displayNameText.Text = data.DisplayName;
-            ccp.SetCountryForNameCode(data.CountryCode.Split('/')[0]);
             speedrunNameText.Text = data.SrComName;
             twitchNameText.Text = data.TwitchName;
             twitterHandleText.Text = data.TwitterHandle;
