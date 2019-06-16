@@ -12,7 +12,7 @@ namespace FlagCarrierMini
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            writer.WriteRawValue(((long)(((DateTime)value - epoch).TotalMilliseconds * 1000d)).ToString());
+            writer.WriteRawValue(((DateTime)value - epoch).TotalMilliseconds.ToString());
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
@@ -20,7 +20,7 @@ namespace FlagCarrierMini
             if (reader.Value == null)
                 return null;
 
-            return epoch.AddMilliseconds((long)reader.Value / 1000d);
+            return epoch.AddMilliseconds(double.Parse(reader.Value.ToString()));
         }
     }
 
