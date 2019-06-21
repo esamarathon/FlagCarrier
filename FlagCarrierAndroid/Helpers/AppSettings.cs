@@ -323,6 +323,7 @@ namespace FlagCarrierAndroid.Helpers
 
         public static List<string> GetAllKeys()
         {
+            // Mq keys are intentionally omitted, since they are not technically settings for this app.
             return new List<string>()
             {
                 TargetUrlKey,
@@ -379,11 +380,21 @@ namespace FlagCarrierAndroid.Helpers
             set => Set(PubKeyKey, value);
         }
 
+        public bool HasPubKey
+        {
+            get => Get<string>(HashKey(PubKeyKey), null) != null;
+        }
+
         public const string PrivKeyKey = SettingsKeys.PrivKeyKey;
         public byte[] PrivKey
         {
             get => GetEncrypted(PrivKeyKey);
             set => SetEncrypted(PrivKeyKey, value);
+        }
+
+        public bool HasPrivKey
+        {
+            get => Get<string>(HashKey(PrivKeyKey), null) != null;
         }
 
         public const string MqHostKey = SettingsKeys.MqHostKey;
