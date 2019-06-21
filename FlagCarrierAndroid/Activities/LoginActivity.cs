@@ -154,9 +154,9 @@ namespace FlagCarrierAndroid.Activities
             {
                 tagData = ndefHandler.ParseNdefMessage(msg.ToByteArray());
 
-                if (ndefHandler.HasPubKey() && tagData.ContainsKey(NdefHandler.SIG_VALID_KEY))
+                if (ndefHandler.HasPubKey() && (tagData.ContainsKey(NdefHandler.SIG_VALID_KEY) || AppSettings.Global.KioskMode))
                 {
-                    bool sigValid = Convert.ToBoolean(tagData[NdefHandler.SIG_VALID_KEY]);
+                    bool sigValid = Convert.ToBoolean(tagData.GetValueOrDefault(NdefHandler.SIG_VALID_KEY, bool.FalseString));
                     if (!sigValid)
                     {
                         ShowToast("Invalid Tag Signature!");
