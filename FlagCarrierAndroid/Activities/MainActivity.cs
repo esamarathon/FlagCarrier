@@ -8,8 +8,10 @@ using Android.Support.V4.View;
 using Android.Support.V4.Widget;
 using Android.Support.V7.App;
 using Android.Support.V7.Widget;
+using System.ComponentModel;
 
 using FlagCarrierAndroid.Fragments;
+using FlagCarrierAndroid.Helpers;
 
 namespace FlagCarrierAndroid.Activities
 {
@@ -44,7 +46,41 @@ namespace FlagCarrierAndroid.Activities
             navigationView = FindViewById<NavigationView>(Resource.Id.nav_view);
             navigationView.SetNavigationItemSelectedListener(this);
 
+            AppSettings.Global.PropertyChanged += AppSettings_PropertyChanged;
+
             SwitchToPage(Resource.Id.nav_scan_tag, false);
+
+            UpdateKioskModeVisibility();
+        }
+
+        private void AppSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case "KioskMode":
+                case "PrivKey":
+                    UpdateKioskModeVisibility();
+                    break;
+                default:
+                    return;
+            }
+        }
+
+        private void UpdateKioskModeVisibility()
+        {
+            IMenu navMenu = navigationView.Menu;
+            IMenuItem manualLogin = navMenu.FindItem(Resource.Id.nav_manual_login);
+            IMenuItem writeTag = navMenu.FindItem(Resource.Id.nav_write_tag);
+            IMenuItem beamMini = navMenu.FindItem(Resource.Id.nav_beam_mini);
+            IMenuItem settings = navMenu.FindItem(Resource.Id.nav_settings);
+
+            bool hasPrivKey = AppSettings.Global.HasPrivKey;
+            bool kioskMode = AppSettings.Global.KioskMode;
+
+            manualLogin.SetVisible(!kioskMode || hasPrivKey);
+            writeTag.SetVisible(!kioskMode || hasPrivKey);
+            beamMini.SetVisible(!kioskMode);
+            settings.SetVisible(!kioskMode);
         }
 
         public bool OnNavigationItemSelected(IMenuItem item)
