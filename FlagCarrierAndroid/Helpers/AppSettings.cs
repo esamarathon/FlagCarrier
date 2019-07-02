@@ -404,6 +404,13 @@ namespace FlagCarrierAndroid.Helpers
             set => Set(MqHostKey, value);
         }
 
+        public const string MqVHostKey = SettingsKeys.MqVHostKey;
+        public string MqVHost
+        {
+            get => Get(MqVHostKey, "");
+            set => Set(MqVHostKey, value);
+        }
+
         public const string MqPortKey = SettingsKeys.MqPortKey;
         public ushort MqPort
         {

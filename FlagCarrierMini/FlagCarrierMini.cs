@@ -100,6 +100,7 @@ namespace FlagCarrierMini
             {
                 mqHandler.Connect(
                     AppSettings.MqHost,
+                    AppSettings.MqVHost,
                     AppSettings.MqUsername,
                     AppSettings.MqPassword,
                     AppSettings.MqPort,

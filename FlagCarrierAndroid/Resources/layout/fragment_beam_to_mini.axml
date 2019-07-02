@@ -117,14 +117,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="0"
-                android:text="@string/btm_mq_queue" />
+                android:text="@string/btm_mq_vhost" />
 
             <EditText
-                android:id="@+id/mqQueueText"
+                android:id="@+id/mqVHostText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:hint="@string/btm_mq_queue" />
+                android:hint="@string/btm_mq_vhost" />
 
             <TextView
                 android:layout_width="match_parent"

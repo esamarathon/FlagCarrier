@@ -49,16 +49,15 @@ namespace FlagCarrierMini
         public bool IsConnected => connection?.IsOpen == true;
 
 
-        public void Connect(string host, string username, string password, ushort port, bool tls)
+        public void Connect(string host, string vhost, string username, string password, ushort port, bool tls)
         {
             Close();
 
-            var factory = new ConnectionFactory();
-
-            string[] hosts = host.Split("/", 2);
-
-            factory.HostName = hosts[0];
-            factory.VirtualHost = (hosts.Length > 1) ? hosts[1] : "/";
+            var factory = new ConnectionFactory
+            {
+                HostName = host,
+                VirtualHost = vhost
+            };
 
             if (username != null && username != "")
                 factory.UserName = username;

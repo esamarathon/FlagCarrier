@@ -225,6 +225,13 @@ namespace FlagCarrierMini
             set => Set(MqHostKey, value);
         }
 
+        public const string MqVHostKey = SettingsKeys.MqVHostKey;
+        public static string MqVHost
+        {
+            get => Get(MqVHostKey, "");
+            set => Set(MqVHostKey, value);
+        }
+
         public const string MqPortKey = SettingsKeys.MqPortKey;
         public static ushort MqPort
         {

@@ -30,6 +30,7 @@ namespace FlagCarrierAndroid.Fragments
         private Switch verboseSwitch;
         private EditText pubKeyText;
         private EditText mqHostText;
+        private EditText mqVHostText;
         private EditText mqPortText;
         private Switch mqTlsSwitch;
         private EditText mqUserText;
@@ -45,6 +46,7 @@ namespace FlagCarrierAndroid.Fragments
             verboseSwitch = view.FindViewById<Switch>(Resource.Id.verboseSwitch);
             pubKeyText = view.FindViewById<EditText>(Resource.Id.pubKeyText);
             mqHostText = view.FindViewById<EditText>(Resource.Id.mqHostText);
+            mqVHostText = view.FindViewById<EditText>(Resource.Id.mqVHostText);
             mqPortText = view.FindViewById<EditText>(Resource.Id.mqPortText);
             mqTlsSwitch = view.FindViewById<Switch>(Resource.Id.mqTlsSwitch);
             mqUserText = view.FindViewById<EditText>(Resource.Id.mqUserText);
@@ -53,6 +55,7 @@ namespace FlagCarrierAndroid.Fragments
             pubKeyText.Text = Convert.ToBase64String(AppSettings.Global.PubKey ?? new byte[0]);
 
             mqHostText.Text = AppSettings.Global.MqHost;
+            mqVHostText.Text = AppSettings.Global.MqVHost;
             mqPortText.Text = AppSettings.Global.MqPort.ToString();
             mqTlsSwitch.Checked = AppSettings.Global.MqTls;
             mqUserText.Text = AppSettings.Global.MqUsername;
@@ -107,6 +110,12 @@ namespace FlagCarrierAndroid.Fragments
                 settingsDict[SettingsKeys.MqTlsKey] = mqTlsSwitch.Checked.ToString();
             }
 
+            string mqVhost = mqVHostText.Text.Trim();
+            if (mqVhost == "null")
+                settingsDict[SettingsKeys.MqVHostKey] = "";
+            else if (mqVhost != "")
+                settingsDict[SettingsKeys.MqVHostKey] = mqVhost;
+
             string mqPort = mqPortText.Text.Trim();
             if (mqPort == "null")
                 settingsDict[SettingsKeys.MqPortKey] = "";
@@ -128,6 +137,7 @@ namespace FlagCarrierAndroid.Fragments
             }
 
             AppSettings.Global.MqHost = mqHost;
+            AppSettings.Global.MqVHost = mqVhost;
             AppSettings.Global.MqPort = (ushort)Convert.ToInt64(mqPort);
             AppSettings.Global.MqTls = mqTlsSwitch.Checked;
             AppSettings.Global.MqUsername = mqUser;
