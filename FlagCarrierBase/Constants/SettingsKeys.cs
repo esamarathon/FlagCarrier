@@ -19,7 +19,6 @@ namespace FlagCarrierBase.Constants
         public const string MqHostKey = "mq_host";
         public const string MqPortKey = "mq_port";
         public const string MqTlsKey = "mq_tls";
-        public const string MqQueueKey = "mq_queue";
         public const string MqUsernameKey = "mq_user";
         public const string MqPasswordKey = "mq_pass";
     }

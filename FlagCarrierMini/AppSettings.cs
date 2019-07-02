@@ -239,13 +239,6 @@ namespace FlagCarrierMini
             set => Set(MqTlsKey, value.ToString());
         }
 
-        public const string MqQueueKey = SettingsKeys.MqQueueKey;
-        public static string MqQueue
-        {
-            get => Get(MqQueueKey, "flagcarrier-tag-scanned");
-            set => Set(MqQueueKey, value);
-        }
-
         public const string MqUsernameKey = SettingsKeys.MqUsernameKey;
         public static string MqUsername
         {

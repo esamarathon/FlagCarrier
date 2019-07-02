@@ -418,13 +418,6 @@ namespace FlagCarrierAndroid.Helpers
             set => Set(MqTlsKey, value);
         }
 
-        public const string MqQueueKey = SettingsKeys.MqQueueKey;
-        public string MqQueue
-        {
-            get => Get(MqQueueKey, "flagcarrier-tag-scanned");
-            set => Set(MqQueueKey, value);
-        }
-
         public const string MqUsernameKey = SettingsKeys.MqUsernameKey;
         public string MqUsername
         {

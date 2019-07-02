@@ -102,8 +102,8 @@ namespace FlagCarrierMini
                     AppSettings.MqHost,
                     AppSettings.MqUsername,
                     AppSettings.MqPassword,
-                    AppSettings.MqPort);
-                mqHandler.Subscribe(AppSettings.MqQueue);
+                    AppSettings.MqPort,
+                    AppSettings.MqTls);
                 Console.WriteLine("Connected to MQ Server");
             }
             catch (Exception e)
@@ -193,10 +193,10 @@ namespace FlagCarrierMini
 
             tse.FlagCarrier.ID = AppSettings.DeviceId;
             tse.FlagCarrier.Group = AppSettings.GroupId;
-            tse.FlagCarrier.Time = DateTime.UtcNow;
             tse.FlagCarrier.UID = curUid;
             tse.FlagCarrier.ValidSignature = sigValid;
             tse.FlagCarrier.PubKey = AppSettings.PubKey;
+            tse.FlagCarrier.Time = new TagScannedEvent.TimeData();
 
             if (vals.ContainsKey("display_name"))
                 tse.User.DisplayName = vals["display_name"];

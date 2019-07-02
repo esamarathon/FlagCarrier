@@ -32,7 +32,6 @@ namespace FlagCarrierAndroid.Fragments
         private EditText mqHostText;
         private EditText mqPortText;
         private Switch mqTlsSwitch;
-        private EditText mqQueueText;
         private EditText mqUserText;
         private EditText mqPassText;
 
@@ -48,7 +47,6 @@ namespace FlagCarrierAndroid.Fragments
             mqHostText = view.FindViewById<EditText>(Resource.Id.mqHostText);
             mqPortText = view.FindViewById<EditText>(Resource.Id.mqPortText);
             mqTlsSwitch = view.FindViewById<Switch>(Resource.Id.mqTlsSwitch);
-            mqQueueText = view.FindViewById<EditText>(Resource.Id.mqQueueText);
             mqUserText = view.FindViewById<EditText>(Resource.Id.mqUserText);
             mqPassText = view.FindViewById<EditText>(Resource.Id.mqPassText);
 
@@ -57,7 +55,6 @@ namespace FlagCarrierAndroid.Fragments
             mqHostText.Text = AppSettings.Global.MqHost;
             mqPortText.Text = AppSettings.Global.MqPort.ToString();
             mqTlsSwitch.Checked = AppSettings.Global.MqTls;
-            mqQueueText.Text = AppSettings.Global.MqQueue;
             mqUserText.Text = AppSettings.Global.MqUsername;
             mqPassText.Text = AppSettings.Global.MqPassword;
 
@@ -116,12 +113,6 @@ namespace FlagCarrierAndroid.Fragments
             else if (mqPort != "")
                 settingsDict[SettingsKeys.MqPortKey] = mqPort;
 
-            string mqQueue = mqQueueText.Text.Trim();
-            if (mqQueue == "null")
-                settingsDict[SettingsKeys.MqQueueKey] = "";
-            else if (mqQueue != "")
-                settingsDict[SettingsKeys.MqQueueKey] = mqQueue;
-
             string mqUser = mqUserText.Text.Trim();
             if (mqUser == "null")
             {
@@ -139,7 +130,6 @@ namespace FlagCarrierAndroid.Fragments
             AppSettings.Global.MqHost = mqHost;
             AppSettings.Global.MqPort = (ushort)Convert.ToInt64(mqPort);
             AppSettings.Global.MqTls = mqTlsSwitch.Checked;
-            AppSettings.Global.MqQueue = mqQueue;
             AppSettings.Global.MqUsername = mqUser;
             AppSettings.Global.MqPassword = mqPassText.Text;
 

@@ -11,7 +11,9 @@ namespace FlagCarrierMini
     {
         private IConnection connection = null;
         private IModel channel = null;
-        private string queue = null;
+        const string exchangeName = "bigbutton";
+
+        public string TagScannedTopic => $"{AppSettings.DeviceId}.tag_scanned";
 
         public MqHandler()
         {
@@ -44,20 +46,10 @@ namespace FlagCarrierMini
             Dispose();
         }
 
-        public bool IsConnected
-        {
-            get
-            {
-                if (connection == null)
-                    return false;
-                if (!connection.IsOpen)
-                    return false;
-                return queue != null;
-            }
-        }
+        public bool IsConnected => connection?.IsOpen == true;
 
 
-        public void Connect(string host, string username = null, string password = null, ushort port = 0, bool tls = true)
+        public void Connect(string host, string username, string password, ushort port, bool tls)
         {
             Close();
 
@@ -77,7 +69,7 @@ namespace FlagCarrierMini
             if (port != 0)
                 factory.Port = port;
             else
-                factory.Port = AmqpTcpEndpoint.DefaultAmqpSslPort;
+                factory.Port = tls ? AmqpTcpEndpoint.DefaultAmqpSslPort : AmqpTcpEndpoint.UseDefaultPort;
 
             if (tls)
             {
@@ -90,10 +82,14 @@ namespace FlagCarrierMini
                 factory.Ssl.Enabled = false;
             }
 
+            factory.AutomaticRecoveryEnabled = true;
+
             connection = factory.CreateConnection();
+
+            SetupChannel();
         }
 
-        public void Subscribe(string queue)
+        private void SetupChannel()
         {
             if (this.channel != null)
             {
@@ -105,13 +101,16 @@ namespace FlagCarrierMini
                 throw new Exception("MqHandler not connected");
 
             var channel = connection.CreateModel();
-            channel.QueueDeclare(queue: queue,
-                                 durable: true,
-                                 exclusive: false,
-                                 autoDelete: false,
-                                 arguments: null);
 
-            this.queue = queue;
+            channel.ExchangeDeclare(exchange: exchangeName,
+                                    type: "topic",
+                                    durable: true,
+                                    autoDelete: true,
+                                    arguments: new Dictionary<string, object>()
+                                    {
+                                        { "x-expires", 4 * 60 * 60 * 1000 }
+                                    });
+
             this.channel = channel;
         }
 
@@ -121,12 +120,12 @@ namespace FlagCarrierMini
                 throw new Exception("No channel established when trying to publish event.");
 
             if (!channel.IsOpen)
-                Subscribe(queue);
+                SetupChannel();
 
-            string json = JsonConvert.SerializeObject(tagEvent, Formatting.None);
+            string json = JsonConvert.SerializeObject(tagEvent, Formatting.None, new JsonSerializerSettings() { DateParseHandling = DateParseHandling.DateTimeOffset });
 
-            channel.BasicPublish(exchange: "",
-                                 routingKey: queue,
+            channel.BasicPublish(exchange: exchangeName,
+                                 routingKey: TagScannedTopic,
                                  basicProperties: null,
                                  body: Encoding.UTF8.GetBytes(json));
         }

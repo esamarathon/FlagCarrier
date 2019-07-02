@@ -15,10 +15,6 @@ namespace FlagCarrierMini
             [JsonProperty("group")]
             public string Group { get; set; }
 
-            [JsonProperty("time")]
-            [JsonConverter(typeof(MicrosecondEpochConverter))]
-            public DateTime Time { get; set; }
-
             [JsonProperty("uid")]
             [JsonConverter(typeof(HexConverter))]
             public byte[] UID { get; set; }
@@ -29,6 +25,28 @@ namespace FlagCarrierMini
             [JsonProperty("pubKey", NullValueHandling = NullValueHandling.Ignore)]
             [JsonConverter(typeof(Base64Converter))]
             public byte[] PubKey { get; set; } = null;
+
+            [JsonProperty("time")]
+            public TimeData Time { get; set; }
+        }
+
+        public class TimeData
+        {
+            private DateTimeOffset dto = DateTimeOffset.UtcNow;
+
+            [JsonProperty("iso")]
+            public DateTimeOffset Iso
+            {
+                get => dto;
+                set => dto = value;
+            }
+
+            [JsonProperty("unix")]
+            public double Unix
+            {
+                get => dto.ToUnixTimeMilliseconds() / 1000.0;
+                set => dto = DateTimeOffset.FromUnixTimeMilliseconds(Convert.ToInt64(value * 1000));
+            }
         }
 
         public class UserData
