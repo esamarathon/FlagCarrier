@@ -209,7 +209,14 @@ namespace FlagCarrierMini
 
             tse.RawData = vals;
 
-            mqHandler.Publish(tse);
+            try
+            {
+                mqHandler.Publish(tse);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Failed publishing scan: " + e.Message);
+            }
         }
 
         private void NfcHandler_ReceiveNdefMessage(NdefMessage msg)

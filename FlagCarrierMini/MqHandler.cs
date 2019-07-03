@@ -104,11 +104,7 @@ namespace FlagCarrierMini
             channel.ExchangeDeclare(exchange: exchangeName,
                                     type: "topic",
                                     durable: true,
-                                    autoDelete: true,
-                                    arguments: new Dictionary<string, object>()
-                                    {
-                                        { "x-expires", 4 * 60 * 60 * 1000 }
-                                    });
+                                    autoDelete: true);
 
             this.channel = channel;
         }
