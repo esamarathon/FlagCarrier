@@ -25,7 +25,16 @@ namespace FlagCarrierWin
         public event Action<Dictionary<string, string>> WriteToTagRequest;
         public event Action UpdatedSettings;
 
-        public NdefHandler NdefHandler { get; set; } = new NdefHandler();
+        private NdefHandler ndefHandler = new NdefHandler();
+        public NdefHandler NdefHandler
+        {
+            get => ndefHandler;
+            set
+            {
+                ndefHandler = value;
+                ApplyKeyPair();
+            }
+        }
 
         public SettingsControl()
         {
