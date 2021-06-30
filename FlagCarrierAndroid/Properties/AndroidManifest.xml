@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="406" android:versionName="4.6" package="de.oromit.flagcarrier" android:installLocation="auto">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="461" android:versionName="4.6.1" package="de.oromit.flagcarrier" android:installLocation="auto">
 	<uses-sdk android:minSdkVersion="19" android:targetSdkVersion="30" />
 	<uses-permission android:name="android.permission.NFC" />
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
