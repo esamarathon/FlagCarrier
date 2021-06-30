@@ -9,14 +9,13 @@ using Android.App;
 using Android.Widget;
 using Android.Nfc;
 using Android.Content;
-using Android.Support.V7.App;
 using Android.Runtime;
 using Android.Nfc.Tech;
 
 using FlagCarrierBase;
 using FlagCarrierAndroid.Helpers;
 
-using SupportToolbar = Android.Support.V7.Widget.Toolbar;
+using SupportToolbar = AndroidX.AppCompat.Widget.Toolbar;
 
 namespace FlagCarrierAndroid.Activities
 {

@@ -1,7 +1,7 @@
-using Android.Support.V7.App;
 using Android.Widget;
+using AndroidX.AppCompat.App;
 
-using ASnackbar = Android.Support.Design.Widget.Snackbar;
+using ASnackbar = Google.Android.Material.Snackbar.Snackbar;
 using AToast = Android.Widget.Toast;
 
 namespace FlagCarrierAndroid.Activities

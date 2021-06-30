@@ -4,13 +4,13 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Android.OS;
-using Android.Support.V4.App;
-using Android.Support.V7.App;
 using Android.Views;
 using Android.Widget;
 using Android.Nfc;
 
-using ASnackbar = Android.Support.Design.Widget.Snackbar;
+using AndroidX.Fragment.App;
+
+using ASnackbar = Google.Android.Material.Snackbar.Snackbar;
 using AToast = Android.Widget.Toast;
 
 namespace FlagCarrierAndroid.Fragments

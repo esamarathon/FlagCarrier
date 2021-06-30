@@ -2,6 +2,11 @@
   <string name="app_name">Flag Carrier</string>
   <string name="app_subtitle">ESA Marathon</string>
 
+  <string name="yes">Yes</string>
+  <string name="no">No</string>
+  <string name="ok">OK</string>
+  <string name="cancel">Cancel</string>
+
   <string name="navigation_drawer_open">Open navigation drawer</string>
   <string name="navigation_drawer_close">Close navigation drawer</string>
   <string name="action_settings">Settings</string>

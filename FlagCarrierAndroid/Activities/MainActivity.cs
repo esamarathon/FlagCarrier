@@ -3,12 +3,13 @@ using Android.Runtime;
 using Android.Views;
 using Android.OS;
 using Android.App;
-using Android.Support.Design.Widget;
-using Android.Support.V4.View;
-using Android.Support.V4.Widget;
-using Android.Support.V7.App;
-using Android.Support.V7.Widget;
 using System.ComponentModel;
+
+using AndroidX.DrawerLayout.Widget;
+using AndroidX.AppCompat.Widget;
+using AndroidX.AppCompat.App;
+using AndroidX.Core.View;
+using Google.Android.Material.Navigation;
 
 using FlagCarrierAndroid.Fragments;
 using FlagCarrierAndroid.Helpers;

@@ -4,11 +4,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Android.OS;
-using Android.Support.V4.App;
-using Android.Support.V7.App;
 using Android.Views;
 using Android.Widget;
 using Android.Nfc;
+using AndroidX.AppCompat.App;
 
 using FlagCarrierBase;
 using FlagCarrierAndroid.Activities;
@@ -52,8 +51,8 @@ namespace FlagCarrierAndroid.Fragments
             AlertDialog.Builder b = new AlertDialog.Builder(MainActivity.Instance);
             b.SetMessage(Resource.String.clear_confirmation);
             b.SetTitle(Resource.String.clear_conf_title);
-            b.SetPositiveButton(Android.Resource.String.Yes, async (s, e) => await DoClear());
-            b.SetNegativeButton(Android.Resource.String.No, (s, e) => { });
+            b.SetPositiveButton(Resource.String.ok, async (s, e) => await DoClear());
+            b.SetNegativeButton(Resource.String.cancel, (s, e) => { });
             b.Show();
         }
 
