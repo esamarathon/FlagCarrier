@@ -16,7 +16,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <TextView
@@ -33,6 +33,22 @@
                 android:ems="10"
                 android:hint="@string/wt_disp_name"
                 android:inputType="textPersonName"
+                android:maxLength="254" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:text="@string/wt_pronouns" />
+
+            <EditText
+                android:id="@+id/pronounsText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:ems="10"
+                android:hint="@string/wt_pronouns"
+                android:inputType="textCapWords"
                 android:maxLength="254" />
 
             <TextView

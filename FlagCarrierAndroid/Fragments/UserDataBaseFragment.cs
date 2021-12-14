@@ -25,6 +25,7 @@ namespace FlagCarrierAndroid.Fragments
         }
 
         protected EditText displayNameText = null;
+        protected EditText pronounsText = null;
         protected CountryCodePicker ccp = null;
         protected EditText speedrunNameText = null;
         protected EditText twitchNameText = null;
@@ -38,6 +39,7 @@ namespace FlagCarrierAndroid.Fragments
             View view = inflater.Inflate(Resource.Layout.fragment_write_tag, container, false);
 
             displayNameText = view.FindViewById<EditText>(Resource.Id.displayNameText);
+            pronounsText = view.FindViewById<EditText>(Resource.Id.pronounsText);
             ccp = view.FindViewById<CountryCodePicker>(Resource.Id.countryCodePicker);
             speedrunNameText = view.FindViewById<EditText>(Resource.Id.speedrunNameText);
             twitchNameText = view.FindViewById<EditText>(Resource.Id.twitchNameText);
@@ -45,6 +47,7 @@ namespace FlagCarrierAndroid.Fragments
             extraDataText = view.FindViewById<EditText>(Resource.Id.extraDataText);
 
             displayNameText.TextChanged += AnyControl_TextChanged;
+            pronounsText.TextChanged += AnyControl_TextChanged;
             speedrunNameText.TextChanged += AnyControl_TextChanged;
             twitchNameText.TextChanged += AnyControl_TextChanged;
             twitterHandleText.TextChanged += AnyControl_TextChanged;
@@ -96,6 +99,7 @@ namespace FlagCarrierAndroid.Fragments
                 ccp.SetCountryForNameCode(data.CountryCode.Split('/', 2)[0]);
 
             displayNameText.Text = data.DisplayName;
+            pronounsText.Text = data.Pronouns;
             speedrunNameText.Text = data.SrComName;
             twitchNameText.Text = data.TwitchName;
             twitterHandleText.Text = data.TwitterHandle;
@@ -116,7 +120,11 @@ namespace FlagCarrierAndroid.Fragments
             data["display_name"] = dspName;
             data["country_code"] = ccp.SelectedCountryNameCode;
 
-            string tmp = speedrunNameText.Text.Trim();
+            string tmp = pronounsText.Text.Trim();
+            if (tmp != "")
+                data["pronouns"] = tmp;
+
+            tmp = speedrunNameText.Text.Trim();
             if (tmp != "")
                 data["speedruncom_name"] = tmp;
 

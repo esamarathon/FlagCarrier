@@ -89,6 +89,7 @@ namespace FlagCarrierAndroid.Fragments
         private void FillWithSettings()
         {
             displayNameText.Text = "set";
+            pronounsText.Text = "";
             speedrunNameText.Text = "";
             twitchNameText.Text = "";
             twitterHandleText.Text = "";

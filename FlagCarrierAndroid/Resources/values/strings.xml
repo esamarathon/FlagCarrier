@@ -41,6 +41,7 @@
   <string name="clear_confirmation">This will clear the currently logged in users. Are you sure?</string>
 
   <string name="wt_disp_name">Display Name</string>
+  <string name="wt_pronouns">Pronouns</string>
   <string name="wt_country">Country</string>
   <string name="wt_speedruncom">speedrun.com Name</string>
   <string name="wt_twitch">Twitch Name</string>

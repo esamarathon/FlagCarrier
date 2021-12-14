@@ -230,6 +230,7 @@ namespace FlagCarrierAndroid.Activities
             List<string> entryOrder = new List<string>
             {
                 "display_name",
+                "pronouns",
                 "country_code",
                 "speedruncom_name",
                 "twitch_name",
@@ -272,6 +273,9 @@ namespace FlagCarrierAndroid.Activities
                     {
                         case "display_name":
                             bldr.Append("Display Name");
+                            break;
+                        case "pronouns":
+                            bldr.Append("Pronouns");
                             break;
                         case "country_code":
                             bldr.Append("Country Code");
