@@ -36,6 +36,7 @@ namespace FlagCarrierWin
         public void PrefillWithSettings(Dictionary<string, string> settings)
         {
             displayNameBox.Text = "set";
+            pronounsBox.Text = "";
             countryCodeBox.Code = "DE";
             srcomNameBox.Text = "";
             twitchNameBox.Text = "";
@@ -68,6 +69,7 @@ namespace FlagCarrierWin
         private void ClearButton_Click(object sender, RoutedEventArgs e)
         {
             displayNameBox.Text = "";
+            pronounsBox.Text = "";
             countryCodeBox.Code = "DE";
             srcomNameBox.Text = "";
             twitchNameBox.Text = "";
@@ -87,6 +89,7 @@ namespace FlagCarrierWin
                 var srData = await SpeedrunComHelper.GetUserInfo(lookup_name);
 
                 displayNameBox.Text = srData.DisplayName;
+                pronounsBox.Text = srData.Pronouns;
                 countryCodeBox.Code = srData.CountryCode;
                 srcomNameBox.Text = srData.SrComName;
                 twitchNameBox.Text = srData.TwitchName;
@@ -112,9 +115,14 @@ namespace FlagCarrierWin
             }
 
             vals.Add(Definitions.DISPLAY_NAME, dspName);
+
+            var txt = pronounsBox.Text.Trim();
+            if (txt != "")
+                vals.Add(Definitions.PRONOUNS, txt);
+
             vals.Add(Definitions.COUNTRY_CODE, ctrCode);
 
-            var txt = srcomNameBox.Text.Trim();
+            txt = srcomNameBox.Text.Trim();
             if (txt != "")
                 vals.Add(Definitions.SRCOM_NAME, txt);
 

@@ -31,6 +31,7 @@ namespace FlagCarrierBase.Helpers
     public class SpeedrunComHelperData
     {
         public string DisplayName = null;
+        public string Pronouns = null;
         public string CountryCode = null;
         public string SrComName = null;
         public string TwitchName = null;
@@ -73,6 +74,15 @@ namespace FlagCarrierBase.Helpers
                 catch (Exception)
                 {
                     res.DisplayName = "";
+                }
+
+                try
+                {
+                    res.Pronouns = (string)userdata["pronouns"];
+                }
+                catch(Exception)
+                {
+                    res.Pronouns = "";
                 }
 
                 try

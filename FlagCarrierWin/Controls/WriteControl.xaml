@@ -22,7 +22,9 @@
 		<StackPanel Grid.Row="0" Grid.ColumnSpan="4">
 			<TextBlock Margin="0,5,0,2">Display Name</TextBlock>
 			<TextBox Name="displayNameBox" TextChanged="AnyBox_TextChanged" />
-			<TextBlock Margin="0,10,0,5">Country Code</TextBlock>
+            <TextBlock Margin="0,10,0,5">Pronouns</TextBlock>
+            <TextBox Name="pronounsBox" TextChanged="AnyBox_TextChanged" />
+            <TextBlock Margin="0,10,0,5">Country Code</TextBlock>
 			<local:CountryDropdown x:Name="countryCodeBox" />
 			<TextBlock Margin="0,10,0,5">Speedrun.com Name</TextBlock>
 			<TextBox Name="srcomNameBox" TextChanged="AnyBox_TextChanged" />
