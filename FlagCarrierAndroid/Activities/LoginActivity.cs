@@ -21,7 +21,7 @@ using Android.Runtime;
 
 namespace FlagCarrierAndroid.Activities
 {
-    [Activity(Label = "@string/login_title", Theme = "@style/AppTheme.NoActionBar")]
+    [Activity(Label = "@string/login_title", Theme = "@style/AppTheme.NoActionBar", Exported = true)]
     [IntentFilter(new[] { NfcAdapter.ActionNdefDiscovered }, Categories = new[] { Intent.CategoryDefault }, DataMimeType = NdefHandler.FLAGCARRIER_MIME_TYPE)]
     public class LoginActivity : BaseActivity
     {
