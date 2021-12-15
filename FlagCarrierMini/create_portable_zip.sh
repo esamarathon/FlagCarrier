@@ -10,13 +10,12 @@ fi
 cd "$(dirname "$0")"
 
 rm -rf bin/FlagCarrierMini
-"$DOTNET" publish -o bin/FlagCarrierMini -f netcoreapp2.1 -c Release || exit -1
+"$DOTNET" publish -o bin/FlagCarrierMini -f net6.0 -c Release || exit -1
 OF="${PWD}/bin/FlagCarrierMini.zip"
 
 mv bin/FlagCarrierMini /tmp/FlagCarrierMini || exit -2
 cd /tmp
 
-printf '@echo off\r\nstart dotnet FlagCarrierMini.dll\r\n' > FlagCarrierMini/FlagCarrierMini.cmd
 printf '#!/bin/sh\ndtn=dotnet\n! command -v dotnet >/dev/null 2>&1 && command -v dotnet.exe >/dev/null 2>&1 && dtn=dotnet.exe\ncd "$(dirname "$0")"\nexec $dtn FlagCarrierMini.dll\n' > FlagCarrierMini/FlagCarrierMini.sh
 
 find FlagCarrierMini -type f -exec chmod 644 {} \;
