@@ -36,11 +36,7 @@ namespace FlagCarrierWin
         public void PrefillWithSettings(Dictionary<string, string> settings)
         {
             displayNameBox.Text = "set";
-            pronounsBox.Text = "";
-            countryCodeBox.Code = "DE";
-            srcomNameBox.Text = "";
-            twitchNameBox.Text = "";
-            twitterHandleBox.Text = "";
+            userIdBox.Text = "";
 
             extraDataBox.Clear();
             extraDataBox.AppendText("set=" + string.Join(",", settings.Keys) + Environment.NewLine);
@@ -69,37 +65,8 @@ namespace FlagCarrierWin
         private void ClearButton_Click(object sender, RoutedEventArgs e)
         {
             displayNameBox.Text = "";
-            pronounsBox.Text = "";
-            countryCodeBox.Code = "DE";
-            srcomNameBox.Text = "";
-            twitchNameBox.Text = "";
-            twitterHandleBox.Text = "";
+            userIdBox.Text = "";
             extraDataBox.Clear();
-        }
-
-        private async void FromSrComButton_Click(object sender, RoutedEventArgs e)
-        {
-            string lookup_name = lastChangedTextBox.Text.Trim();
-
-            if (lookup_name == "")
-                return;
-
-            try
-            {
-                var srData = await SpeedrunComHelper.GetUserInfo(lookup_name);
-
-                displayNameBox.Text = srData.DisplayName;
-                pronounsBox.Text = srData.Pronouns;
-                countryCodeBox.Code = srData.CountryCode;
-                srcomNameBox.Text = srData.SrComName;
-                twitchNameBox.Text = srData.TwitchName;
-                twitterHandleBox.Text = srData.TwitterHandle;
-            }
-            catch(Exception ex)
-            {
-                ErrorMessage?.Invoke(ex.Message);
-                return;
-            }
         }
 
         private Dictionary<string, string> GetWriteData()
@@ -107,32 +74,15 @@ namespace FlagCarrierWin
             Dictionary<string, string> vals = new Dictionary<string, string>();
 
             var dspName = displayNameBox.Text.Trim();
-            var ctrCode = countryCodeBox.Code;
-            if (dspName == "" || ctrCode == "")
+            var userId = userIdBox.Text.Trim();
+            if (dspName == "" || userId == "")
             {
-                ErrorMessage?.Invoke("Display Name and Country Code are required!");
+                ErrorMessage?.Invoke("Display Name and User ID are required!");
                 return null;
             }
 
             vals.Add(Definitions.DISPLAY_NAME, dspName);
-
-            var txt = pronounsBox.Text.Trim();
-            if (txt != "")
-                vals.Add(Definitions.PRONOUNS, txt);
-
-            vals.Add(Definitions.COUNTRY_CODE, ctrCode);
-
-            txt = srcomNameBox.Text.Trim();
-            if (txt != "")
-                vals.Add(Definitions.SRCOM_NAME, txt);
-
-            txt = twitchNameBox.Text.Trim();
-            if (txt != "")
-                vals.Add(Definitions.TWITCH_NAME, txt);
-
-            txt = twitterHandleBox.Text.Trim();
-            if (txt != "")
-                vals.Add(Definitions.TWITTER_HANDLE, txt);
+            vals.Add(Definitions.USER_ID, userId);
 
             foreach (string line in extraDataBox.Text.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries))
             {
