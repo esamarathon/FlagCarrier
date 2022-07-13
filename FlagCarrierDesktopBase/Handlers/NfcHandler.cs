@@ -73,6 +73,7 @@ namespace FlagCarrierBase
         public event Action<string> CardRemoved;
         public event Action<NdefMessage> ReceiveNdefMessage;
         public event Action<byte[]> NewTagUid;
+        public event Action WriteSuccess;
 
         private byte[] ndefDataToWrite;
         private ISCardMonitor monitor;
@@ -479,6 +480,7 @@ namespace FlagCarrierBase
             }
 
             StatusMessage?.Invoke("Written " + data_length + " bytes of data. Ndef message length is " + ndefData.Length + " bytes.");
+            WriteSuccess?.Invoke();
         }
 
         private byte[] DumpMifareUL(PcscSdk.MifareUltralight.AccessHandler mifare)
@@ -593,6 +595,7 @@ namespace FlagCarrierBase
             }
 
             StatusMessage?.Invoke("Written " + data_length + " bytes of data. Ndef message length is " + ndefData.Length + " bytes.");
+            WriteSuccess?.Invoke();
         }
 
         private static readonly byte[][] ndefMadData = new byte[][] {

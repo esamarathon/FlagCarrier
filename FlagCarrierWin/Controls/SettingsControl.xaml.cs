@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using Microsoft.Win32;
+
 using FlagCarrierBase;
 
 namespace FlagCarrierWin
@@ -134,6 +136,31 @@ namespace FlagCarrierWin
             {
                 MessageBox.Show("Invalid base64 in keypair!", "Error");
                 return;
+            }
+        }
+
+        private void RegisterUrlHandler_Click(object sender, RoutedEventArgs e)
+        {
+            const string protocol = "esa-flagcarrier";
+            string selfexe = System.Reflection.Assembly.GetEntryAssembly().Location;
+
+            try
+            {
+                var mainKey = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Classes").CreateSubKey(protocol);
+                mainKey.SetValue(null, $"URL:{protocol} Protocol");
+                mainKey.SetValue("URL Protocol", "");
+
+                var iconKey = mainKey.CreateSubKey(@"DefaultIcon");
+                iconKey.SetValue(null, $"\"{selfexe}\",1");
+
+                var commandKey = mainKey.CreateSubKey(@"shell\open\command");
+                commandKey.SetValue(null, $"\"{selfexe}\" \"%1\"");
+
+                MessageBox.Show("Registered esa-flagcarrier protocol.", "Success");
+            }
+            catch(UnauthorizedAccessException)
+            {
+                MessageBox.Show("Missing registry permissions!", "Error");
             }
         }
     }

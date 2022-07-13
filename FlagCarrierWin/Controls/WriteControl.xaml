@@ -27,7 +27,7 @@
 		</StackPanel>
 		<TextBox Grid.Row="1" Grid.ColumnSpan="3" Name="extraDataBox" AcceptsReturn="True" TextWrapping="Wrap" Margin="0,0,0,16" />
 		<Button Margin="2" Grid.Row="2" Grid.Column="0" Click="WriteButton_Click">Write</Button>
-		<Button Margin="2" Grid.Row="2" Grid.Column="1" Click="ClearButton_Click">Clear</Button>
-		<Button Margin="2" Grid.Row="2" Grid.Column="2" Click="SendToLoginButton_Click">Send to Login</Button>
+		<Button Margin="2" Grid.Row="2" Grid.Column="1" Click="ClearButton_Click" Name="clearButton">Clear</Button>
+		<Button Margin="2" Grid.Row="2" Grid.Column="2" Click="SendToLoginButton_Click" Name="sendToLoginButton">Send to Login</Button>
 	</Grid>
 </UserControl>

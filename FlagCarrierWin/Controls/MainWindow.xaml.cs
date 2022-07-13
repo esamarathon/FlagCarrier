@@ -2,6 +2,8 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using System.Collections.Specialized;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -38,6 +40,7 @@ namespace FlagCarrierWin
             nfcHandler.ErrorMessage += StatusMessage;
             nfcHandler.ReceiveNdefMessage += NfcHandler_ReceiveNdefMessage;
             nfcHandler.NewTagUid += NfcHandler_NewTagUid;
+            nfcHandler.WriteSuccess += NfcHandler_WriteSuccess;
 
             writeControl.ManualLoginRequest += WriteControl_ManualLoginRequest;
             writeControl.WriteDataRequest += WriteControl_WriteDataRequest;
@@ -48,6 +51,30 @@ namespace FlagCarrierWin
             settingsControl.UpdatedSettings += UpdatedSettings;
 
             UpdatedSettings();
+        }
+
+        private bool isWriteQuery = false;
+
+        internal void SetWriteQuery(NameValueCollection dict)
+        {
+            isWriteQuery = true;
+
+            mainTabControl.Items.Clear();
+            mainTabControl.Items.Add(writeTab);
+
+            writeControl.SetWriteQuery(dict);
+        }
+
+        private async void NfcHandler_WriteSuccess()
+        {
+            if (!isWriteQuery)
+                return;
+
+            Dispatcher.Invoke(() => StatusMessage("Wrote tag! Closing in 10 seconds..."));
+
+            await Task.Delay(10000);
+
+            Dispatcher.Invoke(() => Close());
         }
 
         private void NfcHandler_CardRemoved(string name)

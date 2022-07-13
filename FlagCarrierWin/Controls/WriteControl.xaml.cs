@@ -11,6 +11,7 @@ using FlagCarrierBase;
 using FlagCarrierBase.Helpers;
 using NdefLibrary.Ndef;
 using Newtonsoft.Json.Linq;
+using System.Collections.Specialized;
 
 namespace FlagCarrierWin
 {
@@ -31,6 +32,36 @@ namespace FlagCarrierWin
 
             lastChangedTextBox = displayNameBox;
 
+        }
+
+        public void SetWriteQuery(NameValueCollection dict)
+        {
+            clearButton.Visibility = Visibility.Hidden;
+            sendToLoginButton.Visibility = Visibility.Hidden;
+
+            displayNameBox.IsEnabled = false;
+            userIdBox.IsEnabled = false;
+            extraDataBox.IsEnabled = false;
+
+            ClearButton_Click(null, null);
+
+            foreach (string key in dict.Keys)
+            {
+                if (key == Definitions.DISPLAY_NAME)
+                {
+                    displayNameBox.Text = dict.Get(key);
+                }
+                else if (key == Definitions.USER_ID)
+                {
+                    userIdBox.Text = dict.Get(key);
+                }
+                else
+                {
+                    extraDataBox.Text += $"{key}={dict.Get(key)}\n";
+                }
+            }
+
+            Application.Current.Dispatcher.Invoke(() => WriteButton_Click(null, null));
         }
 
         public void PrefillWithSettings(Dictionary<string, string> settings)
