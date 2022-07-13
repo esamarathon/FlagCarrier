@@ -8,7 +8,6 @@ using Android.OS;
 using Android.Text;
 using Android.Views;
 using Android.Widget;
-using Com.Hbb20;
 
 using FlagCarrierBase.Helpers;
 using FlagCarrierAndroid.Activities;
@@ -51,9 +50,6 @@ namespace FlagCarrierAndroid.Fragments
                 case Resource.Id.fillSetOption:
                     FillWithSettings();
                     return true;
-                case Resource.Id.fromSrComOption:
-                    _ = FillFromSpeedrunCom();
-                    return true;
                 case Resource.Id.beamWriteData:
                     Beam();
                     return true;
@@ -89,10 +85,7 @@ namespace FlagCarrierAndroid.Fragments
         private void FillWithSettings()
         {
             displayNameText.Text = "set";
-            pronounsText.Text = "";
-            speedrunNameText.Text = "";
-            twitchNameText.Text = "";
-            twitterHandleText.Text = "";
+            userIdText.Text = "0";
 
             StringBuilder extra = new StringBuilder();
 

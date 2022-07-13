@@ -9,7 +9,6 @@ using Android.OS;
 using Android.Text;
 using Android.Views;
 using Android.Widget;
-using Com.Hbb20;
 
 using FlagCarrierBase.Helpers;
 using FlagCarrierAndroid.Helpers;
@@ -27,8 +26,6 @@ namespace FlagCarrierAndroid.Fragments
 
         public override void OnCreateOptionsMenu(IMenu menu, MenuInflater inflater)
         {
-            inflater.Inflate(Resource.Menu.menu_from_srcom, menu);
-
             base.OnCreateOptionsMenu(menu, inflater);
         }
 
@@ -48,9 +45,6 @@ namespace FlagCarrierAndroid.Fragments
         {
             switch (item.ItemId)
             {
-                case Resource.Id.fromSrComOptionSingle:
-                    _ = FillFromSpeedrunCom();
-                    return true;
                 default:
                     return base.OnOptionsItemSelected(item);
             }

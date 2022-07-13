@@ -118,14 +118,6 @@
     <AndroidResource Include="Resources\xml\apduservice.xml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Bindings\CountryCodePicker\CountryCodePicker.csproj">
-      <Project>{822d177b-2375-44a5-b96c-8b564f7e80fc}</Project>
-      <Name>CountryCodePicker</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Bindings\LibPhoneNumber\LibPhoneNumber.csproj">
-      <Project>{fd733e96-20b4-4de4-8c81-1bc25828c196}</Project>
-      <Name>LibPhoneNumber</Name>
-    </ProjectReference>
     <ProjectReference Include="..\FlagCarrierBase\FlagCarrierBase.csproj">
       <Project>{2d2c480d-06c8-40a4-8d1c-e099314c556f}</Project>
       <Name>FlagCarrierBase</Name>
@@ -238,11 +230,6 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\layout\fragment_beam_to_mini.axml">
-      <SubType>Designer</SubType>
-    </AndroidResource>
-  </ItemGroup>
-  <ItemGroup>
-    <AndroidResource Include="Resources\menu\menu_from_srcom.xml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>

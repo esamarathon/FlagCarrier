@@ -230,11 +230,7 @@ namespace FlagCarrierAndroid.Activities
             List<string> entryOrder = new List<string>
             {
                 "display_name",
-                "pronouns",
-                "country_code",
-                "speedruncom_name",
-                "twitch_name",
-                "twitter_handle"
+                "user_id"
             };
 
             AppendKnownKeys(bldr, entryOrder);
@@ -274,20 +270,8 @@ namespace FlagCarrierAndroid.Activities
                         case "display_name":
                             bldr.Append("Display Name");
                             break;
-                        case "pronouns":
-                            bldr.Append("Pronouns");
-                            break;
-                        case "country_code":
-                            bldr.Append("Country Code");
-                            break;
-                        case "speedruncom_name":
-                            bldr.Append("speedrun.com Name");
-                            break;
-                        case "twitch_name":
-                            bldr.Append("Twitch Name");
-                            break;
-                        case "twitter_handle":
-                            bldr.Append("Twitter Handle");
+                        case "user_id":
+                            bldr.Append("User ID");
                             break;
                         default:
                             bldr.Append(knownKey);

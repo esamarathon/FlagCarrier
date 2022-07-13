@@ -1,8 +1,0 @@
-<metadata>
-  <add-node path="/api/package[@name='com.hbb20']/class[@name='CCPCountry']">
-    <method name="compareTo" return="int" abstract="false" native="false" synchronized="false" static="false" final="false" deprecated="not deprecated" visibility="public">
-      <parameter name="p0" type="java.lang.Object" />
-    </method>
-  </add-node>
-  <attr path="/api/package[@name='com.futuremind.recyclerviewfastscroll.viewprovider']/class[@name='VisibilityAnimationManager.Builder']/method[@name='build' and count(parameter)=0]" name="managedReturn">Java.Lang.Object</attr>
-</metadata>

@@ -8,7 +8,6 @@ using Android.OS;
 using Android.Text;
 using Android.Views;
 using Android.Widget;
-using Com.Hbb20;
 
 using FlagCarrierBase.Helpers;
 using FlagCarrierAndroid.Activities;
@@ -25,11 +24,7 @@ namespace FlagCarrierAndroid.Fragments
         }
 
         protected EditText displayNameText = null;
-        protected EditText pronounsText = null;
-        protected CountryCodePicker ccp = null;
-        protected EditText speedrunNameText = null;
-        protected EditText twitchNameText = null;
-        protected EditText twitterHandleText = null;
+        protected EditText userIdText = null;
         protected EditText extraDataText = null;
 
         protected string lookupName = null;
@@ -39,18 +34,12 @@ namespace FlagCarrierAndroid.Fragments
             View view = inflater.Inflate(Resource.Layout.fragment_write_tag, container, false);
 
             displayNameText = view.FindViewById<EditText>(Resource.Id.displayNameText);
-            pronounsText = view.FindViewById<EditText>(Resource.Id.pronounsText);
-            ccp = view.FindViewById<CountryCodePicker>(Resource.Id.countryCodePicker);
-            speedrunNameText = view.FindViewById<EditText>(Resource.Id.speedrunNameText);
-            twitchNameText = view.FindViewById<EditText>(Resource.Id.twitchNameText);
-            twitterHandleText = view.FindViewById<EditText>(Resource.Id.twitterHandleText);
+            userIdText = view.FindViewById<EditText>(Resource.Id.userIdText);
             extraDataText = view.FindViewById<EditText>(Resource.Id.extraDataText);
 
             displayNameText.TextChanged += AnyControl_TextChanged;
-            pronounsText.TextChanged += AnyControl_TextChanged;
-            speedrunNameText.TextChanged += AnyControl_TextChanged;
-            twitchNameText.TextChanged += AnyControl_TextChanged;
-            twitterHandleText.TextChanged += AnyControl_TextChanged;
+            userIdText.TextChanged += AnyControl_TextChanged;
+            extraDataText.TextChanged += AnyControl_TextChanged;
 
             Button submitButton = view.FindViewById<Button>(Resource.Id.writeTagButton);
             submitButton.Click += SubmitButton_Click;
@@ -74,38 +63,6 @@ namespace FlagCarrierAndroid.Fragments
             throw new NotImplementedException();
         }
 
-        protected async Task FillFromSpeedrunCom()
-        {
-            SpeedrunComHelperData data = null;
-
-            try
-            {
-                data = await SpeedrunComHelper.GetUserInfo(lookupName);
-            }
-            catch (SpeedrunComHelperException e)
-            {
-                ShowToast(e.Message);
-            }
-            catch (Exception e)
-            {
-                ShowToast("Failed getting sr.com data: " + e.Message);
-            }
-
-            if (data == null)
-                return;
-
-            ccp.SetCountryForNameCode(data.CountryCode);
-            if (!ccp.SelectedCountryNameCode.Equals(data.CountryCode, StringComparison.OrdinalIgnoreCase))
-                ccp.SetCountryForNameCode(data.CountryCode.Split('/', 2)[0]);
-
-            displayNameText.Text = data.DisplayName;
-            pronounsText.Text = data.Pronouns;
-            speedrunNameText.Text = data.SrComName;
-            twitchNameText.Text = data.TwitchName;
-            twitterHandleText.Text = data.TwitterHandle;
-            extraDataText.Text = "";
-        }
-
         protected Dictionary<string, string> GetData()
         {
             var data = new Dictionary<string, string>();
@@ -117,24 +74,15 @@ namespace FlagCarrierAndroid.Fragments
                 return null;
             }
 
+            string userId = userIdText.Text.Trim();
+            if (userId == "")
+            {
+                ShowToast("A user ID is required.");
+                return null;
+            }
+
             data["display_name"] = dspName;
-            data["country_code"] = ccp.SelectedCountryNameCode;
-
-            string tmp = pronounsText.Text.Trim();
-            if (tmp != "")
-                data["pronouns"] = tmp;
-
-            tmp = speedrunNameText.Text.Trim();
-            if (tmp != "")
-                data["speedruncom_name"] = tmp;
-
-            tmp = twitchNameText.Text.Trim();
-            if (tmp != "")
-                data["twitch_name"] = tmp;
-
-            tmp = twitterHandleText.Text.Trim();
-            if (tmp != "")
-                data["twitter_handle"] = tmp;
+            data["user_id"] = userId;
 
             string extra = extraDataText.Text.Trim();
             foreach (string lineRaw in extra.Split('\n'))
