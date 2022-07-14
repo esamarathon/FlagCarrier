@@ -142,7 +142,7 @@ namespace FlagCarrierWin
         private void RegisterUrlHandler_Click(object sender, RoutedEventArgs e)
         {
             const string protocol = "esa-flagcarrier";
-            string selfexe = System.Reflection.Assembly.GetEntryAssembly().Location;
+            string selfexe = Environment.ProcessPath ?? System.Reflection.Assembly.GetEntryAssembly().Location;
 
             try
             {

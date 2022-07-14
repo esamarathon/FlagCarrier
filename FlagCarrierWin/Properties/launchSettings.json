@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "FlagCarrierWin": {
+      "commandName": "Project"
+    },
+    "FlagCarrierWin URL Mode": {
+      "commandName": "Project",
+      "commandLineArgs": "esa-flagcarrier://write?display_name=bla&user_id=1234"
+    }
+  }
+}

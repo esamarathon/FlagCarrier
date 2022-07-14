@@ -4,7 +4,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Net;
 using System.Net.Http;
-using System.Web;
 using System.Linq;
 
 using FlagCarrierBase;

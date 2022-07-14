@@ -1,10 +1,12 @@
 using System;
+using System.Text;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Web;
 
 namespace FlagCarrierWin
 {
@@ -27,7 +29,7 @@ namespace FlagCarrierWin
 
                 if (uri.Host.ToLower() == "write" && !string.IsNullOrWhiteSpace(uri.Query))
                 {
-                    var dict = System.Web.HttpUtility.ParseQueryString(uri.Query);
+                    var dict = HttpUtility.ParseQueryString(uri.Query, Encoding.UTF8);
                     window.SetWriteQuery(dict);
                 }
                 else
