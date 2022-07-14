@@ -19,7 +19,8 @@ using SupportToolbar = AndroidX.AppCompat.Widget.Toolbar;
 
 namespace FlagCarrierAndroid.Activities
 {
-    [Activity(Label = "@string/write_tag_title", Theme = "@style/AppTheme.NoActionBar")]
+    [Activity(Label = "@string/write_tag_title", Theme = "@style/AppTheme.NoActionBar", Exported = true)]
+    [IntentFilter(new[] { Intent.ActionView }, Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable }, DataScheme = "esa-flagcarrier", DataHost = "write")]
     public class WriteTagActivity : BaseActivity
     {
         public const string WriteTagIntentAction = "de.oromit.flagcarrier.write_tag_intent";
@@ -103,6 +104,10 @@ namespace FlagCarrierAndroid.Activities
             {
                 ParseWriteTagIntent(intent);
             }
+            else if (intent.Action == Intent.ActionView)
+            {
+                ParseUrlActivation(intent);
+            }
             else
             {
                 ShowToast("Unknown WriteTag Intent: " + intent.Action);
@@ -125,6 +130,36 @@ namespace FlagCarrierAndroid.Activities
                 return;
             }
 
+            RefreshWriteDataView();
+        }
+
+        private void ParseUrlActivation(Intent intent)
+        {
+            var uri = intent.Data;
+
+            if (uri is null || uri.Scheme != "esa-flagcarrier" || uri.Host != "write")
+            {
+                ShowToast("Invalid url scheme activation!");
+                Finish();
+                return;
+            }
+
+            if (uri.QueryParameterNames?.Any() != true)
+            {
+                ShowToast("No data to be written!");
+                Finish();
+                return;
+            }
+
+            writeData = new Dictionary<string, string>();
+            foreach (string key in uri.QueryParameterNames)
+                writeData[key] = uri.GetQueryParameter(key);
+
+            RefreshWriteDataView();
+        }
+
+        private void RefreshWriteDataView()
+        {
             writeDataView.Text = writeData
                 .Select(kv => kv.Key + "=" + kv.Value)
                 .Aggregate((cur, next) => cur + "\n" + next);
