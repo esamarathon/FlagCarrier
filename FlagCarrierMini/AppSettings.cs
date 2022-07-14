@@ -11,7 +11,7 @@ namespace FlagCarrierMini
 {
     class AppSettings
     {
-        private static readonly Configuration config = ConfigurationManager.OpenExeConfiguration(Assembly.GetExecutingAssembly().Location);
+        private static readonly Configuration config = ConfigurationManager.OpenExeConfiguration(Environment.ProcessPath);
 
         static AppSettings()
         {
