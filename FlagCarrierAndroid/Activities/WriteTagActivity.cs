@@ -54,7 +54,7 @@ namespace FlagCarrierAndroid.Activities
                 0,
                 new Intent(this, Class)
                     .AddFlags(ActivityFlags.SingleTop),
-                0);
+                PendingIntentFlags.Mutable);
 
             writeTagFilters = new IntentFilter[]
             {
