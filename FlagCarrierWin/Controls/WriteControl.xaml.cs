@@ -20,8 +20,6 @@ namespace FlagCarrierWin
     /// </summary>
     public partial class WriteControl : UserControl
     {
-        private TextBox lastChangedTextBox = null;
-
         public event Action<Dictionary<string, string>> ManualLoginRequest;
         public event Action<Dictionary<string, string>> WriteDataRequest;
         public event Action<string> ErrorMessage;
@@ -29,9 +27,6 @@ namespace FlagCarrierWin
         public WriteControl()
         {
             InitializeComponent();
-
-            lastChangedTextBox = displayNameBox;
-
         }
 
         public void SetWriteQuery(NameValueCollection dict)
@@ -129,14 +124,6 @@ namespace FlagCarrierWin
             }
 
             return vals;
-        }
-
-        private void AnyBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            var box = sender as TextBox;
-            if (box == null)
-                return;
-            lastChangedTextBox = box;
         }
     }
 }

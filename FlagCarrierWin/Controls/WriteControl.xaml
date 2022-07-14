@@ -20,9 +20,9 @@
 		</Grid.ColumnDefinitions>
 		<StackPanel Grid.Row="0" Grid.ColumnSpan="3">
 			<TextBlock Margin="0,5,0,2">Display Name</TextBlock>
-			<TextBox Name="displayNameBox" TextChanged="AnyBox_TextChanged" />
+			<TextBox Name="displayNameBox" />
             <TextBlock Margin="0,10,0,5">User ID</TextBlock>
-            <TextBox Name="userIdBox" TextChanged="AnyBox_TextChanged" />
+            <TextBox Name="userIdBox" />
 			<TextBlock Margin="0,10,0,5">Extra Data (Lines of key=value)</TextBlock>
 		</StackPanel>
 		<TextBox Grid.Row="1" Grid.ColumnSpan="3" Name="extraDataBox" AcceptsReturn="True" TextWrapping="Wrap" Margin="0,0,0,16" />
