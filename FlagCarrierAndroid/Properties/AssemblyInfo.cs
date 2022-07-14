@@ -8,13 +8,13 @@ using Android.App;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("ESA")]
 [assembly: AssemblyProduct("FlagCarrierAndroid")]
-[assembly: AssemblyCopyright("Copyright © Oromit 2021")]
+[assembly: AssemblyCopyright("Copyright © Oromit 2022")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
 
-[assembly: AssemblyVersion("4.6.2.0")]
-[assembly: AssemblyFileVersion("4.6.2.0")]
+[assembly: AssemblyVersion("5.0.0.0")]
+[assembly: AssemblyFileVersion("5.0.0.0")]
 
 [assembly: UsesPermission(Android.Manifest.Permission.Internet)]
 [assembly: UsesPermission(Android.Manifest.Permission.AccessNetworkState)]
