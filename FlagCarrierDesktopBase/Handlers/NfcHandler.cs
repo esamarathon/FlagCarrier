@@ -223,7 +223,8 @@ namespace FlagCarrierBase
 
                 t1Duration = 4,
                 t2Duration = 4,
-                reps = 5
+                reps = 2,
+                buzzer = 1
             };
 
             SignalACR(readerName, ctrl);
@@ -241,8 +242,8 @@ namespace FlagCarrierBase
 
                 t1Duration = 6,
                 t2Duration = 4,
-                reps = 3,
-                buzzer = 1
+                reps = 5,
+                buzzer = 3
             };
 
             SignalACR(readerName, ctrl);
